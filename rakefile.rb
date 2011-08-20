@@ -36,6 +36,7 @@ CLOBBER.include("pkg")
 CLEAN.include("#{BUILDDIR}/**/*.*")
 CLOBBER.include("#{BUILDDIR}")
 CLEAN.include("#{DISTDIR}/**/*.*")
+CLOBBER.include("#{DISTDIR}/**/*.*")
 
 
 directory BUILDDIR
