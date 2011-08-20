@@ -1,0 +1,25 @@
+========================================================================
+= File: 	README.rdoc
+= Purpose: 	Instructions and hints for customizing TorrentProcessor.
+=
+= Generated:	07/31/2011
+= Copyright: 	Copyright (c) 2011, kTech Systems LLC. All rights reserved.
+= Website:   	http://ktechsystems.com
+========================================================================
+
+CUSTOMIZING YOUR CODE:
+
+	You should add all of your data functionality to the Processor
+	object that has been created for you in lib/processor.rb.
+	
+	To modify command line arguments, you should edit bin/torrentprocessor
+	and lib/torrentprocessorcontroller.rb
+	
+	Add or modify configuration values by editing lib/torrentprocessorcfg.rb.
+	
+	Turn on logging (including display of stack trace when exceptions
+	are thrown) by uncommenting the '$LOGGING = true' line
+	in lib/torrentprocessor.rb
+	
+	
+	

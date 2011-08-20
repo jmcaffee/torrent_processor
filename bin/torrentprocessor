@@ -1,0 +1,167 @@
+#! C:/tools/Ruby/bin/ruby.exe
+##############################################################################
+# File::    torrentprocessor.rb
+# Purpose:: Utility to ...
+# 
+# Author::    Jeff McAffee 07/31/2011
+# Copyright:: Copyright (c) 2011, kTech Systems LLC. All rights reserved.
+# Website::   http://ktechsystems.com
+##############################################################################
+
+require 'torrentprocessor'
+require 'user-choices'
+
+
+class TorrentProcessorApp < UserChoices::Command
+  include UserChoices
+	include TorrentProcessor
+
+    
+	def initialize()
+		super
+		@controller = Controller.new
+	end
+    
+    
+	def add_sources(builder)
+		builder.add_source(CommandLineSource, :usage,
+			"Usage: #{$0} [options]", # SRCDIR FILENAME STATE PREVSTATE MSG LABEL",
+			"TorrentProcessor will process torrent downloads throughout the torrent DL lifecycle.\n")
+			#"  SRCDIR:    Directory torrent src file is located in",
+			#"  FILENAME:  Torrent filename",
+			#"  STATE:     Current state flag",
+			#"  PREVSTATE: Previous state flag",
+			#"  MSG:       Msg value returned by uTorrent",
+			#"  LABEL:     Label applied to torrent within uTorrent")
+	end # def add_sources
+    
+    
+	def add_choices(builder)
+		# Arguments
+		#builder.add_choice(:cmdArg, :length=>1) { |command_line|   # Use length to REQUIRE args.
+		builder.add_choice(:cmdArg) { |command_line|
+			command_line.uses_arglist
+		}
+		
+		# Switches
+		builder.add_choice(:version, :type=>:boolean, :default=>false) { |command_line|
+			command_line.uses_switch("--version", "Show application version.")
+		}
+		
+		builder.add_choice(:verbose, :type=>:boolean, :default=>false) { |command_line|
+			command_line.uses_switch("-v", "--verbose",
+															"Verbose output.")
+		}
+		
+		builder.add_choice(:init, :type=>:boolean, :default=>false) { |command_line|
+			command_line.uses_switch("--init",
+															"Configure Torrent Processor application.")
+		}
+		
+		builder.add_choice(:interactive, :type=>:boolean, :default=>false) { |command_line|
+			command_line.uses_switch("-i", "--interactive",
+															"Interactive Mode.")
+		}
+		
+		# Options
+		builder.add_choice(:option, :type=>:string) { |command_line|
+			command_line.uses_option("-o", "--option ARG",
+															"Option description.")
+		}
+		
+	end # def add_choices
+    
+	# This method is called automatically by UserChoices.
+	# Use it to handle simple post processing of user choices.
+	def postprocess_user_choices
+		@user_choices[:srcdir] = @user_choices[:cmdArg].shift
+		@user_choices[:srcfile] = @user_choices[:cmdArg].shift
+		@user_choices[:state] = @user_choices[:cmdArg].shift
+		@user_choices[:prevstate] = @user_choices[:cmdArg].shift
+		@user_choices[:msg] = @user_choices[:cmdArg].shift
+		@user_choices[:label] = @user_choices[:cmdArg].shift
+	end
+	
+	
+	# Execute the TorrentProcessor application.
+	# This method is called automatically when 'torrentprocessor(.rb)' is executed from the command line.
+	def execute
+		$LOG.debug "TorrentProcessorApp::execute"
+
+		if(@user_choices[:version])
+			puts TorrentProcessor::logo()
+			return
+		end
+
+		if(@user_choices[:init])
+			puts TorrentProcessor::logo()
+			@controller.setupApp()
+			return
+		end
+
+		if(@user_choices[:verbose])
+			@controller.verbose(@user_choices[:verbose])
+		end
+		
+		# Handle srcdir and srcfile
+		if(@user_choices[:srcdir])
+			@controller.srcdir(@user_choices[:srcdir])
+		end
+		
+		if(@user_choices[:srcfile])
+			@controller.srcfile(@user_choices[:srcfile])
+		end
+		
+		if(@user_choices[:state])
+			@controller.state(@user_choices[:state])
+		end
+		
+		if(@user_choices[:prevstate])
+			@controller.prevstate(@user_choices[:prevstate])
+		end
+		
+		if(@user_choices[:msg])
+			@controller.msg(@user_choices[:msg])
+		end
+		
+		if(@user_choices[:label])
+			@controller.label(@user_choices[:label])
+		end
+		
+		# TODO: Replace :aswitch with a application specific switch.
+		if(@user_choices[:interactive])
+			puts TorrentProcessor::logo()
+			puts
+			@controller.interactiveMode()
+			return
+		end
+		
+		if(@user_choices[:cmdArg].empty?) # If no cmd line arg...
+			@controller.noCmdLineArg()																# Will raise an error of there's a problem.
+		else
+			@controller.processCmdLineArgs(@user_choices[:cmdArg])		# Will raise an error of there's a problem.
+		end
+		
+		@controller.process()
+	end # def execute
+        
+    
+end # class TorrentProcessorApp
+
+
+# Uncomment the next line if this file can be both loaded via 'require' AND called from the command line.
+#if $0 == __FILE__
+	begin
+		TorrentProcessorApp.new.execute
+	rescue SystemExit
+		
+	rescue Exception => e
+		puts "!!! ERROR:"
+		puts "\t" + e.message
+		puts
+		exit if !$LOGGING
+		puts "Exception type: #{e.class.to_s}"
+		puts e.backtrace
+		puts
+	end
+#end    

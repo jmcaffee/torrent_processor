@@ -1,0 +1,102 @@
+
+
+Torrent Lifecycle
+====================
+
+Torrent download starts
+Torrent download completes
+Copy torrent to processing dir
+Torrent queues for seeding
+Torrent seeds
+Torrent seeding completes (finishes)
+Torrent and data deleted
+
+
+====================
+Application Lifecycle
+====================
+
+Inputs:
+	- Application is called via uTorrent -> Preferences -> Advanced -> Run Program functionality
+	- Application is called via scheduler
+	
+Process (kicked off as a result of an input listed above):
+	- Check for app lock
+		- Exit application if lock exists (the application is already processing)
+		
+	- Claim app lock
+		
+	- Check for cache id
+		- Cache id exists?
+			Y - Retrieve torrent list (using cache id)
+			N - Retrieve full torrent list
+			  - Store cache id in DB
+	
+	- Update DB torrent list including status, ratio, etc.
+	
+	- Update torrent state table based on status, ratio etc.
+	
+	- Check removed torrents list
+		- list contains torrents?
+			Y - For any torrents that have been flagged as 'awaiting removal'
+				- Remove torrent info from torrents list
+				- Remove torrent info from state list
+			Y - For torrents that have been removed and DO NOT have an 'awaiting removal' state
+				- Log the fact that torrent has been removed (and it was not requested by TP)
+				- Remove the torrents from the torrents list and the torrent state list in the DB
+	
+	- Pull list of torrents that have completed downloading AND have not yet been processed
+		- Queue torrents for processing
+		- Process torrents
+			- For each torrent
+				- Using RoboCopy
+					- Copy torrent download to processing dir
+						- Torrents with 'Movie' tag are copied to UnsortedMovies folder
+						- Torrents with 'TV Show' tag are copied to UnsortedMedia folder
+						- All other torrents are copied to UnsortedMedia folder
+				- Verify copy succeeded
+					- Update torrent state in DB if copy succeeded
+		
+	- Pull list of torrents that have completed seeding AND have been processed
+		- Queue torrents for removal and clean up (uTorrent)
+		- Process torrents
+			- For each torrent
+				- Send remove request to uTorrent via webui
+				- Update torrent state in DB to 'awaiting removal'
+	
+	- Release app lock
+
+INSTALLING
+======================
+
+Install uTorrent
+
+Install uTorrent's webui
+
+Install ruby (1.9.2)
+
+Install sqlite 3
+	Download the precompiled files, including the library, from http://sqlite.org/download.html
+	Currently:
+			sqlite-shell-win32-x86-3070701.zip
+			sqlite-dll-win32-x86-3070701.zip
+			sqlite-analyzer-win32-x86-3070701.zip
+	
+	Extract sqlite-dll-win32-x86-3070701.zip to the ruby bin folder on c:\
+		In this case, I extracted it to c:\tools\Ruby\Ruby192\bin
+		
+	Extract sqlite-shell-win32-x86-3070701.zip and sqlite-analyzer-win32-x86-3070701.zip to either the Ruby bin folder or another
+	folder on the C: drive.
+		In this case, I extracted them to C:\tools\sqlite3
+		
+	Add folder to system PATH variable (if SQLite tools were extracted to a folder other than ruby/bin):
+		PATH var can be set by right-clicking My Computer and choosing Properties -> Advanced System Settings -> Environment Variables
+		Under System Variables (*not* User variables for xxx), edit the PATH variable and add (sans quotes) ';C:\tools\sqlite3' at the end.
+		Click OK, and OK again.
+		You can now close the Computer -> Properties dialog.
+	
+Install ruby gems
+
+
+Install torrentprocessor gem
+
