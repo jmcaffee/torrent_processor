@@ -3,17 +3,17 @@
 #
 module TorrentProcessor
 
-  VERSION = "0.0.1" unless constants.include?("VERSION")
-	APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
-	COPYRIGHT = "Copyright (c) 2011, kTech Systems LLC. All rights reserved." unless constants.include?("COPYRIGHT")
+  VERSION = "0.0.2" unless constants.include?("VERSION")
+  APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
+  COPYRIGHT = "Copyright (c) 2012, kTech Systems LLC. All rights reserved." unless constants.include?("COPYRIGHT")
 
 
-	def self.logo()
-		return	[	"#{TorrentProcessor::APPNAME} v#{TorrentProcessor::VERSION}",
-							"#{TorrentProcessor::COPYRIGHT}",
-							""
-						].join("\n")
-	end
+  def self.logo()
+    return  [ "#{TorrentProcessor::APPNAME} v#{TorrentProcessor::VERSION}",
+              "#{TorrentProcessor::COPYRIGHT}",
+              ""
+            ].join("\n")
+  end
 
 
 end # module TorrentProcessor

@@ -102,6 +102,8 @@ module TorrentProcessor
       end # if @verbose
 
       data = @response.body
+      raise "Invalid response. Check the address, login and password of the server." if data.nil? || data.empty?
+      
       $LOG.debug "  Response Body: #{data}"
       data
     end
