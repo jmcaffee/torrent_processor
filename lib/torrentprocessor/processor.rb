@@ -151,6 +151,11 @@ module TorrentProcessor
       # Update the db's list of torrents.
       @controller.database.update_torrents( utorrent.torrents )
       
+      # Apply filters if needed.
+      # NOTE: The seed limits are only applied to 'new' torrents. This should limit the application so that
+      # limits aren't needlessly applied everytime the torrents are processed.
+      apply_seed_limit_filters()
+
       # Update the db torrent list states
       update_torrent_states()
       
@@ -201,6 +206,61 @@ module TorrentProcessor
     end
     
     
+    ###
+    # Apply seed limit filters to new torrents. Torrents are considered 'new' if they don't have a state (tp_state)
+    #
+    def apply_seed_limit_filters()
+      $LOG.debug "Processor::apply_seed_limit_filters()"
+      
+        # Get list of torrents where state = NULL
+        q = "SELECT hash, percent_progress, name FROM torrents WHERE tp_state IS NULL;"
+        rows = @controller.database.execute(q)
+        
+        filter_props = {}
+
+        # For each torrent, get its properties and apply a seed limit if needed.
+        rows.each do |r|
+          response = utorrent.get_torrent_job_properties( r[0] )
+          if (! response["props"].nil? )
+          
+            props = response["props"][0]
+            seed_override = props["seed_override"]
+            seed_ratio = props["seed_ratio"]
+            raw_trackers = props["trackers"]
+
+            if (seed_override != 1)   # Don't bother if an override is already set.
+
+              # Break the list of trackers into individual strings and load the filters (if any).
+              trackers = raw_trackers.split("\r\n")
+              filters = @controller.cfg[:filters]
+
+              # Check each tracker against all filters looking for a match.
+              if (! trackers.nil? && trackers.length > 0 )
+                if (! filters.nil? && filters.length > 0 )
+                  trackers.each do |tracker|
+                    filters.each do |filtered_tracker, limit|
+                      if ( tracker.include?(filtered_tracker) )
+
+                        # Found a match... add it to the props list to be applied when we're finished here.
+                        filter_props[r[0]] = {"seed_override" => 1, "seed_ratio" => Integer(limit)}
+                        $LOG.debug "  filter criteria met: #{filtered_tracker}, #{limit}, #{r[2]}, for tracker #{tracker}"
+                        @controller.log( "Applying tracker filter to #{r[2]}." )
+                        @controller.log( "    seed_ratio: #{limit}" )
+                      end   # tracker includes filtered_tracker
+                    end   # each filter
+                  end   # each tracker
+                end   # filters not empty
+              end   # trackers not empty
+            end   # seed override not in effect
+          end   # props not nil
+        end   # each row
+
+        if ( filter_props.length > 0 )
+          response = utorrent.set_job_properties( filter_props )
+        end
+    end
+    
+        
     ###
     # Update torrent states within the DB
     #

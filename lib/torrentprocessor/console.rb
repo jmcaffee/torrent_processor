@@ -78,6 +78,9 @@ module TorrentProcessor
                         [".rmode", "Toggle request mode (BODY <=> RAW)"],
                         [".schema", "Display the table CREATE statements. Use .schema ?TABLE? for individual tables."],
                         [".setup", "Configure TorrentProcessor"],
+                        [".cfg.addfilter", "Add a tracker seed filter"],
+                        [".cfg.delfilter", "Delete a tracker seed filter"],
+                        [".cfg.listfilters", "List current tracker filters"],
                         [".status", "Display status of torrents (in DB)"],
                         [".tables", "Display list of tables (in DB)"],
                         [".update-state", "Update a torrent's state"],
@@ -123,7 +126,7 @@ module TorrentProcessor
                     [".db-read-lock", "Read the current app lock value"],
                     [".db-release-lock", "Release the DB lock"],
                     [".db-set-lock", "Set the current app lock value"],
-                    [".db-update", "Update DB with torrent data"]
+                    [".db-update", "Clear out DB and update with fresh torrent data"]
                   ]
                       
       # Add the commands to a cmd array.
@@ -367,6 +370,22 @@ module TorrentProcessor
         return true
       end
       
+      if cmd == ".cfg.addfilter"
+        cfg_AddFilter()
+        return true
+      end
+
+      if cmd == ".cfg.delfilter"
+        cfg_DeleteFilter()
+        return true
+      end
+      
+      if cmd == ".cfg.listfilters"
+        cfg_ListFilters()
+        return true
+      end
+
+
       return false
     end
 
@@ -572,6 +591,24 @@ module TorrentProcessor
       $LOG.debug "Console::dbUpdate"
       
       puts "Not Implemented yet."
+      
+      # Remove all torrents in DB.
+      q = "SELECT hash FROM torrents;"
+      rows = @database.execute(q)
+      
+      # For each torrent in list, remove it
+      rows.each do |r|
+        @database.delete_torrent( r[0] )
+      end
+
+      # Get a list of torrents.
+      cacheID = @database.read_cache()
+      @utorrent.get_torrent_list( cacheID )
+      @database.update_cache( @utorrent.cache )
+      
+      # Update the db's list of torrents.
+      @database.update_torrents( @utorrent.torrents )
+      
     end
       
     
@@ -585,6 +622,63 @@ module TorrentProcessor
     end
       
     
+    ###
+    # Add a tracker seed filter
+    #
+    def cfg_AddFilter()
+      $LOG.debug "Console::cfg_AddFilter"
+
+      tracker = getInput( " trackers contains:" )
+      seedval = getInput( " set seed limit to: " )
+      
+      if tracker.empty? || seedval.empty?
+        puts "Add filter cancelled (invalid input)."
+        return
+      end
+
+      @controller.add_filter( tracker, seedval )
+      puts "Filter added for #{tracker} with a seed limit of #{seedval}"
+    end
+
+
+    ###
+    # Remove a tracker seed filter
+    #
+    def cfg_DeleteFilter()
+      $LOG.debug "Console::cfg_DeleteFilter"
+
+      cfg_ListFilters()
+      puts
+      tracker = getInput( " tracker:" )
+      
+      if tracker.empty?
+        puts "Delete filter cancelled (invalid input)."
+        return
+      end
+
+      @controller.delete_filter( tracker )
+      puts "Filter removed for #{tracker}"
+    end
+
+
+    ###
+    # List all tracker seed filters
+    #
+    def cfg_ListFilters()
+      $LOG.debug "Console::cfg_ListFilters"
+
+      puts "Current Filters:"
+      puts "----------------"
+      filters = @controller.cfg[:filters]
+      puts " None" if (filters.nil? || filters.length < 1)
+      return if (filters.nil? || filters.length < 1)
+      
+      filters.each do |tracker, seedlimit|
+        puts " #{tracker} : #{seedlimit}"
+      end
+    end
+
+
     ###
     # Test the webui connection
     #
@@ -657,6 +751,10 @@ module TorrentProcessor
       response = @utorrent.get_torrent_job_properties( rows[0][1] )
       #puts rows.inspect
       puts "Name: #{rows[0][2]}"
+      
+      puts "Error: No longer in uTorrent, but still in DB." if response["props"].nil?
+      return if response["props"].nil?
+
       puts "uTorrent Build: #{response["build"]}"
       puts "Props:"
       tab = "  "

@@ -199,6 +199,33 @@ module TorrentProcessor
 
 
     ###
+    # Set torrent job properties
+    #
+    # props: hash of hashes
+    #   Expected format:
+    #     {hash1 => {'prop1' => 'value1', 'prop2' => 'value2'},
+    #      hash2 => {'prp1' => 'val1', 'prp2' => 'val2'}}
+    def set_job_properties(props)
+      $LOG.debug "UTorrentWebUI::set_job_properties( props )"
+
+      urlRoot = "/gui/?action=setprops"
+      jobprops = ""
+
+      props.each do |hash, propset|
+        jobprops = "&hash=#{hash}"
+        propset.each do |property, value|
+          jobprops += "&s=#{property}&v=#{value}"
+        end
+      end
+
+      raise "Invalid job properties provided to UTorrentWebUI:set_job_properties: #{props.inspect}" if jobprops.empty?
+      @url = urlRoot + jobprops
+      sendGetQuery(@url)
+      result = parseResponse()
+    end
+
+
+    ###
     # Send uTorrent request to remove torrent
     #
     def remove_torrent(hash)

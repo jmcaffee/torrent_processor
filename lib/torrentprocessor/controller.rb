@@ -333,6 +333,39 @@ module TorrentProcessor
     end
       
     
+    ###
+    # Add a tracker seedlimit filter to the config file
+    #
+    def add_filter(tracker, seedlimit)
+      $LOG.debug "Controller::add_filter( #{tracker}, #{seedlimit} )"
+
+      filters = @cfg[:filters]
+      filters = {} if filters.nil?
+      filters[tracker] = seedlimit
+      @cfg[:filters] = filters
+      c = Config.new
+      c.cfg = @cfg
+      c.save
+      
+    end
+
+
+    ###
+    # Remove a tracker seedlimit filter from the config file
+    #
+    def delete_filter(tracker)
+      $LOG.debug "Controller::delete_filter( #{tracker} )"
+      filters = @cfg[:filters]
+      return if filters.nil?
+      return if (! filters.include?( tracker ) )
+      filters.delete( tracker )
+      @cfg[:filters] = filters
+      c = Config.new
+      c.cfg = @cfg
+      c.save
+    end
+
+
   end # class Controller
 
 
