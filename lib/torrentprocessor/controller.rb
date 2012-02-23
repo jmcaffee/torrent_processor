@@ -366,6 +366,62 @@ module TorrentProcessor
     end
 
 
+    ###
+    # Set the uTorrent WebUI username
+    #
+    def set_user(user)
+      $LOG.debug "Controller::set_user( #{user} )"
+
+      @cfg[:user] = user
+      c = Config.new
+      c.cfg = @cfg
+      c.save
+      
+    end
+
+
+    ###
+    # Set the uTorrent WebUI password
+    #
+    def set_pwd(pwd)
+      $LOG.debug "Controller::set_pwd( #{pwd} )"
+
+      @cfg[:pass] = pwd
+      c = Config.new
+      c.cfg = @cfg
+      c.save
+      
+    end
+
+
+    ###
+    # Set the uTorrent IP address
+    #
+    def set_ip(ip)
+      $LOG.debug "Controller::set_ip( #{ip} )"
+
+      @cfg[:ip] = ip
+      c = Config.new
+      c.cfg = @cfg
+      c.save
+      
+    end
+
+
+    ###
+    # Set the uTorrent Port number
+    #
+    def set_port(port)
+      $LOG.debug "Controller::set_port( #{port} )"
+
+      @cfg[:port] = port
+      c = Config.new
+      c.cfg = @cfg
+      c.save
+      
+    end
+
+
   end # class Controller
 
 
