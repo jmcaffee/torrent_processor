@@ -13,6 +13,7 @@ require 'json/pure'
 require 'net/http'
 require 'hpricot'
 require 'torrentdata'
+require "rssdata"
 
 
 module TorrentProcessor
@@ -25,6 +26,8 @@ module TorrentProcessor
     attr_accessor :result
     attr_reader   :response
     attr_reader   :torrents
+    attr_reader   :rssfeeds
+    attr_reader   :rssfilters
     attr_reader   :settings
     
     ###
@@ -48,6 +51,8 @@ module TorrentProcessor
       
       @torrents         = Hash.new
       @torrents_removed = Hash.new
+      @rssfeeds         = Hash.new
+      @rssfilters       = Hash.new
       
     end
     
@@ -285,6 +290,12 @@ module TorrentProcessor
       # Clear out the removed torrents hash
       @torrents_removed.clear unless @torrents_removed.nil?
       
+      # Clear out the RSS Feeds hash
+      @rssfeeds.clear unless @rssfeeds.nil?
+      
+      # Clear out the RSS Filters hash
+      @rssfilters.clear unless @rssfilters.nil?
+      
       # Stash the cache
       @torrentc = response["torrentc"]
       $LOG.info "    Cache value stored: #{@torrentc}"
@@ -293,6 +304,12 @@ module TorrentProcessor
       parseTorrentListCacheResponse( response ) if response.include?("torrentsp")
       $LOG.error("  List Request Response does not contain either 'torrents' or 'torrentsp'") if (!response.include?("torrents") && !response.include?("torrentsp"))
       
+      parseRssFeedsListResponse( response )     if response.include?("rssfeeds")
+      $LOG.info("  List Request Response does not contain RSS Feed data") if (!response.include?("rssfeeds"))
+
+      parseRssFiltersListResponse( response )   if response.include?("rssfilters")
+      $LOG.info("  List Request Response does not contain RSS Filter data") if (!response.include?("rssfilters"))
+
       return response
     end
     
@@ -337,6 +354,42 @@ module TorrentProcessor
         @torrents_removed[td.hash] = td
       end
     
+    end
+    
+    
+    ###
+    # Parse a rssfeed response result from a torrent list request
+    #
+    # response:: the JSON parsed reponse
+    #
+    def parseRssFeedsListResponse(response)
+      $LOG.debug "UTorrentWebUI::parseRssFeedsListResponse(response)"
+      feeds = response["rssfeeds"]
+      
+      # feeds is an array of arrays
+      feeds.each do |f|
+        feed = RSSFeed.new(f)
+        @rssfeeds[feed.feed_name] = feed
+      end
+          
+    end
+    
+    
+    ###
+    # Parse a rssfilter response result from a torrent list request
+    #
+    # response:: the JSON parsed reponse
+    #
+    def parseRssFiltersListResponse(response)
+      $LOG.debug "UTorrentWebUI::parseRssFiltersListResponse(response)"
+      filters = response["rssfilters"]
+      
+      # filters is an array of arrays
+      filters.each do |f|
+        filter = RSSFilter.new(f)
+        @rssfilters[filter.feed_name] = filter
+      end
+          
     end
     
     

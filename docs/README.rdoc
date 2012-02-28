@@ -1,25 +1,42 @@
-========================================================================
-= File: 	README.rdoc
-= Purpose: 	Instructions and hints for customizing TorrentProcessor.
-=
-= Generated:	07/31/2011
-= Copyright: 	Copyright (c) 2011, kTech Systems LLC. All rights reserved.
-= Website:   	http://ktechsystems.com
-========================================================================
+= TorrentProcessor Overview
 
-CUSTOMIZING YOUR CODE:
+==== Generated:	07/31/2011
+==== Copyright (c) 2011, kTech Systems LLC. All rights reserved.
+==== Website:   	http://ktechsystems.com
 
-	You should add all of your data functionality to the Processor
-	object that has been created for you in lib/processor.rb.
-	
-	To modify command line arguments, you should edit bin/torrentprocessor
-	and lib/torrentprocessorcontroller.rb
-	
-	Add or modify configuration values by editing lib/torrentprocessorcfg.rb.
-	
-	Turn on logging (including display of stack trace when exceptions
-	are thrown) by uncommenting the '$LOGGING = true' line
-	in lib/torrentprocessor.rb
+------------------------------------------------------------------------
+
+== OVERVIEW:
+TorrentProcessor is an application that facilitates movement and
+monitoring of torrents that are downloaded by uTorrent.
+
+TorrentProcessor's goal is to copy torrents to an external (to uTorrent)
+directory for incorporation into XBMC via SickBeard. TP copies (not moves) the
+torrents so that uTorrent can continue to seed torrents. When uTorrent
+indicates that seeding of a torrent has been completed, TP will send a
+request to uTorrent to remove the torrent and torrent data as well as
+delete the downloaded file. This helps to keep the system clean of large
+extraneous (duplicate) files.
+
+TorrentProcessor leverages the {WebUI interface}[http://www.utorrent.com/community/developers/webapi] with uTorrent to manipulate
+the torrent data.
+
+TP is designed to be run on a regular basis by the scheduler (hourly). It can also
+be used interactively by running it with the -i option.
+    
+== CUSTOMIZING YOUR CODE:
+
+You should add all of your data functionality to the Processor
+object that has been created for you in lib/processor.rb.
+
+To modify command line arguments, you should edit bin/torrentprocessor
+and lib/controller.rb
+
+Add or modify configuration values by editing lib/config.rb.
+
+Turn on logging (including display of stack trace when exceptions
+are thrown) by uncommenting the '$LOGGING = true' line
+in lib/torrentprocessor.rb
 	
 	
 	

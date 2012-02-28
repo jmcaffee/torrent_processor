@@ -3,7 +3,7 @@
 #
 module TorrentProcessor
 
-  VERSION = "0.0.2" unless constants.include?("VERSION")
+  VERSION = "0.2.8" unless constants.include?("VERSION")
   APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
   COPYRIGHT = "Copyright (c) 2012, kTech Systems LLC. All rights reserved." unless constants.include?("COPYRIGHT")
 

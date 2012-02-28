@@ -65,6 +65,7 @@ module TorrentProcessor
       configureConfigCommands()
       configureDbCommands()
       configureUTorrentCommands()
+      configureRSSCommands()
     end
     
     
@@ -159,6 +160,22 @@ module TorrentProcessor
     
     
     ###
+    # Configure uTorrent RSS specific commands
+    #
+    def configureRSSCommands()
+      $LOG.debug "Console::configureRSSCommands()"
+
+      PluginManager.register_plugin(:rss, RSSPlugin)
+      @rss_cmds = PluginManager.command_list(:rss)
+      
+      # Add the commands to a cmd array.
+      @rss_cmds.each do |c|
+        @cmds << c[0]
+      end
+    end
+    
+    
+    ###
     # Set the verbose flag
     #
     # arg:: verbose mode if true
@@ -191,6 +208,7 @@ module TorrentProcessor
       displayCommandList( "Configuration Commands:", @cfg_cmds )
       displayCommandList( "DB Commands:", @db_cmds )
       displayCommandList( "uTorrent Commands:", @utorrent_cmds )
+      displayCommandList( "RSS Commands:", @rss_cmds )
       
       puts
     end

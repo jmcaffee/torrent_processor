@@ -30,7 +30,8 @@ module TorrentProcessor
           ".jobprops" =>    Command.new(UTPlugin, :ut_jobprops,         "Retrieve a torrent's job properties"),
           ".tlist" =>       Command.new(UTPlugin, :ut_list,             "Get a list of torrents from uTorrent"),
           ".tnames" =>      Command.new(UTPlugin, :ut_names,            "Display names of torrents in uTorrent"),
-          ".tdetails" =>    Command.new(UTPlugin, :ut_torrent_details,  "Display torrent(s) details (TODO)"),
+          ".tdetails" =>    Command.new(UTPlugin, :ut_torrent_details,  "Display torrent(s) details"),
+          ".listquery" =>   Command.new(UTPlugin, :ut_list_query,       "Return response output of list query"),
           #"." => Command.new(UTPlugin, :, ""),
         }
       end
@@ -116,7 +117,9 @@ module TorrentProcessor
         data = ut.get_torrent_list()
         display_current_torrent_list( ut.torrents )
         #puts data
-        puts "Torrents count: #{ut.torrents.length.to_s}"
+        puts " #{ut.torrents.length} Torrent(s) found."
+        puts
+
         return true
       end
 
@@ -161,7 +164,44 @@ module TorrentProcessor
         kaller = args[1]
         ut = kaller.utorrent
         
-        puts "Not implemented yet!"
+        ut.get_torrent_list()
+        hashes = select_torrent_hashes( ut.torrents )
+        return true if hashes.nil?
+        
+        hashes.each do |torr|
+          puts Formatter.pHr
+          hsh = torr[0]
+          Formatter.pHash(ut.torrents[hsh].to_hsh)
+        end # each torr
+        
+        puts Formatter.pHr
+
+        return true
+      end
+
+
+      ###
+      # Return the response data from a uTorrent list query
+      #
+      # *Args*
+      #
+      # +args+ -- args passed from caller
+      #
+      # *Returns*
+      #
+      # nothing
+      #
+      def ut_list_query(args)
+        $LOG.debug "UTPlugin::ut_list_query"
+        cmdtxt = args[0]
+        kaller = args[1]
+        ut = kaller.utorrent
+        
+        response = ut.get_torrent_list()
+        Formatter.pHr
+        puts response.inspect
+        Formatter.pHr
+
         return true
       end
 

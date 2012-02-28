@@ -1,0 +1,51 @@
+rsfilters
+[4, 9, "DailyShow3", "*", "", "", 7, -1, "", 0, 0, 0, 0, "", false, false]]} - auto download, smart filter
+[4, 1, "DailyShow3", "*", "", "", 7, -1, "", 0, 0, 0, 0, "", false, false]]} - auto download
+feed doesn't show up in rssfilters when autodownload is off
+
+"rssfeeds"=>[
+[3, true, true, false, false, 0, "showRSS personal feed|http://showrss.karmorra.info/rss.php?user_id=64797&hd=null&proper=null", 1330137909, [["Archer VTV", "Archer 3x06 (
+[5, true, false, false, false, 0, "Finder1|http://showrss.karmorra.info/feeds/418.rss", 1330138215, [["The Finder", "The Finder S01E06 HDTV x264-LOL", "http://showrss
+[6, true, false, false, false, 0, "Fades2|http://showrss.karmorra.info/feeds/392.rss", 1330138321, [["The Fades", "The Fades 1x06 HDTV Xvi
+no auto:
+[7, true, false, true, false, 0, "DailyShow3|http://showrss.karmorra.info/feeds/82.rss", 1330138350, [["The Daily Show 2012 02 23 VTV", "The Daily Show 2012 02 23 (HDT
+[7, true, false, true, false, 0, "DailyShow3|http://showrss.karmorra.info/feeds/82.rss", 1330138350, [["The Daily Show 2012 02 23 VTV", "The Daily Show 2012 02 23
+[7, true, false, true, false, 0, "DailyShow3|http://showrss.karmorra.info/feeds/82.rss", 1330138350, [["The Daily Show 2012 02 23 VTV", "The Daily Show 2012 02 23 (HD
+
+[5, 9, "DailyShow3", "*", "not", "savein-place", 7, -1, "", 0, 0, 0, 0, "1x12-14", true, false]]}
+
+[5, 9, "DailyShow3", "*", "not", "savein-place", 7, 16384, "", 0, 0, 0, 0, "1x12-14", true, false]
+[5, 11, "DailyShow3", "*", "not", "savein-place", 7, 16384, "", 0, 0, 0, 0, "1x12-14", true, false]]
+rssfilters
+[
+    4, 
+    9,                  Bitfield (1:No Smart Filter, 
+                            5: Give download highest priority (4)
+                            9:Smart Filter, (8)
+                            11: Filter matches original name instead of decoded, 
+                            17: Don't start downloads automatically 
+    "DailyShow3",       Feed name
+    "*",                Include Filter (wildcards are * and ?, multiple filters separated by | (a pipe), ex: *MP3 Archives*|*Go?Open*)
+    "",                 Exclude Filter
+    "",                 Save-to location
+    7, 
+    -1,                 Quality (-1:All, 16384:WebRip, 
+    "",                 Label for new torrents
+    0,                  Minimum Interval (Value field)
+                            0: Match Always
+                            1: Match only once
+                            2: 12 hrs
+                            3: 1 day
+                            4: 2 days
+                            5: 3 days
+                            6: 4days
+                            7: 1 week
+    0, 
+    0, 
+    0, 
+    "",                 Episode filter
+    false,              Use episode filter
+    false
+    
+    
+    ]]} - auto download, smart filter
