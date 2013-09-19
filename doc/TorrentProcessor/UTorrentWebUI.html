@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=IBM437" http-equiv="Content-Type">
+
+<title>class TorrentProcessor::UTorrentWebUI - TorrentProcessor Documentation</title>
+
+<link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../index.html">Home</a>
+    <a href="../table_of_contents.html#classes">Classes</a>
+    <a href="../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/torrentprocessor/utorrentwebui.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-new">::new</a>
+    
+    <li><a href="#method-i-cache">#cache</a>
+    
+    <li><a href="#method-i-getQuery">#getQuery</a>
+    
+    <li><a href="#method-i-getToken">#getToken</a>
+    
+    <li><a href="#method-i-get_torrent_job_properties">#get_torrent_job_properties</a>
+    
+    <li><a href="#method-i-get_torrent_list">#get_torrent_list</a>
+    
+    <li><a href="#method-i-get_torrent_list_using_cache">#get_torrent_list_using_cache</a>
+    
+    <li><a href="#method-i-get_utorrent_settings">#get_utorrent_settings</a>
+    
+    <li><a href="#method-i-parseListRequestResponse">#parseListRequestResponse</a>
+    
+    <li><a href="#method-i-parseResponse">#parseResponse</a>
+    
+    <li><a href="#method-i-parseTorrentListCacheResponse">#parseTorrentListCacheResponse</a>
+    
+    <li><a href="#method-i-parseTorrentListResponse">#parseTorrentListResponse</a>
+    
+    <li><a href="#method-i-remove_torrent">#remove_torrent</a>
+    
+    <li><a href="#method-i-sendGetQuery">#sendGetQuery</a>
+    
+    <li><a href="#method-i-set_job_properties">#set_job_properties</a>
+    
+    <li><a href="#method-i-startSession">#startSession</a>
+    
+    <li><a href="#method-i-stopSession">#stopSession</a>
+    
+    <li><a href="#method-i-storeCookie">#storeCookie</a>
+    
+    <li><a href="#method-i-torrents_removed-3F">#torrents_removed?</a>
+    
+    <li><a href="#method-i-verbose-3D">#verbose=</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="../docs/README_rdoc.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../TorrentProcessor.html">TorrentProcessor</a>
+  
+    <li><a href="../TorrentProcessor/Config.html">TorrentProcessor::Config</a>
+  
+    <li><a href="../TorrentProcessor/Console.html">TorrentProcessor::Console</a>
+  
+    <li><a href="../TorrentProcessor/Controller.html">TorrentProcessor::Controller</a>
+  
+    <li><a href="../TorrentProcessor/Database.html">TorrentProcessor::Database</a>
+  
+    <li><a href="../TorrentProcessor/Formatter.html">TorrentProcessor::Formatter</a>
+  
+    <li><a href="../TorrentProcessor/Plugin.html">TorrentProcessor::Plugin</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/CfgPlugin.html">TorrentProcessor::Plugin::CfgPlugin</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/Command.html">TorrentProcessor::Plugin::Command</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/DBPlugin.html">TorrentProcessor::Plugin::DBPlugin</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/DBPluginBase.html">TorrentProcessor::Plugin::DBPluginBase</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/PluginManager.html">TorrentProcessor::Plugin::PluginManager</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/Tester.html">TorrentProcessor::Plugin::Tester</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/UTPlugin.html">TorrentProcessor::Plugin::UTPlugin</a>
+  
+    <li><a href="../TorrentProcessor/Processor.html">TorrentProcessor::Processor</a>
+  
+    <li><a href="../TorrentProcessor/TPSetup.html">TorrentProcessor::TPSetup</a>
+  
+    <li><a href="../TorrentProcessor/TorrentData.html">TorrentProcessor::TorrentData</a>
+  
+    <li><a href="../TorrentProcessor/UTorrentWebUI.html">TorrentProcessor::UTorrentWebUI</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class TorrentProcessor::UTorrentWebUI</h1>
+
+  <div id="description" class="description">
+    
+<p><a href="UTorrentWebUI.html">UTorrentWebUI</a> class</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <!-- Attributes -->
+    <section id="attribute-method-details" class="method-section section">
+      <h3 class="section-header">Attributes</h3>
+
+      
+      <div id="attribute-i-response" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">response</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-result" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">result</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-settings" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">settings</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-torrents" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">torrents</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-verbose" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">verbose</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section><!-- attribute-method-details -->
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(ip, port, user, pass)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p><a href="Processor.html">Processor</a> constructor</p>
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 33</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">ip</span>, <span class="ruby-identifier">port</span>, <span class="ruby-identifier">user</span>, <span class="ruby-identifier">pass</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;UTorrentWebUI::initialize( ip:#{ip}, port:#{port} user:#{user} pass:#{pass}&quot;</span>
+  
+  <span class="ruby-ivar">@ip</span>         = <span class="ruby-identifier">ip</span>
+  <span class="ruby-ivar">@port</span>       = <span class="ruby-identifier">port</span>
+  <span class="ruby-ivar">@user</span>       = <span class="ruby-identifier">user</span>
+  <span class="ruby-ivar">@pass</span>       = <span class="ruby-identifier">pass</span>
+  <span class="ruby-ivar">@base_url</span>   = <span class="ruby-string">&quot;/gui/?&quot;</span>
+  <span class="ruby-ivar">@url</span>        = <span class="ruby-string">&quot;&quot;</span>
+  <span class="ruby-ivar">@result</span>     = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@http</span>       = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@token</span>      = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@verbose</span>    = <span class="ruby-keyword">false</span>
+  <span class="ruby-ivar">@settings</span>   = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-ivar">@torrentc</span>   = <span class="ruby-keyword">nil</span>
+  
+  <span class="ruby-ivar">@torrents</span>         = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-ivar">@torrents_removed</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-cache" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cache</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Return the cache token</p>
+          
+
+          
+          <div class="method-source-code" id="cache-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 369</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::cache()&quot;</span>
+
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@torrentc</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cache-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cache-method -->
+
+    
+      <div id="method-i-getQuery" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getQuery</span><span
+            class="method-args">(query)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Send a GET query</p>
+<dl class="rdoc-list note-list"><dt>returns
+<dd>
+<p>response body</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="getQuery-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 80</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">getQuery</span>(<span class="ruby-identifier">query</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;UTorrentWebUI::getQuery( #{query} )&quot;</span>
+  <span class="ruby-identifier">req</span> = <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span><span class="ruby-operator">::</span><span class="ruby-constant">Get</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">query</span>)
+  <span class="ruby-identifier">req</span>.<span class="ruby-identifier">basic_auth</span> <span class="ruby-ivar">@user</span>, <span class="ruby-ivar">@pass</span>
+  <span class="ruby-identifier">req</span>[<span class="ruby-string">&quot;cookie&quot;</span>] = <span class="ruby-ivar">@cookie</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@cookie</span>
+  
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@verbose</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;  REQUEST HEADERS:&quot;</span>
+    <span class="ruby-identifier">req</span>.<span class="ruby-identifier">each_header</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;    #{k}  =&gt;  #{v}&quot;</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">puts</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># if @verbose</span>
+  
+  <span class="ruby-ivar">@response</span> = <span class="ruby-ivar">@http</span>.<span class="ruby-identifier">request</span>(<span class="ruby-identifier">req</span>)
+  
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@verbose</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;  RESPONSE HEADERS:&quot;</span>
+    <span class="ruby-ivar">@response</span>.<span class="ruby-identifier">each_header</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;    #{k}  =&gt;  #{v}&quot;</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">puts</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># if @verbose</span>
+
+  <span class="ruby-identifier">data</span> = <span class="ruby-ivar">@response</span>.<span class="ruby-identifier">body</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Invalid response. Check the address, login and password of the server.&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">empty?</span>
+  
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;  Response Body: #{data}&quot;</span>
+  <span class="ruby-identifier">data</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- getQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getQuery-method -->
+
+    
+      <div id="method-i-getToken" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getToken</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Get the uTorrent token for queries</p>
+<dl class="rdoc-list note-list"><dt>returns
+<dd>
+<p>token</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="getToken-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 116</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">getToken</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::getToken()&quot;</span>
+  <span class="ruby-identifier">getQuery</span>(<span class="ruby-string">&quot;/gui/token.html&quot;</span>)
+  <span class="ruby-identifier">data</span> = <span class="ruby-constant">Hpricot</span>(<span class="ruby-ivar">@response</span>.<span class="ruby-identifier">body</span>)
+  <span class="ruby-ivar">@token</span> = <span class="ruby-identifier">data</span>.<span class="ruby-identifier">at</span>(<span class="ruby-node">&quot;div[#token]&quot;</span>).<span class="ruby-identifier">inner_html</span>
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;  Token: #{@token}&quot;</span>
+  
+  <span class="ruby-identifier">storeCookie</span>()
+  <span class="ruby-ivar">@token</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- getToken-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getToken-method -->
+
+    
+      <div id="method-i-get_torrent_job_properties" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_torrent_job_properties</span><span
+            class="method-args">(hash)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Get a torrent's job properties</p>
+          
+
+          
+          <div class="method-source-code" id="get_torrent_job_properties-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 191</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_torrent_job_properties</span>(<span class="ruby-identifier">hash</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::get_torrent_job_properties()&quot;</span>
+
+  <span class="ruby-ivar">@url</span> = <span class="ruby-node">&quot;/gui/?action=getprops&amp;hash=#{hash}&quot;</span>
+
+  <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-ivar">@url</span>)
+  <span class="ruby-identifier">result</span> = <span class="ruby-identifier">parseResponse</span>()
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- get_torrent_job_properties-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- get_torrent_job_properties-method -->
+
+    
+      <div id="method-i-get_torrent_list" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_torrent_list</span><span
+            class="method-args">(cache_id = nil)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Get a list of Torrents</p>
+          
+
+          
+          <div class="method-source-code" id="get_torrent_list-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 244</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_torrent_list</span>(<span class="ruby-identifier">cache_id</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;UTorrentWebUI::get_torrent_list( #{cache_id} )&quot;</span>
+  
+  <span class="ruby-ivar">@url</span> = <span class="ruby-string">&quot;/gui/?list=1&quot;</span>
+  <span class="ruby-ivar">@url</span> = <span class="ruby-node">&quot;/gui/?list=1&amp;cache=#{cache_id}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cache_id</span>.<span class="ruby-identifier">nil?</span>
+  
+  <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-ivar">@url</span>)
+  <span class="ruby-identifier">result</span> = <span class="ruby-identifier">parseResponse</span>()
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">parseListRequestResponse</span>( <span class="ruby-identifier">result</span> )
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- get_torrent_list-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- get_torrent_list-method -->
+
+    
+      <div id="method-i-get_torrent_list_using_cache" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_torrent_list_using_cache</span><span
+            class="method-args">(cache_id)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Get a list of Torrents using a cache value</p>
+          
+
+          
+          <div class="method-source-code" id="get_torrent_list_using_cache-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 261</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_torrent_list_using_cache</span>(<span class="ruby-identifier">cache_id</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;UTorrentWebUI::get_torrent_list_using_cache( #{cache_id} )&quot;</span>
+  <span class="ruby-comment"># TODO: Remove this method</span>
+  <span class="ruby-ivar">@url</span> = <span class="ruby-node">&quot;/gui/?list=1&amp;cache=#{cache_id}&quot;</span>
+  
+  <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-ivar">@url</span>)
+  <span class="ruby-identifier">result</span> = <span class="ruby-identifier">parseResponse</span>()
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">parseListRequestResponse</span>( <span class="ruby-identifier">result</span> )
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- get_torrent_list_using_cache-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- get_torrent_list_using_cache-method -->
+
+    
+      <div id="method-i-get_utorrent_settings" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_utorrent_settings</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Get uTorrent settings</p>
+          
+
+          
+          <div class="method-source-code" id="get_utorrent_settings-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 175</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_utorrent_settings</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::get_utorrent_settings()&quot;</span>
+
+  <span class="ruby-ivar">@url</span> = <span class="ruby-string">&quot;/gui/?action=getsettings&quot;</span>
+  
+  <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-ivar">@url</span>)
+  <span class="ruby-identifier">result</span> = <span class="ruby-identifier">parseResponse</span>()
+  
+  <span class="ruby-ivar">@settings</span> = <span class="ruby-identifier">result</span>[<span class="ruby-string">&quot;settings&quot;</span>]
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- get_utorrent_settings-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- get_utorrent_settings-method -->
+
+    
+      <div id="method-i-parseListRequestResponse" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">parseListRequestResponse</span><span
+            class="method-args">(response)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Parse a response result from a torrent list request</p>
+<dl class="rdoc-list note-list"><dt>response
+<dd>
+<p>the JSON parsed reponse</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="parseListRequestResponse-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 279</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">parseListRequestResponse</span>(<span class="ruby-identifier">response</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::parseListRequestResponse(response)&quot;</span>
+
+  <span class="ruby-comment"># Clear out the torrents hash</span>
+  <span class="ruby-ivar">@torrents</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@torrents</span>.<span class="ruby-identifier">nil?</span>
+  
+  <span class="ruby-comment"># Clear out the removed torrents hash</span>
+  <span class="ruby-ivar">@torrents_removed</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@torrents_removed</span>.<span class="ruby-identifier">nil?</span>
+  
+  <span class="ruby-comment"># Stash the cache</span>
+  <span class="ruby-ivar">@torrentc</span> = <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;torrentc&quot;</span>]
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">info</span> <span class="ruby-node">&quot;    Cache value stored: #{@torrentc}&quot;</span>
+  
+  <span class="ruby-identifier">parseTorrentListResponse</span>( <span class="ruby-identifier">response</span> )      <span class="ruby-keyword">if</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&quot;torrents&quot;</span>)
+  <span class="ruby-identifier">parseTorrentListCacheResponse</span>( <span class="ruby-identifier">response</span> ) <span class="ruby-keyword">if</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&quot;torrentsp&quot;</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">error</span>(<span class="ruby-string">&quot;  List Request Response does not contain either 'torrents' or 'torrentsp'&quot;</span>) <span class="ruby-keyword">if</span> (<span class="ruby-operator">!</span><span class="ruby-identifier">response</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&quot;torrents&quot;</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">response</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&quot;torrentsp&quot;</span>))
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">response</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- parseListRequestResponse-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- parseListRequestResponse-method -->
+
+    
+      <div id="method-i-parseResponse" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">parseResponse</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Parse the response data (using JSON)</p>
+          
+
+          
+          <div class="method-source-code" id="parseResponse-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 161</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">parseResponse</span>
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::parseResponse()&quot;</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@response</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@response</span>
+    <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Response is NIL or empty.&quot;</span>
+    <span class="ruby-keyword">return</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-identifier">result</span> = <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-ivar">@response</span>.<span class="ruby-identifier">body</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- parseResponse-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- parseResponse-method -->
+
+    
+      <div id="method-i-parseTorrentListCacheResponse" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">parseTorrentListCacheResponse</span><span
+            class="method-args">(response)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Parse a response result from a torrent list cache request</p>
+<dl class="rdoc-list note-list"><dt>response
+<dd>
+<p>the JSON parsed reponse</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="parseTorrentListCacheResponse-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 323</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">parseTorrentListCacheResponse</span>(<span class="ruby-identifier">response</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::parseTorrentListCacheResponse(response)&quot;</span>
+  <span class="ruby-identifier">torrents</span> = <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;torrentsp&quot;</span>]
+  
+  <span class="ruby-comment"># torrents is an array of arrays</span>
+  <span class="ruby-identifier">torrents</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">td</span> = <span class="ruby-constant">TorrentData</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">t</span>)
+    <span class="ruby-ivar">@torrents</span>[<span class="ruby-identifier">td</span>.<span class="ruby-identifier">hash</span>] = <span class="ruby-identifier">td</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-comment"># Store the 'removed' torrents</span>
+  <span class="ruby-identifier">removed</span> = <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;torrentsm&quot;</span>]
+  <span class="ruby-identifier">removed</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">td</span> = <span class="ruby-constant">TorrentData</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">t</span>)
+    <span class="ruby-ivar">@torrents_removed</span>[<span class="ruby-identifier">td</span>.<span class="ruby-identifier">hash</span>] = <span class="ruby-identifier">td</span>
+  <span class="ruby-keyword">end</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- parseTorrentListCacheResponse-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- parseTorrentListCacheResponse-method -->
+
+    
+      <div id="method-i-parseTorrentListResponse" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">parseTorrentListResponse</span><span
+            class="method-args">(response)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Parse a response result from a torrent list request</p>
+<dl class="rdoc-list note-list"><dt>response
+<dd>
+<p>the JSON parsed reponse</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="parseTorrentListResponse-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 305</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">parseTorrentListResponse</span>(<span class="ruby-identifier">response</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::parseTorrentListResponse(response)&quot;</span>
+  <span class="ruby-identifier">torrents</span> = <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;torrents&quot;</span>]
+  
+  <span class="ruby-comment"># torrents is an array of arrays</span>
+  <span class="ruby-identifier">torrents</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">td</span> = <span class="ruby-constant">TorrentData</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">t</span>)
+    <span class="ruby-ivar">@torrents</span>[<span class="ruby-identifier">td</span>.<span class="ruby-identifier">hash</span>] = <span class="ruby-identifier">td</span>
+  <span class="ruby-keyword">end</span>
+      
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- parseTorrentListResponse-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- parseTorrentListResponse-method -->
+
+    
+      <div id="method-i-remove_torrent" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">remove_torrent</span><span
+            class="method-args">(hash)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Send uTorrent request to remove torrent</p>
+          
+
+          
+          <div class="method-source-code" id="remove_torrent-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 231</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_torrent</span>(<span class="ruby-identifier">hash</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::remove_torrent( hash )&quot;</span>
+
+  <span class="ruby-ivar">@url</span> = <span class="ruby-node">&quot;/gui/?action=removedata&amp;hash=#{hash}&quot;</span>
+  
+  <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-ivar">@url</span>)
+  <span class="ruby-identifier">result</span> = <span class="ruby-identifier">parseResponse</span>()
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- remove_torrent-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- remove_torrent-method -->
+
+    
+      <div id="method-i-sendGetQuery" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">sendGetQuery</span><span
+            class="method-args">(query)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Send a GET query</p>
+<dl class="rdoc-list note-list"><dt>query
+<dd>
+<p>Query to send</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="sendGetQuery-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 144</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-identifier">query</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;UTorrentWebUI::sendQuery( #{query} )&quot;</span>
+
+  <span class="ruby-identifier">data</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-identifier">startSession</span>()
+  <span class="ruby-identifier">getToken</span>()
+  <span class="ruby-identifier">data</span> = <span class="ruby-identifier">getQuery</span>(<span class="ruby-node">&quot;#{query}&amp;token=#{@token}&quot;</span>)
+  <span class="ruby-identifier">stopSession</span>()
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">data</span>
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- sendGetQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sendGetQuery-method -->
+
+    
+      <div id="method-i-set_job_properties" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">set_job_properties</span><span
+            class="method-args">(props)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set torrent job properties</p>
+
+<p>props: hash of hashes</p>
+
+<pre class="ruby"><span class="ruby-constant">Expected</span> <span class="ruby-identifier">format</span><span class="ruby-operator">:</span>
+  {<span class="ruby-identifier">hash1</span> =<span class="ruby-operator">&gt;</span> {<span class="ruby-string">'prop1'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">'value1'</span>, <span class="ruby-string">'prop2'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">'value2'</span>},
+   <span class="ruby-identifier">hash2</span> =<span class="ruby-operator">&gt;</span> {<span class="ruby-string">'prp1'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">'val1'</span>, <span class="ruby-string">'prp2'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">'val2'</span>}}
+</pre>
+          
+
+          
+          <div class="method-source-code" id="set_job_properties-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 208</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_job_properties</span>(<span class="ruby-identifier">props</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::set_job_properties( props )&quot;</span>
+
+  <span class="ruby-identifier">urlRoot</span> = <span class="ruby-string">&quot;/gui/?action=setprops&quot;</span>
+  <span class="ruby-identifier">jobprops</span> = <span class="ruby-string">&quot;&quot;</span>
+
+  <span class="ruby-identifier">props</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span>, <span class="ruby-identifier">propset</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">jobprops</span> = <span class="ruby-node">&quot;&amp;hash=#{hash}&quot;</span>
+    <span class="ruby-identifier">propset</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">property</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">jobprops</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot;&amp;s=#{property}&amp;v=#{value}&quot;</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Invalid job properties provided to UTorrentWebUI:set_job_properties: #{props.inspect}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">jobprops</span>.<span class="ruby-identifier">empty?</span>
+  <span class="ruby-ivar">@url</span> = <span class="ruby-identifier">urlRoot</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">jobprops</span>
+  <span class="ruby-identifier">sendGetQuery</span>(<span class="ruby-ivar">@url</span>)
+  <span class="ruby-identifier">result</span> = <span class="ruby-identifier">parseResponse</span>()
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- set_job_properties-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- set_job_properties-method -->
+
+    
+      <div id="method-i-startSession" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">startSession</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Start a HTTP session</p>
+<dl class="rdoc-list note-list"><dt>returns
+<dd>
+<p>HTTP object</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="startSession-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 60</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">startSession</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::startSession()&quot;</span>
+  <span class="ruby-ivar">@http</span> = <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-ivar">@ip</span>, <span class="ruby-ivar">@port</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- startSession-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- startSession-method -->
+
+    
+      <div id="method-i-stopSession" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">stopSession</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Stop a HTTP session</p>
+          
+
+          
+          <div class="method-source-code" id="stopSession-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 69</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">stopSession</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::stopSession()&quot;</span>
+  <span class="ruby-ivar">@http</span>.<span class="ruby-identifier">finish</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- stopSession-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- stopSession-method -->
+
+    
+      <div id="method-i-storeCookie" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">storeCookie</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Store the cookie if sent</p>
+          
+
+          
+          <div class="method-source-code" id="storeCookie-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 131</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">storeCookie</span>()
+  <span class="ruby-identifier">tmpcookie</span> = <span class="ruby-ivar">@response</span>[<span class="ruby-string">&quot;set-cookie&quot;</span>]
+  <span class="ruby-ivar">@cookie</span> = <span class="ruby-identifier">tmpcookie</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot;;&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">tmpcookie</span>.<span class="ruby-identifier">nil?</span>
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;  Cookie set: #{@cookie}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">tmpcookie</span>.<span class="ruby-identifier">nil?</span>
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- storeCookie-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- storeCookie-method -->
+
+    
+      <div id="method-i-torrents_removed-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">torrents_removed?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Indicates if there are torrents that have been removed.</p>
+<dl class="rdoc-list note-list"><dt>returns
+<dd>
+<p>none</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="torrents_removed-3F-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 359</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">torrents_removed?</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;UTorrentWebUI::torrents_removed?()&quot;</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@removed_torrents</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@removed_torrents</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- torrents_removed-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- torrents_removed-3F-method -->
+
+    
+      <div id="method-i-verbose-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">verbose=</span><span
+            class="method-args">(arg)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the verbose flag</p>
+<dl class="rdoc-list note-list"><dt>arg
+<dd>
+<p>verbose mode if true</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="verbose-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/utorrentwebui.rb, line 348</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">verbose=</span>(<span class="ruby-identifier">arg</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;UTorrentWebUI::verbose=( #{arg} )&quot;</span>
+  <span class="ruby-ivar">@verbose</span> = <span class="ruby-identifier">arg</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- verbose-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- verbose-3D-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

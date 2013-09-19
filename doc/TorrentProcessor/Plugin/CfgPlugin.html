@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=IBM437" http-equiv="Content-Type">
+
+<title>class TorrentProcessor::Plugin::CfgPlugin - TorrentProcessor Documentation</title>
+
+<link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../../index.html">Home</a>
+    <a href="../../table_of_contents.html#classes">Classes</a>
+    <a href="../../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/torrentprocessor/cfgplugin.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    <!-- Included Modules -->
+<nav id="includes-section" class="section">
+  <h3 class="section-header">Included Modules</h3>
+
+  <ul class="link-list">
+  
+  
+    <li><span class="include">::KtCmdLine</span>
+  
+  
+  </ul>
+</nav>
+
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-register_cmds">::register_cmds</a>
+    
+    <li><a href="#method-i-cfg_addfilter">#cfg_addfilter</a>
+    
+    <li><a href="#method-i-cfg_delfilter">#cfg_delfilter</a>
+    
+    <li><a href="#method-i-cfg_ip">#cfg_ip</a>
+    
+    <li><a href="#method-i-cfg_listfilters">#cfg_listfilters</a>
+    
+    <li><a href="#method-i-cfg_port">#cfg_port</a>
+    
+    <li><a href="#method-i-cfg_pwd">#cfg_pwd</a>
+    
+    <li><a href="#method-i-cfg_setup">#cfg_setup</a>
+    
+    <li><a href="#method-i-cfg_user">#cfg_user</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="../../docs/README_rdoc.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../../TorrentProcessor.html">TorrentProcessor</a>
+  
+    <li><a href="../../TorrentProcessor/Config.html">TorrentProcessor::Config</a>
+  
+    <li><a href="../../TorrentProcessor/Console.html">TorrentProcessor::Console</a>
+  
+    <li><a href="../../TorrentProcessor/Controller.html">TorrentProcessor::Controller</a>
+  
+    <li><a href="../../TorrentProcessor/Database.html">TorrentProcessor::Database</a>
+  
+    <li><a href="../../TorrentProcessor/Formatter.html">TorrentProcessor::Formatter</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin.html">TorrentProcessor::Plugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/CfgPlugin.html">TorrentProcessor::Plugin::CfgPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/Command.html">TorrentProcessor::Plugin::Command</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/DBPlugin.html">TorrentProcessor::Plugin::DBPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/DBPluginBase.html">TorrentProcessor::Plugin::DBPluginBase</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/PluginManager.html">TorrentProcessor::Plugin::PluginManager</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/Tester.html">TorrentProcessor::Plugin::Tester</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/UTPlugin.html">TorrentProcessor::Plugin::UTPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Processor.html">TorrentProcessor::Processor</a>
+  
+    <li><a href="../../TorrentProcessor/TPSetup.html">TorrentProcessor::TPSetup</a>
+  
+    <li><a href="../../TorrentProcessor/TorrentData.html">TorrentProcessor::TorrentData</a>
+  
+    <li><a href="../../TorrentProcessor/UTorrentWebUI.html">TorrentProcessor::UTorrentWebUI</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class TorrentProcessor::Plugin::CfgPlugin</h1>
+
+  <div id="description" class="description">
+    
+<p><a href="CfgPlugin.html">CfgPlugin</a> class</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-register_cmds" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">register_cmds</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="register_cmds-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 29</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">CfgPlugin</span>.<span class="ruby-identifier">register_cmds</span>
+  { <span class="ruby-string">&quot;.setup&quot;</span> =<span class="ruby-operator">&gt;</span>       <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_setup</span>,      <span class="ruby-string">&quot;Run TorrentProcessor setup&quot;</span>),
+    <span class="ruby-string">&quot;.user&quot;</span> =<span class="ruby-operator">&gt;</span>        <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_user</span>,       <span class="ruby-string">&quot;Configure uTorrent user&quot;</span>),
+    <span class="ruby-string">&quot;.pwd&quot;</span> =<span class="ruby-operator">&gt;</span>         <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_pwd</span>,        <span class="ruby-string">&quot;Configure uTorrent password&quot;</span>),
+    <span class="ruby-string">&quot;.ip&quot;</span> =<span class="ruby-operator">&gt;</span>          <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_ip</span>,         <span class="ruby-string">&quot;Configure uTorrent IP address&quot;</span>),
+    <span class="ruby-string">&quot;.port&quot;</span> =<span class="ruby-operator">&gt;</span>        <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_port</span>,       <span class="ruby-string">&quot;Configure uTorrent Port&quot;</span>),
+    <span class="ruby-string">&quot;.addfilter&quot;</span> =<span class="ruby-operator">&gt;</span>   <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_addfilter</span>,  <span class="ruby-string">&quot;Add a tracker seed filter&quot;</span>),
+    <span class="ruby-string">&quot;.delfilter&quot;</span> =<span class="ruby-operator">&gt;</span>   <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_delfilter</span>,  <span class="ruby-string">&quot;Delete a tracker seed filter&quot;</span>),
+    <span class="ruby-string">&quot;.listfilters&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CfgPlugin</span>, <span class="ruby-value">:cfg_listfilters</span>,<span class="ruby-string">&quot;List current tracker filters&quot;</span>),
+    <span class="ruby-comment">#&quot;.&quot; =&gt; Command.new(CfgPlugin, :, &quot;&quot;),</span>
+  }
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- register_cmds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- register_cmds-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-cfg_addfilter" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_addfilter</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Add a tracker seed filter</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_addfilter-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 133</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_addfilter</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_addfilter&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+  
+  <span class="ruby-identifier">tracker</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-string">&quot; trackers contains:&quot;</span> )
+  <span class="ruby-identifier">seedval</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-string">&quot; set seed limit to: &quot;</span> )
+  
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">tracker</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">seedval</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Add filter cancelled (invalid input).&quot;</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">add_filter</span>( <span class="ruby-identifier">tracker</span>, <span class="ruby-identifier">seedval</span> )
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Filter added for #{tracker} with a seed limit of #{seedval}&quot;</span>
+  <span class="ruby-identifier">puts</span> 
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_addfilter-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_addfilter-method -->
+
+    
+      <div id="method-i-cfg_delfilter" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_delfilter</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Delete a tracker seed filter</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_delfilter-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 157</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_delfilter</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_delfilter&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+  
+  <span class="ruby-identifier">cfg_listfilters</span>([<span class="ruby-keyword">nil</span>,<span class="ruby-identifier">kaller</span>])
+  <span class="ruby-identifier">puts</span>
+  <span class="ruby-identifier">tracker</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-string">&quot; tracker:&quot;</span> )
+  
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">tracker</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Delete filter cancelled (invalid input).&quot;</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">delete_filter</span>( <span class="ruby-identifier">tracker</span> )
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Filter removed for #{tracker}&quot;</span>
+  <span class="ruby-identifier">puts</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_delfilter-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_delfilter-method -->
+
+    
+      <div id="method-i-cfg_ip" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_ip</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Configure uTorrent IP address</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_ip-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 97</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_ip</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_ip&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Current address: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}&quot;</span>
+  <span class="ruby-identifier">newip</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-string">&quot; New IP address: &quot;</span> )
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">set_ip</span>(<span class="ruby-identifier">newip</span>)
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Address changed to: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}&quot;</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_ip-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_ip-method -->
+
+    
+      <div id="method-i-cfg_listfilters" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_listfilters</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>List all tracker seed filters</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_listfilters-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 182</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_listfilters</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_listfilters&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+  
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Current Filters:&quot;</span>
+  <span class="ruby-constant">Formatter</span>.<span class="ruby-identifier">pHr</span>
+  <span class="ruby-identifier">filters</span> = <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">cfg</span>[<span class="ruby-value">:filters</span>]
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot; None&quot;</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">filters</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">filters</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">filters</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">filters</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>)
+  
+  <span class="ruby-identifier">filters</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">tracker</span>, <span class="ruby-identifier">seedlimit</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; #{tracker} : #{seedlimit}&quot;</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">puts</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_listfilters-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_listfilters-method -->
+
+    
+      <div id="method-i-cfg_port" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_port</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Configure uTorrent Port</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_port-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 115</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_port</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_port&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Current address: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}&quot;</span>
+  <span class="ruby-identifier">newport</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-node">&quot; New port #: &quot;</span> )
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">set_port</span>(<span class="ruby-identifier">newport</span>)
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Address changed to: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}&quot;</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_port-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_port-method -->
+
+    
+      <div id="method-i-cfg_pwd" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_pwd</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Configure uTorrent password</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_pwd-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 79</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_pwd</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_pwd&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Current password: #{ctrl.cfg[:pass]}&quot;</span>
+  <span class="ruby-identifier">newpass</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-string">&quot; New password: &quot;</span> )
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">set_pwd</span>(<span class="ruby-identifier">newpass</span>)
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Password changed to: #{ctrl.cfg[:pass]}&quot;</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_pwd-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_pwd-method -->
+
+    
+      <div id="method-i-cfg_setup" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_setup</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Run <a href="../../TorrentProcessor.html">TorrentProcessor</a> setup</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_setup-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 46</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_setup</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_setup&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+  
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">setupApp</span>()
+
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_setup-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_setup-method -->
+
+    
+      <div id="method-i-cfg_user" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cfg_user</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Configure uTorrent user</p>
+          
+
+          
+          <div class="method-source-code" id="cfg_user-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/cfgplugin.rb, line 61</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">cfg_user</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;CfgPlugin::cfg_user&quot;</span>
+  <span class="ruby-identifier">cmdtxt</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+  <span class="ruby-identifier">kaller</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+  <span class="ruby-identifier">ctrl</span> = <span class="ruby-identifier">kaller</span>.<span class="ruby-identifier">controller</span>
+  
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Current username: #{ctrl.cfg[:user]}&quot;</span>
+  <span class="ruby-identifier">newuser</span> = <span class="ruby-identifier">getInput</span>( <span class="ruby-string">&quot; New username: &quot;</span> )
+  <span class="ruby-identifier">ctrl</span>.<span class="ruby-identifier">set_user</span>(<span class="ruby-identifier">newuser</span>)
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; Username changed to: #{ctrl.cfg[:user]}&quot;</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- cfg_user-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cfg_user-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=IBM437" http-equiv="Content-Type">
+
+<title>class TorrentProcessor::Plugin::PluginManager - TorrentProcessor Documentation</title>
+
+<link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../../index.html">Home</a>
+    <a href="../../table_of_contents.html#classes">Classes</a>
+    <a href="../../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/torrentprocessor/plugin.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-command">::command</a>
+    
+    <li><a href="#method-c-command_list">::command_list</a>
+    
+    <li><a href="#method-c-register_cmds">::register_cmds</a>
+    
+    <li><a href="#method-c-register_plugin">::register_plugin</a>
+    
+    <li><a href="#method-c-registered_cmds">::registered_cmds</a>
+    
+    <li><a href="#method-c-registered_plugins">::registered_plugins</a>
+    
+    <li><a href="#method-i-dump_plugins">#dump_plugins</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="../../docs/README_rdoc.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../../TorrentProcessor.html">TorrentProcessor</a>
+  
+    <li><a href="../../TorrentProcessor/Config.html">TorrentProcessor::Config</a>
+  
+    <li><a href="../../TorrentProcessor/Console.html">TorrentProcessor::Console</a>
+  
+    <li><a href="../../TorrentProcessor/Controller.html">TorrentProcessor::Controller</a>
+  
+    <li><a href="../../TorrentProcessor/Database.html">TorrentProcessor::Database</a>
+  
+    <li><a href="../../TorrentProcessor/Formatter.html">TorrentProcessor::Formatter</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin.html">TorrentProcessor::Plugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/CfgPlugin.html">TorrentProcessor::Plugin::CfgPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/Command.html">TorrentProcessor::Plugin::Command</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/DBPlugin.html">TorrentProcessor::Plugin::DBPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/DBPluginBase.html">TorrentProcessor::Plugin::DBPluginBase</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/PluginManager.html">TorrentProcessor::Plugin::PluginManager</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/Tester.html">TorrentProcessor::Plugin::Tester</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/UTPlugin.html">TorrentProcessor::Plugin::UTPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Processor.html">TorrentProcessor::Processor</a>
+  
+    <li><a href="../../TorrentProcessor/TPSetup.html">TorrentProcessor::TPSetup</a>
+  
+    <li><a href="../../TorrentProcessor/TorrentData.html">TorrentProcessor::TorrentData</a>
+  
+    <li><a href="../../TorrentProcessor/UTorrentWebUI.html">TorrentProcessor::UTorrentWebUI</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class TorrentProcessor::Plugin::PluginManager</h1>
+
+  <div id="description" class="description">
+    
+<p><a href="PluginManager.html">PluginManager</a> class</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-command" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">command</span><span
+            class="method-args">(cmdname, *args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Call a plugin's command, passing it a set of arguments.</p>
+
+<p><strong>Args</strong></p>
+
+<p><code>cmdname</code> -- the command to be called, defined by the plugin's
+<a href="PluginManager.html#method-c-register_cmds">::register_cmds</a>
+class method</p>
+
+<p><code>args</code> -- a list of arguments to be passed to the plugin command</p>
+          
+
+          
+          <div class="method-source-code" id="command-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 95</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">command</span>(<span class="ruby-identifier">cmdname</span>, *<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">cmd_parts</span> = <span class="ruby-identifier">cmdname</span>.<span class="ruby-identifier">split</span>
+  <span class="ruby-identifier">cmdpart</span> = <span class="ruby-identifier">cmd_parts</span>[<span class="ruby-value">0</span>]
+
+  <span class="ruby-ivar">@registered_cmds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">plugin_type</span>, <span class="ruby-identifier">cmd_names</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">cmd_names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cmdsig</span>,<span class="ruby-identifier">cmd</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">cmdsig</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">cmdpart</span>)
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">cmd</span>.<span class="ruby-identifier">execute</span>( <span class="ruby-identifier">cmdname</span>, *<span class="ruby-identifier">args</span> )
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>   <span class="ruby-comment"># each plugin_type command</span>
+  <span class="ruby-keyword">end</span>   <span class="ruby-comment"># each plugin_type</span>
+
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span>
+  <span class="ruby-comment">#raise &quot;Command not recognized: #{cmdname}&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- command-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- command-method -->
+
+    
+      <div id="method-c-command_list" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">command_list</span><span
+            class="method-args">(plugin_type)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns an array of arrays containing the plugin command and a desciption.
+The command and description are defined by the plugin's <a
+href="PluginManager.html#method-c-register_cmds">::register_cmds</a> class
+method.</p>
+
+<p><strong>Args</strong></p>
+
+<p><code>plugin_type</code> -- an arbitrary symbol used to classify the plugin
+'type'</p>
+
+<p><strong>Returns</strong></p>
+
+<p>array of arrays [ [cmd name, cmd desc] ]</p>
+          
+
+          
+          <div class="method-source-code" id="command_list-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 124</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">command_list</span>(<span class="ruby-identifier">plugin_type</span>)
+  <span class="ruby-identifier">cmd_list</span> = []
+  <span class="ruby-ivar">@registered_cmds</span>[<span class="ruby-identifier">plugin_type</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cmd_name</span>, <span class="ruby-identifier">cmdObj</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">cmd_list</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">cmd_name</span>, <span class="ruby-identifier">cmdObj</span>.<span class="ruby-identifier">desc</span>]
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">cmd_list</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- command_list-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- command_list-method -->
+
+    
+      <div id="method-c-register_cmds" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">register_cmds</span><span
+            class="method-args">(plugin_type, plug_klass)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Register a plugin's commands. After the plugin has been added to the  @<a
+href="PluginManager.html#method-c-registered_plugins">::registered_plugins</a>
+hash, the plugin's <a
+href="PluginManager.html#method-c-register_cmds">::register_cmds</a> class
+method is called to register the plugin's commands.</p>
+
+<p><strong>Args</strong></p>
+
+<p><code>plugin_type</code> -- a symbol that can be used to retrieve a
+categorized list of plugin commands</p>
+
+<p><code>plug_klass</code> -- the class constant (ie. Test) to be registered.
+This constant is used to instanciate the plugin on demand.</p>
+          
+
+          
+          <div class="method-source-code" id="register_cmds-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 77</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">register_cmds</span>(<span class="ruby-identifier">plugin_type</span>, <span class="ruby-identifier">plug_klass</span>)
+  <span class="ruby-ivar">@registered_cmds</span>[<span class="ruby-identifier">plugin_type</span>] = {} <span class="ruby-keyword">unless</span> (<span class="ruby-operator">!</span> <span class="ruby-ivar">@registered_cmds</span>[<span class="ruby-identifier">plugin_type</span>].<span class="ruby-identifier">nil?</span>)
+
+  <span class="ruby-identifier">plug_klass</span>.<span class="ruby-identifier">register_cmds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cmd_name</span>,<span class="ruby-identifier">cmd</span><span class="ruby-operator">|</span>
+    <span class="ruby-ivar">@registered_cmds</span>[<span class="ruby-identifier">plugin_type</span>][<span class="ruby-identifier">cmd_name</span>] = <span class="ruby-identifier">cmd</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- register_cmds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- register_cmds-method -->
+
+    
+      <div id="method-c-register_plugin" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">register_plugin</span><span
+            class="method-args">(plugin_type, plug_klass)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Register a plugin. After the plugin has been added to the  @<a
+href="PluginManager.html#method-c-registered_plugins">::registered_plugins</a>
+hash, the plugin's <a
+href="PluginManager.html#method-c-register_cmds">::register_cmds</a> class
+method is called to register the plugin's commands.</p>
+
+<p><strong>Args</strong></p>
+
+<p><code>plugin_type</code> -- a symbol that can be used to retrieve a
+categorized list of plugins</p>
+
+<p><code>plug_klass</code> -- the class constant (ie. Test) to be registered.
+This constant is used to instanciate the plugin on demand.</p>
+          
+
+          
+          <div class="method-source-code" id="register_plugin-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 58</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">register_plugin</span>(<span class="ruby-identifier">plugin_type</span>, <span class="ruby-identifier">plug_klass</span>)
+  <span class="ruby-ivar">@registered_plugins</span>[<span class="ruby-identifier">plugin_type</span>] = [] <span class="ruby-keyword">unless</span> (<span class="ruby-operator">!</span> <span class="ruby-ivar">@registered_plugins</span>[<span class="ruby-identifier">plugin_type</span>].<span class="ruby-identifier">nil?</span>)
+
+  <span class="ruby-ivar">@registered_plugins</span>[<span class="ruby-identifier">plugin_type</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">plug_klass</span>
+  <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">register_cmds</span>(<span class="ruby-identifier">plugin_type</span>, <span class="ruby-identifier">plug_klass</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- register_plugin-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- register_plugin-method -->
+
+    
+      <div id="method-c-registered_cmds" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">registered_cmds</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Return a hash of registered commands</p>
+          
+
+          
+          <div class="method-source-code" id="registered_cmds-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 42</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">registered_cmds</span>
+  <span class="ruby-ivar">@registered_cmds</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- registered_cmds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- registered_cmds-method -->
+
+    
+      <div id="method-c-registered_plugins" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">registered_plugins</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Return a hash of registered plugins</p>
+          
+
+          
+          <div class="method-source-code" id="registered_plugins-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 34</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">registered_plugins</span>
+  <span class="ruby-ivar">@registered_plugins</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- registered_plugins-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- registered_plugins-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-dump_plugins" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">dump_plugins</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="dump_plugins-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 133</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">dump_plugins</span>
+  <span class="ruby-constant">PluginManager</span>.<span class="ruby-identifier">registered_plugins</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">plug</span>, <span class="ruby-identifier">marray</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-identifier">plug</span>.<span class="ruby-identifier">to_s</span>
+    <span class="ruby-identifier">marray</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">meth</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;  #{meth.to_s}&quot;</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- dump_plugins-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- dump_plugins-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

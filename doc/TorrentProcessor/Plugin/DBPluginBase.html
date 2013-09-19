@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=IBM437" http-equiv="Content-Type">
+
+<title>class TorrentProcessor::Plugin::DBPluginBase - TorrentProcessor Documentation</title>
+
+<link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../../index.html">Home</a>
+    <a href="../../table_of_contents.html#classes">Classes</a>
+    <a href="../../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/torrentprocessor/plugin.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-new">::new</a>
+    
+    <li><a href="#method-c-register_cmds">::register_cmds</a>
+    
+    <li><a href="#method-i-test">#test</a>
+    
+    <li><a href="#method-i-test2">#test2</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="../../docs/README_rdoc.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../../TorrentProcessor.html">TorrentProcessor</a>
+  
+    <li><a href="../../TorrentProcessor/Config.html">TorrentProcessor::Config</a>
+  
+    <li><a href="../../TorrentProcessor/Console.html">TorrentProcessor::Console</a>
+  
+    <li><a href="../../TorrentProcessor/Controller.html">TorrentProcessor::Controller</a>
+  
+    <li><a href="../../TorrentProcessor/Database.html">TorrentProcessor::Database</a>
+  
+    <li><a href="../../TorrentProcessor/Formatter.html">TorrentProcessor::Formatter</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin.html">TorrentProcessor::Plugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/CfgPlugin.html">TorrentProcessor::Plugin::CfgPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/Command.html">TorrentProcessor::Plugin::Command</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/DBPlugin.html">TorrentProcessor::Plugin::DBPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/DBPluginBase.html">TorrentProcessor::Plugin::DBPluginBase</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/PluginManager.html">TorrentProcessor::Plugin::PluginManager</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/Tester.html">TorrentProcessor::Plugin::Tester</a>
+  
+    <li><a href="../../TorrentProcessor/Plugin/UTPlugin.html">TorrentProcessor::Plugin::UTPlugin</a>
+  
+    <li><a href="../../TorrentProcessor/Processor.html">TorrentProcessor::Processor</a>
+  
+    <li><a href="../../TorrentProcessor/TPSetup.html">TorrentProcessor::TPSetup</a>
+  
+    <li><a href="../../TorrentProcessor/TorrentData.html">TorrentProcessor::TorrentData</a>
+  
+    <li><a href="../../TorrentProcessor/UTorrentWebUI.html">TorrentProcessor::UTorrentWebUI</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class TorrentProcessor::Plugin::DBPluginBase</h1>
+
+  <div id="description" class="description">
+    
+<p><a href="DBPluginBase.html">DBPluginBase</a> class</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 205</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>()
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+      <div id="method-c-register_cmds" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">register_cmds</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="register_cmds-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 199</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">DBPluginBase</span>.<span class="ruby-identifier">register_cmds</span>
+  {<span class="ruby-string">&quot;.test&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DBPluginBase</span>, <span class="ruby-value">:test</span>, <span class="ruby-string">&quot;Test command&quot;</span>),
+    <span class="ruby-string">&quot;.test2&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Command</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DBPluginBase</span>, <span class="ruby-value">:test2</span>, <span class="ruby-string">&quot;Another command&quot;</span>)}
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- register_cmds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- register_cmds-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-test" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">test</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="test-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 210</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">test</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Test fired with args: #{args.inspect}&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- test-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- test-method -->
+
+    
+      <div id="method-i-test2" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">test2</span><span
+            class="method-args">(args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="test2-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/plugin.rb, line 215</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">test2</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Test2 fired with args: #{args.inspect}&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- test2-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- test2-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

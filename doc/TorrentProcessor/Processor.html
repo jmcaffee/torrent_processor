@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=IBM437" http-equiv="Content-Type">
+
+<title>class TorrentProcessor::Processor - TorrentProcessor Documentation</title>
+
+<link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../index.html">Home</a>
+    <a href="../table_of_contents.html#classes">Classes</a>
+    <a href="../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/torrentprocessor/processor.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-new">::new</a>
+    
+    <li><a href="#method-i-appLocked-3F">#appLocked?</a>
+    
+    <li><a href="#method-i-apply_seed_limit_filters">#apply_seed_limit_filters</a>
+    
+    <li><a href="#method-i-copy_torrent">#copy_torrent</a>
+    
+    <li><a href="#method-i-get_target_seed_ratio">#get_target_seed_ratio</a>
+    
+    <li><a href="#method-i-interactiveMode">#interactiveMode</a>
+    
+    <li><a href="#method-i-label-3D">#label=</a>
+    
+    <li><a href="#method-i-lockApp">#lockApp</a>
+    
+    <li><a href="#method-i-msg-3D">#msg=</a>
+    
+    <li><a href="#method-i-prevstate-3D">#prevstate=</a>
+    
+    <li><a href="#method-i-process">#process</a>
+    
+    <li><a href="#method-i-process_torrents_awaiting_processing">#process_torrents_awaiting_processing</a>
+    
+    <li><a href="#method-i-process_torrents_completed_seeding">#process_torrents_completed_seeding</a>
+    
+    <li><a href="#method-i-quote">#quote</a>
+    
+    <li><a href="#method-i-remove_missing_torrents">#remove_missing_torrents</a>
+    
+    <li><a href="#method-i-remove_torrents">#remove_torrents</a>
+    
+    <li><a href="#method-i-retrieve_utorrent_settings">#retrieve_utorrent_settings</a>
+    
+    <li><a href="#method-i-srcdir-3D">#srcdir=</a>
+    
+    <li><a href="#method-i-srcfile-3D">#srcfile=</a>
+    
+    <li><a href="#method-i-state-3D">#state=</a>
+    
+    <li><a href="#method-i-unlockApp">#unlockApp</a>
+    
+    <li><a href="#method-i-update_torrent_states">#update_torrent_states</a>
+    
+    <li><a href="#method-i-update_torrents_completed_processing">#update_torrents_completed_processing</a>
+    
+    <li><a href="#method-i-utorrent">#utorrent</a>
+    
+    <li><a href="#method-i-verbose-3D">#verbose=</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="../docs/README_rdoc.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../TorrentProcessor.html">TorrentProcessor</a>
+  
+    <li><a href="../TorrentProcessor/Config.html">TorrentProcessor::Config</a>
+  
+    <li><a href="../TorrentProcessor/Console.html">TorrentProcessor::Console</a>
+  
+    <li><a href="../TorrentProcessor/Controller.html">TorrentProcessor::Controller</a>
+  
+    <li><a href="../TorrentProcessor/Database.html">TorrentProcessor::Database</a>
+  
+    <li><a href="../TorrentProcessor/Formatter.html">TorrentProcessor::Formatter</a>
+  
+    <li><a href="../TorrentProcessor/Plugin.html">TorrentProcessor::Plugin</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/CfgPlugin.html">TorrentProcessor::Plugin::CfgPlugin</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/Command.html">TorrentProcessor::Plugin::Command</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/DBPlugin.html">TorrentProcessor::Plugin::DBPlugin</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/DBPluginBase.html">TorrentProcessor::Plugin::DBPluginBase</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/PluginManager.html">TorrentProcessor::Plugin::PluginManager</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/Tester.html">TorrentProcessor::Plugin::Tester</a>
+  
+    <li><a href="../TorrentProcessor/Plugin/UTPlugin.html">TorrentProcessor::Plugin::UTPlugin</a>
+  
+    <li><a href="../TorrentProcessor/Processor.html">TorrentProcessor::Processor</a>
+  
+    <li><a href="../TorrentProcessor/TPSetup.html">TorrentProcessor::TPSetup</a>
+  
+    <li><a href="../TorrentProcessor/TorrentData.html">TorrentProcessor::TorrentData</a>
+  
+    <li><a href="../TorrentProcessor/UTorrentWebUI.html">TorrentProcessor::UTorrentWebUI</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class TorrentProcessor::Processor</h1>
+
+  <div id="description" class="description">
+    
+<p><a href="Processor.html">Processor</a> class</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <!-- Attributes -->
+    <section id="attribute-method-details" class="method-section section">
+      <h3 class="section-header">Attributes</h3>
+
+      
+      <div id="attribute-i-controller" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">controller</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-label" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">label</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-msg" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">msg</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-prevstate" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">prevstate</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-srcdir" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">srcdir</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-srcfile" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">srcfile</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-state" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">state</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-verbose" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">verbose</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section><!-- attribute-method-details -->
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(controller)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p><a href="Processor.html">Processor</a> constructor</p>
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 33</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">controller</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::initialize&quot;</span>
+  
+  <span class="ruby-ivar">@controller</span> = <span class="ruby-identifier">controller</span>
+  <span class="ruby-ivar">@srcdir</span>     = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@srcfile</span>    = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@verbose</span>    = <span class="ruby-keyword">false</span>
+  <span class="ruby-ivar">@utorrent</span>   = <span class="ruby-keyword">nil</span>
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-appLocked-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">appLocked?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Test if app is locked</p>
+          
+
+          
+          <div class="method-source-code" id="appLocked-3F-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 561</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">appLocked?</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::appLocked?()&quot;</span>
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">read_lock</span>() <span class="ruby-operator">==</span> <span class="ruby-string">&quot;Y&quot;</span>
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- appLocked-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- appLocked-3F-method -->
+
+    
+      <div id="method-i-apply_seed_limit_filters" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">apply_seed_limit_filters</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Apply seed limit filters to new torrents. Torrents are considered 'new' if
+they don't have a state (tp_state)</p>
+          
+
+          
+          <div class="method-source-code" id="apply_seed_limit_filters-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 212</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">apply_seed_limit_filters</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::apply_seed_limit_filters()&quot;</span>
+  
+    <span class="ruby-comment"># Get list of torrents where state = NULL</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, percent_progress, name FROM torrents WHERE tp_state IS NULL;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+    
+    <span class="ruby-identifier">filter_props</span> = {}
+
+    <span class="ruby-comment"># For each torrent, get its properties and apply a seed limit if needed.</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">response</span> = <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">get_torrent_job_properties</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>] )
+      <span class="ruby-keyword">if</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;props&quot;</span>].<span class="ruby-identifier">nil?</span> )
+      
+        <span class="ruby-identifier">props</span> = <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;props&quot;</span>][<span class="ruby-value">0</span>]
+        <span class="ruby-identifier">seed_override</span> = <span class="ruby-identifier">props</span>[<span class="ruby-string">&quot;seed_override&quot;</span>]
+        <span class="ruby-identifier">seed_ratio</span> = <span class="ruby-identifier">props</span>[<span class="ruby-string">&quot;seed_ratio&quot;</span>]
+        <span class="ruby-identifier">raw_trackers</span> = <span class="ruby-identifier">props</span>[<span class="ruby-string">&quot;trackers&quot;</span>]
+
+        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">seed_override</span> <span class="ruby-operator">!=</span> <span class="ruby-value">1</span>)   <span class="ruby-comment"># Don't bother if an override is already set.</span>
+
+          <span class="ruby-comment"># Break the list of trackers into individual strings and load the filters (if any).</span>
+          <span class="ruby-identifier">trackers</span> = <span class="ruby-identifier">raw_trackers</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot;\r\n&quot;</span>)
+          <span class="ruby-identifier">filters</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">cfg</span>[<span class="ruby-value">:filters</span>]
+
+          <span class="ruby-comment"># Check each tracker against all filters looking for a match.</span>
+          <span class="ruby-keyword">if</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">trackers</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">trackers</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> )
+            <span class="ruby-keyword">if</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">filters</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">filters</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> )
+              <span class="ruby-identifier">trackers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">tracker</span><span class="ruby-operator">|</span>
+                <span class="ruby-identifier">filters</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">filtered_tracker</span>, <span class="ruby-identifier">limit</span><span class="ruby-operator">|</span>
+                  <span class="ruby-keyword">if</span> ( <span class="ruby-identifier">tracker</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">filtered_tracker</span>) )
+
+                    <span class="ruby-comment"># Found a match... add it to the props list to be applied when we're finished here.</span>
+                    <span class="ruby-identifier">filter_props</span>[<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>]] = {<span class="ruby-string">&quot;seed_override&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-string">&quot;seed_ratio&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">limit</span>)}
+                    <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;  filter criteria met: #{filtered_tracker}, #{limit}, #{r[2]}, for tracker #{tracker}&quot;</span>
+                    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;Applying tracker filter to #{r[2]}.&quot;</span> )
+                    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;    seed_ratio: #{limit}&quot;</span> )
+                  <span class="ruby-keyword">end</span>   <span class="ruby-comment"># tracker includes filtered_tracker</span>
+                <span class="ruby-keyword">end</span>   <span class="ruby-comment"># each filter</span>
+              <span class="ruby-keyword">end</span>   <span class="ruby-comment"># each tracker</span>
+            <span class="ruby-keyword">end</span>   <span class="ruby-comment"># filters not empty</span>
+          <span class="ruby-keyword">end</span>   <span class="ruby-comment"># trackers not empty</span>
+        <span class="ruby-keyword">end</span>   <span class="ruby-comment"># seed override not in effect</span>
+      <span class="ruby-keyword">end</span>   <span class="ruby-comment"># props not nil</span>
+    <span class="ruby-keyword">end</span>   <span class="ruby-comment"># each row</span>
+
+    <span class="ruby-keyword">if</span> ( <span class="ruby-identifier">filter_props</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> )
+      <span class="ruby-identifier">response</span> = <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">set_job_properties</span>( <span class="ruby-identifier">filter_props</span> )
+    <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- apply_seed_limit_filters-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- apply_seed_limit_filters-method -->
+
+    
+      <div id="method-i-copy_torrent" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">copy_torrent</span><span
+            class="method-args">( hash, fname, fdir, lbl)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Copy torrent files to a specific location</p>
+          
+
+          
+          <div class="method-source-code" id="copy_torrent-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 406</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">copy_torrent</span>( <span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fname</span>, <span class="ruby-identifier">fdir</span>, <span class="ruby-identifier">lbl</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::copy_torrent( #{hash}, #{fname}, #{fdir}, #{lbl} )&quot;</span>
+  <span class="ruby-identifier">appPath</span> = <span class="ruby-string">&quot;robocopy&quot;</span>
+  
+  <span class="ruby-comment"># Setup the destination processing folder path.</span>
+  <span class="ruby-identifier">destPath</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">cfg</span>[<span class="ruby-value">:otherprocessing</span>]
+  <span class="ruby-identifier">destPath</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">cfg</span>[<span class="ruby-value">:tvprocessing</span>]     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">lbl</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&quot;TV&quot;</span>))
+  <span class="ruby-identifier">destPath</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">cfg</span>[<span class="ruby-value">:movieprocessing</span>]  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">lbl</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&quot;Movie&quot;</span>))
+  
+  <span class="ruby-comment"># Handle situation where the torrent is in a subfolder.</span>
+  <span class="ruby-identifier">pathTail</span> = <span class="ruby-string">&quot;&quot;</span>
+  <span class="ruby-identifier">cmdLineSwitch</span> = <span class="ruby-string">&quot;&quot;</span>
+  <span class="ruby-identifier">isSubDir</span> = <span class="ruby-keyword">false</span>
+  
+  <span class="ruby-keyword">if</span> (<span class="ruby-operator">!</span><span class="ruby-identifier">fdir</span>.<span class="ruby-identifier">include?</span>( <span class="ruby-ivar">@dir_completed_download</span> ))
+    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>(<span class="ruby-string">&quot;    ERROR: Downloaded Torrent is not in the expected location.&quot;</span>)
+    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>(<span class="ruby-node">&quot;           Torrent location: #{fdir}&quot;</span>)
+    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>(<span class="ruby-node">&quot;           Expected location: #{@dir_completed_download} -- or a subdirectory of this location.&quot;</span>)
+    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>(<span class="ruby-string">&quot;    Copy operation will be attempted later.&quot;</span>)
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">fdir</span> <span class="ruby-operator">!=</span> <span class="ruby-ivar">@dir_completed_download</span>)
+    <span class="ruby-identifier">isSubDir</span> = <span class="ruby-keyword">true</span>
+    <span class="ruby-identifier">pathTail</span> = <span class="ruby-identifier">fdir</span>.<span class="ruby-identifier">split</span>(<span class="ruby-ivar">@dir_completed_download</span>)[<span class="ruby-value">1</span>]
+    <span class="ruby-identifier">cmdLineSwitch</span> = <span class="ruby-string">&quot;/E&quot;</span>
+    <span class="ruby-comment"># If we're using the /E switch (copy empty subdirs) we do NOT want to provide a filename (we're copying the entire dir):</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-identifier">destPath</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">pathTail</span>
+  <span class="ruby-identifier">cmdLine</span> = <span class="ruby-node">&quot;#{quote(fdir)} #{quote(destPath)} #{quote(fname)}&quot;</span>
+  <span class="ruby-identifier">cmdLine</span> = <span class="ruby-node">&quot;#{quote(fdir)} #{quote(destPath)} #{cmdLineSwitch}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-operator">!</span><span class="ruby-identifier">isSubDir</span>
+  <span class="ruby-identifier">appCmd</span> = <span class="ruby-node">&quot;#{appPath} #{cmdLine}&quot;</span>
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span> <span class="ruby-node">&quot;Executing: #{appCmd}&quot;</span>
+  
+  <span class="ruby-identifier">result</span> = <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">system</span>(<span class="ruby-node">&quot;#{appCmd}&quot;</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">result</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span> (<span class="ruby-node">&quot;    ERROR: #{appPath} failed. Command line it was called with: &quot;</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">appCmd</span>) )
+      <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">targetPath</span> = <span class="ruby-node">&quot;#{destPath}\\#{fname}&quot;</span>
+  <span class="ruby-identifier">targetPath</span> = <span class="ruby-node">&quot;#{destPath}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-operator">!</span><span class="ruby-identifier">isSubDir</span>
+  <span class="ruby-keyword">if</span>( <span class="ruby-operator">!</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">targetPath</span>) )
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span> (<span class="ruby-node">&quot;    ERROR: Unable to verify that target exists. Target path: #{targetPath}&quot;</span>)
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span> (<span class="ruby-node">&quot;    ERROR: #{appPath} failed to copy file. Command line it was called with: &quot;</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">appCmd</span>) )
+      <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- copy_torrent-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- copy_torrent-method -->
+
+    
+      <div id="method-i-get_target_seed_ratio" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_target_seed_ratio</span><span
+            class="method-args">(name, hash)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Determine the target seed ratio for a torrent.</p>
+          
+
+          
+          <div class="method-source-code" id="get_target_seed_ratio-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 519</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_target_seed_ratio</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">hash</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::get_target_seed_ratio( #{name} )&quot;</span>
+  <span class="ruby-identifier">target_ratio</span> = <span class="ruby-ivar">@seed_ratio</span>
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;  target_ratio set to default: #{target_ratio}&quot;</span>
+        <span class="ruby-comment"># This torrent may have an overridden target seed ratio.</span>
+        <span class="ruby-comment"># Pull down the torrent job properties to check and see.</span>
+  <span class="ruby-identifier">response</span> = <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">get_torrent_job_properties</span>( <span class="ruby-identifier">hash</span> )
+  <span class="ruby-keyword">if</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;props&quot;</span>].<span class="ruby-identifier">nil?</span> )
+  
+    <span class="ruby-identifier">props</span> = <span class="ruby-identifier">response</span>[<span class="ruby-string">&quot;props&quot;</span>][<span class="ruby-value">0</span>]
+    <span class="ruby-identifier">seed_override</span> = <span class="ruby-identifier">props</span>[<span class="ruby-string">&quot;seed_override&quot;</span>]
+    <span class="ruby-identifier">seed_ratio</span> = <span class="ruby-identifier">props</span>[<span class="ruby-string">&quot;seed_ratio&quot;</span>]
+    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">seed_override</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>)
+      <span class="ruby-identifier">target_ratio</span> = <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">seed_ratio</span>)
+      <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;  target_ratio set to override value: #{target_ratio}&quot;</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;Torrent [#{name}] has overridden target seed ratio&quot;</span> )
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;  target ratio = #{target_ratio}&quot;</span> )
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-comment"># Add some padding to the target ratio since the final ratio is almost</span>
+  <span class="ruby-comment"># never exactly reached.</span>
+  <span class="ruby-comment"># 5 = .05 percent.</span>
+  <span class="ruby-identifier">target_ratio</span> = <span class="ruby-identifier">target_ratio</span> <span class="ruby-operator">-</span> <span class="ruby-value">5</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- get_target_seed_ratio-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- get_target_seed_ratio-method -->
+
+    
+      <div id="method-i-interactiveMode" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">interactiveMode</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Run interactive console</p>
+          
+
+          
+          <div class="method-source-code" id="interactiveMode-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 548</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">interactiveMode</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::interactiveMode&quot;</span>
+  
+  <span class="ruby-identifier">console</span> = <span class="ruby-constant">Console</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@controller</span>)
+  <span class="ruby-identifier">console</span>.<span class="ruby-identifier">verbose</span> = <span class="ruby-ivar">@verbose</span>
+  
+  <span class="ruby-identifier">console</span>.<span class="ruby-identifier">execute</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- interactiveMode-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- interactiveMode-method -->
+
+    
+      <div id="method-i-label-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">label=</span><span
+            class="method-args">(labelval)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the uTorrent label</p>
+<dl class="rdoc-list note-list"><dt>labelval
+<dd>
+<p>uTorrent label</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="label-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 105</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">label=</span>(<span class="ruby-identifier">labelval</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::label=( #{labelval} )&quot;</span>
+  <span class="ruby-ivar">@label</span> = <span class="ruby-identifier">labelval</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- label-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- label-3D-method -->
+
+    
+      <div id="method-i-lockApp" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">lockApp</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set application lock flag</p>
+          
+
+          
+          <div class="method-source-code" id="lockApp-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 573</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">lockApp</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::lockApp()&quot;</span>
+  
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">aquire_lock</span>()
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- lockApp-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- lockApp-method -->
+
+    
+      <div id="method-i-msg-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">msg=</span><span
+            class="method-args">(msgval)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the uTorrent msg</p>
+<dl class="rdoc-list note-list"><dt>msgval
+<dd>
+<p>uTorrent msg</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="msg-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 94</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">msg=</span>(<span class="ruby-identifier">msgval</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::msg=( #{msgval} )&quot;</span>
+  <span class="ruby-ivar">@msg</span> = <span class="ruby-identifier">msgval</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- msg-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- msg-3D-method -->
+
+    
+      <div id="method-i-prevstate-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">prevstate=</span><span
+            class="method-args">(stateval)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the previous state</p>
+<dl class="rdoc-list note-list"><dt>stateval
+<dd>
+<p>previous torrent state</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="prevstate-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 83</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">prevstate=</span>(<span class="ruby-identifier">stateval</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::prevstate=( #{stateval} )&quot;</span>
+  <span class="ruby-ivar">@prevstate</span> = <span class="ruby-identifier">stateval</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- prevstate-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- prevstate-3D-method -->
+
+    
+      <div id="method-i-process" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">process</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>TODO: write process() description</p>
+          
+
+          
+          <div class="method-source-code" id="process-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 139</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">process</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::process&quot;</span>
+  
+  <span class="ruby-identifier">retrieve_utorrent_settings</span>()
+  
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-string">&quot;Requesting torrent list update&quot;</span> )
+  
+  <span class="ruby-comment"># Get a list of torrents.</span>
+  <span class="ruby-identifier">cacheID</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">read_cache</span>()
+  <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">get_torrent_list</span>( <span class="ruby-identifier">cacheID</span> )
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_cache</span>( <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">cache</span> )
+  
+  <span class="ruby-comment"># Update the db's list of torrents.</span>
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrents</span>( <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">torrents</span> )
+  
+  <span class="ruby-comment"># Apply filters if needed.</span>
+  <span class="ruby-comment"># NOTE: The seed limits are only applied to 'new' torrents. This should limit the application so that</span>
+  <span class="ruby-comment"># limits aren't needlessly applied everytime the torrents are processed.</span>
+  <span class="ruby-identifier">apply_seed_limit_filters</span>()
+
+  <span class="ruby-comment"># Update the db torrent list states</span>
+  <span class="ruby-identifier">update_torrent_states</span>()
+  
+  <span class="ruby-comment"># Remove any torrents from the db that have been removed from utorrent (due to a request).</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">torrents_removed?</span>
+    <span class="ruby-identifier">remove_torrents</span>( <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">removed_torrents</span> )
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-comment"># 'Cleanup' DB by removing torrents that are in the DB (awaiting removal) </span>
+    <span class="ruby-comment"># but are no longer in the (utorrent) torrents list due to missing a cache.</span>
+    <span class="ruby-comment"># By missing a cache, utorrent is not sending the 'removed' torrents, only what is currently in its list.</span>
+    <span class="ruby-identifier">remove_missing_torrents</span>( <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">torrents</span> )
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-comment"># Process torrents that are awaiting processing.</span>
+  <span class="ruby-identifier">process_torrents_awaiting_processing</span>()
+  
+  <span class="ruby-comment"># Process torrents that have completed processing.</span>
+  <span class="ruby-identifier">update_torrents_completed_processing</span>()
+    
+  <span class="ruby-comment"># Process torrents that have completed seeding.</span>
+  <span class="ruby-identifier">process_torrents_completed_seeding</span>()
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- process-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- process-method -->
+
+    
+      <div id="method-i-process_torrents_awaiting_processing" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">process_torrents_awaiting_processing</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Process torrents that are awaiting processing</p>
+          
+
+          
+          <div class="method-source-code" id="process_torrents_awaiting_processing-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 376</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_torrents_awaiting_processing</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::process_torrents_awaiting_processing()&quot;</span>
+  
+    <span class="ruby-comment"># Get list of torrents from DB where state = awaiting processing</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, name, folder, label FROM torrents WHERE tp_state = \&quot;awaiting processing\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+    
+    <span class="ruby-comment"># For each torrent, process it</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">hash</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>]
+      <span class="ruby-identifier">fname</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]
+      <span class="ruby-identifier">fdir</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">2</span>]
+      <span class="ruby-identifier">lbl</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">3</span>]
+      
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;Processing torrent: #{fname} (in #{fdir})&quot;</span> )
+      <span class="ruby-identifier">success</span> = <span class="ruby-identifier">copy_torrent</span>( <span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fname</span>, <span class="ruby-identifier">fdir</span>, <span class="ruby-identifier">lbl</span>)
+      
+      <span class="ruby-comment"># For each torrent, if processed successfully (file copied), set state = processed</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>( <span class="ruby-identifier">hash</span>, <span class="ruby-string">&quot;processed&quot;</span> ) <span class="ruby-keyword">if</span> <span class="ruby-identifier">success</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;    Torrent processed successfully: #{fname}&quot;</span> ) <span class="ruby-keyword">if</span> <span class="ruby-identifier">success</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;    ERROR: Torrent NOT processed successfully: #{fname}&quot;</span> ) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">success</span>
+    <span class="ruby-keyword">end</span>
+    
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- process_torrents_awaiting_processing-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- process_torrents_awaiting_processing-method -->
+
+    
+      <div id="method-i-process_torrents_completed_seeding" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">process_torrents_completed_seeding</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Process torrents that have completed seeding</p>
+          
+
+          
+          <div class="method-source-code" id="process_torrents_completed_seeding-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 492</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_torrents_completed_seeding</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::process_torrents_completed_seeding()&quot;</span>
+  
+    <span class="ruby-comment"># Get list of torrents from DB where state = seeding</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, ratio, name FROM torrents WHERE tp_state = \&quot;seeding\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+
+    <span class="ruby-comment"># For each torrent, if ratio &gt;= target ratio</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">target_ratio</span> = <span class="ruby-identifier">get_target_seed_ratio</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">2</span>], <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>] )
+      <span class="ruby-keyword">if</span> ( <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]) <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">target_ratio</span> )
+        <span class="ruby-comment"># Set state = awaiting removal</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], <span class="ruby-string">&quot;awaiting removal&quot;</span> )
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;State set to awaiting removal: #{r[2]}&quot;</span> )
+        
+        <span class="ruby-comment"># Request removal via utorrent</span>
+        <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">remove_torrent</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>] )
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;Removal request sent: #{r[2]}&quot;</span> )
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+    
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- process_torrents_completed_seeding-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- process_torrents_completed_seeding-method -->
+
+    
+      <div id="method-i-quote" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">quote</span><span
+            class="method-args">(str)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Quote a string</p>
+<dl class="rdoc-list note-list"><dt>str
+<dd>
+<p>String to apply quotes to</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="quote-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 465</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">quote</span>(<span class="ruby-identifier">str</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-node">&quot;\&quot;#{str}\&quot;&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- quote-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- quote-method -->
+
+    
+      <div id="method-i-remove_missing_torrents" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">remove_missing_torrents</span><span
+            class="method-args">(torrents)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Remove torrents from DB that have been removed from utorrent</p>
+<dl class="rdoc-list note-list"><dt>torrents
+<dd>
+<p>current list of torrents passed from utorrent</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="remove_missing_torrents-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 348</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_missing_torrents</span>(<span class="ruby-identifier">torrents</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::remove_missing_torrents( torrents )&quot;</span>
+  
+    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-string">&quot;Removing (pending removal) torrents from DB that are no longer in the uTorrent list&quot;</span> )
+    
+    <span class="ruby-comment"># From DB - Get list of torrents that are awaiting removal</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, name FROM torrents WHERE tp_state = \&quot;awaiting removal\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+    
+    
+    <span class="ruby-comment"># For each torrent in awaiting list, remove it if the torrent list DOES NOT contains its hash</span>
+    <span class="ruby-identifier">removed_count</span> = <span class="ruby-value">0</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">torrents</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>])
+        <span class="ruby-comment"># Remove it from DB</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;    Torrent removed from DB: #{r[1]}&quot;</span> )
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">delete_torrent</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>] )
+        <span class="ruby-identifier">removed_count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+    
+    <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>(<span class="ruby-string">&quot;    No torrents were removed.&quot;</span>) <span class="ruby-keyword">if</span> (<span class="ruby-identifier">removed_count</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- remove_missing_torrents-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- remove_missing_torrents-method -->
+
+    
+      <div id="method-i-remove_torrents" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">remove_torrents</span><span
+            class="method-args">(torrents)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Remove torrents from DB that have been removed from utorrent</p>
+<dl class="rdoc-list note-list"><dt>torrents
+<dd>
+<p>torrents that have been removed</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="remove_torrents-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 315</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_torrents</span>(<span class="ruby-identifier">torrents</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::remove_torrents( torrents )&quot;</span>
+  
+    <span class="ruby-comment"># From DB - Get list of torrents that are awaiting removal</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, name FROM torrents WHERE tp_state = \&quot;awaiting removal\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+    
+    <span class="ruby-comment"># For each torrent in awaiting list, remove it if the removed list contains its hash</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">torrents</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>])
+        <span class="ruby-comment"># Remove it from DB and removal list</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">delete_torrent</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>] )
+        <span class="ruby-identifier">torrents</span>.<span class="ruby-identifier">delete</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>] )
+        <span class="ruby-comment"># Log it</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;Torrent removed (as requested): #{r[1]}&quot;</span> )
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+    
+    <span class="ruby-comment"># For remaining torrents in removal list, remove them from DB and removal list</span>
+    <span class="ruby-identifier">torrents</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span>, <span class="ruby-identifier">t</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">delete_torrent</span>( <span class="ruby-identifier">hash</span> )
+      <span class="ruby-comment"># Log it</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;Torrent removed (NOT requested): #{t.name}&quot;</span> )
+    <span class="ruby-keyword">end</span>
+    
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- remove_torrents-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- remove_torrents-method -->
+
+    
+      <div id="method-i-retrieve_utorrent_settings" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">retrieve_utorrent_settings</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Retrieve the current uTorrent settings. seed_ratio in particular.</p>
+          
+
+          
+          <div class="method-source-code" id="retrieve_utorrent_settings-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 187</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">retrieve_utorrent_settings</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::retrieve_utorrent_settings()&quot;</span>
+  
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-string">&quot;--- Requesting uTorrent Settings ---&quot;</span> )
+  <span class="ruby-identifier">settings</span> = <span class="ruby-identifier">utorrent</span>.<span class="ruby-identifier">get_utorrent_settings</span>()
+  <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&quot;seed_ratio&quot;</span>
+      <span class="ruby-ivar">@seed_ratio</span> = <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">i</span>[<span class="ruby-value">2</span>])
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;    uTorrent seed ratio: #{@seed_ratio.to_s}&quot;</span> )
+      <span class="ruby-keyword">next</span>
+    <span class="ruby-keyword">end</span>
+    
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&quot;dir_completed_download&quot;</span>
+      <span class="ruby-ivar">@dir_completed_download</span> = <span class="ruby-identifier">i</span>[<span class="ruby-value">2</span>]
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;    uTorrent completed download dir: #{@dir_completed_download}&quot;</span> )
+      <span class="ruby-keyword">next</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- retrieve_utorrent_settings-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- retrieve_utorrent_settings-method -->
+
+    
+      <div id="method-i-srcdir-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">srcdir=</span><span
+            class="method-args">(srcdirpath)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the srcdir</p>
+<dl class="rdoc-list note-list"><dt>srcdirpath
+<dd>
+<p>input file path</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="srcdir-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 50</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">srcdir=</span>(<span class="ruby-identifier">srcdirpath</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::srcdir=( #{srcdirpath} )&quot;</span>
+  <span class="ruby-ivar">@srcdir</span> = <span class="ruby-identifier">srcdirpath</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- srcdir-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- srcdir-3D-method -->
+
+    
+      <div id="method-i-srcfile-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">srcfile=</span><span
+            class="method-args">(srcfilepath)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the srcfile</p>
+<dl class="rdoc-list note-list"><dt>srcfilepath
+<dd>
+<p>input file path</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="srcfile-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 61</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">srcfile=</span>(<span class="ruby-identifier">srcfilepath</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::srcfile=( #{srcfilepath} )&quot;</span>
+  <span class="ruby-ivar">@srcfile</span> = <span class="ruby-identifier">srcfilepath</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- srcfile-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- srcfile-3D-method -->
+
+    
+      <div id="method-i-state-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">state=</span><span
+            class="method-args">(stateval)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the current state</p>
+<dl class="rdoc-list note-list"><dt>state
+<dd>
+<p>current torrent state</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="state-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 72</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">state=</span>(<span class="ruby-identifier">stateval</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::state=( #{stateval} )&quot;</span>
+  <span class="ruby-ivar">@state</span> = <span class="ruby-identifier">stateval</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- state-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- state-3D-method -->
+
+    
+      <div id="method-i-unlockApp" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">unlockApp</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>UnSet application lock flag</p>
+          
+
+          
+          <div class="method-source-code" id="unlockApp-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 583</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">unlockApp</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::unlockApp()&quot;</span>
+  
+  <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">release_lock</span>()
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- unlockApp-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- unlockApp-method -->
+
+    
+      <div id="method-i-update_torrent_states" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">update_torrent_states</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Update torrent states within the DB</p>
+          
+
+          
+          <div class="method-source-code" id="update_torrent_states-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 267</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_torrent_states</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::update_torrent_states()&quot;</span>
+  
+    <span class="ruby-comment"># Get list of torrents where state = NULL</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, percent_progress, name FROM torrents WHERE tp_state IS NULL;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+    
+    <span class="ruby-comment"># For each torrent where download percentage &lt; 100, set state = downloading</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-value">1000</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], <span class="ruby-string">&quot;downloading&quot;</span>)
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;State set to downloading: #{r[2]}&quot;</span> )
+      <span class="ruby-keyword">else</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], <span class="ruby-string">&quot;download complete&quot;</span>)
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;State set to downloading complete: #{r[2]}&quot;</span> )
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+    
+    <span class="ruby-comment"># Get list of torrents where state = downloading</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, percent_progress, name FROM torrents WHERE tp_state = \&quot;downloading\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+
+    <span class="ruby-comment"># For each torrent where download percentage = 100, set state = download complete</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1000</span>
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], <span class="ruby-string">&quot;download complete&quot;</span>)
+        <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;State set to downloading complete: #{r[2]}&quot;</span> )
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+            
+    <span class="ruby-comment"># Get list of torrents where state = download complete</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, name FROM torrents WHERE tp_state = \&quot;download complete\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+
+    <span class="ruby-comment"># For each torrent where state = download complete, set state = awaiting processing</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], <span class="ruby-string">&quot;awaiting processing&quot;</span>)
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;State set to awaiting processing: #{r[1]}&quot;</span> )
+    <span class="ruby-keyword">end</span>
+    
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- update_torrent_states-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- update_torrent_states-method -->
+
+    
+      <div id="method-i-update_torrents_completed_processing" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">update_torrents_completed_processing</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Process torrents that have completed processing</p>
+          
+
+          
+          <div class="method-source-code" id="update_torrents_completed_processing-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 473</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_torrents_completed_processing</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::update_torrents_completed_processing()&quot;</span>
+  
+    <span class="ruby-comment"># Get list of torrents from DB where state = processed</span>
+    <span class="ruby-identifier">q</span> = <span class="ruby-string">&quot;SELECT hash, name FROM torrents WHERE tp_state = \&quot;processed\&quot;;&quot;</span>
+    <span class="ruby-identifier">rows</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">q</span>)
+
+    <span class="ruby-comment"># For each torrent, set state = seeding</span>
+    <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">database</span>.<span class="ruby-identifier">update_torrent_state</span>( <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], <span class="ruby-string">&quot;seeding&quot;</span> )
+      <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">log</span>( <span class="ruby-node">&quot;State set to seeding: #{r[1]}&quot;</span> )
+    <span class="ruby-keyword">end</span>
+    
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- update_torrents_completed_processing-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- update_torrents_completed_processing-method -->
+
+    
+      <div id="method-i-utorrent" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">utorrent</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Return a utorrent instance</p>
+          
+
+          
+          <div class="method-source-code" id="utorrent-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 125</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">utorrent</span>()
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-string">&quot;Processor::utorrent()&quot;</span>
+
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@utorrent</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@utorrent</span>.<span class="ruby-identifier">nil?</span>
+  
+  <span class="ruby-identifier">cfg</span> = <span class="ruby-ivar">@controller</span>.<span class="ruby-identifier">cfg</span>
+  <span class="ruby-ivar">@utorrent</span> = <span class="ruby-constant">UTorrentWebUI</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">cfg</span>[<span class="ruby-value">:ip</span>], <span class="ruby-identifier">cfg</span>[<span class="ruby-value">:port</span>], <span class="ruby-identifier">cfg</span>[<span class="ruby-value">:user</span>], <span class="ruby-identifier">cfg</span>[<span class="ruby-value">:pass</span>])
+  
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- utorrent-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- utorrent-method -->
+
+    
+      <div id="method-i-verbose-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">verbose=</span><span
+            class="method-args">(arg)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the verbose flag</p>
+<dl class="rdoc-list note-list"><dt>arg
+<dd>
+<p>verbose mode if true</p>
+</dd></dl>
+          
+
+          
+          <div class="method-source-code" id="verbose-3D-source">
+            <pre><span class="ruby-comment"># File lib/torrentprocessor/processor.rb, line 116</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">verbose=</span>(<span class="ruby-identifier">arg</span>)
+  <span class="ruby-identifier">$LOG</span>.<span class="ruby-identifier">debug</span> <span class="ruby-node">&quot;Processor::verbose=( #{arg} )&quot;</span>
+  <span class="ruby-ivar">@verbose</span> = <span class="ruby-identifier">arg</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- verbose-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- verbose-3D-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+
