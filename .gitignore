@@ -6,3 +6,4 @@ dist/
 # File Types
 *.log
 
+install.cmd
