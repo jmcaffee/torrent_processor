@@ -1,0 +1,7 @@
+# Directories
+build/
+pkg/
+
+# File Types
+*.log
+
