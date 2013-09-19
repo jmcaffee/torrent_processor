@@ -1,7 +1,7 @@
 = TorrentProcessor Overview
 
 ==== Generated:	07/31/2011
-==== Copyright (c) 2011, kTech Systems LLC. All rights reserved.
+==== Copyright (c) 2013, kTech Systems LLC. All rights reserved.
 ==== Website:   	http://ktechsystems.com
 
 ------------------------------------------------------------------------
