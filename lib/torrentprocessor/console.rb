@@ -12,7 +12,7 @@ require 'ktcommon/ktcmdline'
 require 'utorrentwebui'
 require 'formatter'
 require 'plugin'
-require 'dbplugin'
+require 'plugin/db_plugin'
 require 'utplugin'
 require 'cfgplugin'
 
