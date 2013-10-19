@@ -13,7 +13,7 @@ require 'utorrentwebui'
 require 'formatter'
 require 'plugin'
 require 'plugin/db_plugin'
-require 'utplugin'
+require 'plugin/ut_plugin'
 require 'cfgplugin'
 
 
