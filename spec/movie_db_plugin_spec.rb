@@ -1,7 +1,7 @@
 require 'spec_helper'
 include TorrentProcessor::Plugin
 
-describe TMDBPlugin do
+describe MovieDBPlugin do
 
     let(:ctrl)  do
       ctrl = OpenStruct.new
@@ -10,12 +10,12 @@ describe TMDBPlugin do
     end
 
   it "provides console commands" do
-    cmds = TMDBPlugin.register_cmds
+    cmds = MovieDBPlugin.register_cmds
     cmds.size.should eq 2
   end
 
   context "when testing the connection" do
-    subject(:plugin) {TMDBPlugin.new}
+    subject(:plugin) {MovieDBPlugin.new}
 
     it ".test_connection connects to TMDB.org" do
       expect(plugin.test_connection([nil,ctrl])).to be true
@@ -33,7 +33,7 @@ describe TMDBPlugin do
         let(:a_team_file)               {'The.A-Team.mkv'}
         let(:a_team_title)              {'The A-Team'}
 
-    subject(:plugin) {TMDBPlugin.new}
+    subject(:plugin) {MovieDBPlugin.new}
 
     it "searches for a movie title" do
       expect(plugin.search_movie([total_recall_file, ctrl])[0].title).to eq total_recall_title

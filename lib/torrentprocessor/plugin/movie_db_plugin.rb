@@ -1,6 +1,6 @@
 ############################################################################
-# File::    tmdb_plugin.rb
-# Purpose:: Retrieve info from TMDB
+# File::    movie_db_plugin.rb
+# Purpose:: Retrieve info from TMDB using MovieDB
 #
 # Author::    Jeff McAffee 2013-10-19
 # Copyright:: Copyright (c) 2013, kTech Systems LLC. All rights reserved.
@@ -10,20 +10,20 @@
 module TorrentProcessor::Plugin
 
   ##########################################################################
-  # TMDBPlugin class
-  class TMDBPlugin
+  # MovieDBPlugin class
+  class MovieDBPlugin
     include KtCmdLine
 
 
-    def TMDBPlugin.register_cmds
-      { ".tmdbtestcon"      => Command.new(TMDBPlugin, :test_connection,    "Test the TMdb connection"),
-        ".tmdbmoviesearch"  => Command.new(TMDBPlugin, :search_movie,       "Search for a movie"),
+    def MovieDBPlugin.register_cmds
+      { ".tmdbtestcon"      => Command.new(MovieDBPlugin, :test_connection,    "Test the TMdb connection"),
+        ".tmdbmoviesearch"  => Command.new(MovieDBPlugin, :search_movie,       "Search for a movie"),
         #"." => Command.new(IMDBPlugin, :, ""),
       }
     end
 
     def initialize
-      @tag = 'TMDBPlugin'
+      @tag = 'MovieDBPlugin'
     end
 
     ###
@@ -81,5 +81,5 @@ module TorrentProcessor::Plugin
 
       return movies
     end
-  end # class TMDBPlugin
+  end # class MovieDBPlugin
 end # module TorrentProcessor::Plugin
