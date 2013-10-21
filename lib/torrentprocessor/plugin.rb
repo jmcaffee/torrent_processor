@@ -35,3 +35,4 @@ end # module TorrentProcessor
 require_relative('plugin/plugin_manager')
 require_relative('plugin/command')
 require_relative('plugin/db_plugin_base')
+require_relative('plugin/tmdb_plugin')

@@ -1,7 +1,7 @@
 ##############################################################################
 # File::    torrentprocessorcfg.rb
 # Purpose:: TorrentProcessor configuration file reader/writer class.
-# 
+#
 # Author::    Jeff McAffee 07/31/2011
 # Copyright:: Copyright (c) 2011, kTech Systems LLC. All rights reserved.
 # Website::   http://ktechsystems.com
@@ -12,7 +12,7 @@ require 'torrentprocessor/version'
 
 
 module TorrentProcessor
-    
+
   ##########################################################################
   # Config class
   class Config < KtCfg::CfgFile
@@ -40,16 +40,16 @@ module TorrentProcessor
       $LOG.debug "Config::setDefaults"
 
       # Notes about APPDATA paths:
-      # Local app data should be used when an app's data is too 
+      # Local app data should be used when an app's data is too
       # big to move around. Or is specific to the machine running
       # the application.
       #
-      # Roaming app data files could be pushed to a server (in a 
+      # Roaming app data files could be pushed to a server (in a
       # domain environment) and downloaded onto a different work
       # station.
       #
       # LocalLow is used for data that must be sandboxed. Currently
-      # it is only used by IE for addons and storing data from 
+      # it is only used by IE for addons and storing data from
       # untrusted sources (as far as I know).
       #
 
@@ -61,16 +61,19 @@ module TorrentProcessor
       @cfg[:version]  = TorrentProcessor::VERSION
       @cfg[:logging]  = false
       @cfg[:filters] = {}
+      @cfg[:tmdb_api_key] = ''
+      @cfg[:target_movies_path] = ''
+      @cfg[:no_copy_movie_time] = -1
 
       @cfgFile = "torrentprocessor.yml"
-      
+
       # Set the config file path. Default is the 'global' one in APPDATA.
       if( @rootDir.nil? )
-        @rootDir = appDataPath 
+        @rootDir = appDataPath
         @cfgFile = "config.yml"
-        
+
         # Override the gobal config if there is a local (current working dir) version.
-        if(File.exists?(File.join(FileUtils.pwd(), "torrentprocessor.yml")))      
+        if(File.exists?(File.join(FileUtils.pwd(), "torrentprocessor.yml")))
           @rootDir = FileUtils.pwd()
           @cfgFile = "torrentprocessor.yml"
         end

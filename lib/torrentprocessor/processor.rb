@@ -38,6 +38,7 @@ module TorrentProcessor
       @srcfile    = nil
       @verbose    = false
       @utorrent   = nil
+      @moviedb    = nil
 
     end
 
@@ -134,7 +135,20 @@ module TorrentProcessor
 
 
     ###
-    # TODO: write process() description
+    # Return a moviedb instance
+    #
+    def moviedb()
+      $LOG.debug "Processor::moviedb"
+
+      return @moviedb unless @moviedb.nil?
+
+      cfg = @controller.cfg
+      @moviedb = MovieDB.new(cfg[:tmdb_api_key])
+    end
+
+
+    ###
+    # Process torrent files retrieved from UTorrent application
     #
     def process()
       $LOG.debug "Processor::process"
@@ -432,6 +446,7 @@ module TorrentProcessor
       if (fdir != @dir_completed_download)
         isSubDir = true
         pathTail = fdir.split(@dir_completed_download)[1]
+        pathTail = pathTail.prepend('/') unless pathTail.start_with?('/')
         cmdLineSwitch = "/E"
         # If we're using the /E switch (copy empty subdirs) we do NOT want to provide a filename (we're copying the entire dir):
       end
