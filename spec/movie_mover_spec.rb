@@ -69,14 +69,14 @@ describe MovieMover do
       end
 
 
-    it ".get_video_file returns largest file in directory" do
+    it "#get_video_file returns largest file in directory" do
       expect(mover.get_video_file(total_recall_dir).end_with?(total_recall_file + '.mp4')).to eq true
       expect(mover.get_video_file(bridesmaids_dir). end_with?(bridesmaids_file  + '.avi')).to eq true
       expect(mover.get_video_file(cowboys_dir).     end_with?(cowboys_file      + '.mkv')).to eq true
       expect(mover.get_video_file(ateam_dir).       end_with?(ateam_file        + '.mkv')).to eq true
     end
 
-    it ".process processes all directories in the root movie directory" do
+    it "#process processes all directories in the root movie directory" do
       mover.process(root_src_dir, root_dest_dir, -1, -1)
 
       expect(File.exist?(total_recall_final_file_path)).to eq true
@@ -92,43 +92,13 @@ describe MovieMover do
       expect(File.exist?(ateam_dir)).to eq false
     end
 
-    #context "when testing the connection" do
 
-    #  it ".test_connection connects to TMDB.org" do
-    #    expect(mdb.test_connection()).to be true
-    #  end
-    #end
+    context "when logger is nil" do
+      subject(:mover)   { MovieMover.new(mdb, nil) }
 
-
-    #context "when searching for a movie" do
-    #    let(:total_recall_file)         {'Total Recall-Dvdrip-H264-MRFIXIT'}
-    #    let(:total_recall_title)        {'Total Recall'}
-    #    let(:bridesmaids_file)          {'Brides Maids 2011 DVDRiP XciD AC3 - BHRG.avi'}
-    #    let(:bridesmaids_title)         {'Bridesmaids'}
-    #    let(:cowboys_and_aliens_file)   {'Cowboys.Aliens.mkv'}
-    #    let(:cowboys_and_aliens_title)  {'Cowboys & Aliens'}
-    #    let(:a_team_file)               {'The.A-Team.mkv'}
-    #    let(:a_team_title)              {'The A-Team'}
-
-    #  it "searches for a movie title" do
-    #    expect(mdb.search_movie(total_recall_file)[0].title).to eq total_recall_title
-    #  end
-
-    #  it "searches for a movie title with year" do
-    #    expect(mdb.search_movie(bridesmaids_file)[0].title).to eq bridesmaids_title
-    #  end
-
-    #  it "strips spaces and re-searches for a movie title" do
-    #    expect(mdb.search_movie(bridesmaids_file)[0].title).to eq bridesmaids_title
-    #  end
-
-    #  it "finds titles with missing special characters" do
-    #    expect(mdb.search_movie(cowboys_and_aliens_file)[0].title).to eq cowboys_and_aliens_title
-    #  end
-
-    #  it "searches for a movie title with dash" do
-    #    expect(mdb.search_movie(a_team_file)[0].title).to eq a_team_title
-    #  end
-    #end # context search command
+      it "MovieMover does not blow up" do
+        expect(mover.process(root_src_dir, root_dest_dir, -1, -1))
+      end
+    end # context "when logger is nil"
   end # context 'when movies need to be processed'
 end

@@ -8,11 +8,11 @@
 ##############################################################################
 
 require_relative 'robocopy'
+require 'YAML'
 
 module TorrentProcessor::ProcessorPlugin
 
   class MovieMoverDetails
-    require 'YAML'
 
     def initialize(config_file)
       @yml_path = config_file
@@ -44,6 +44,12 @@ module TorrentProcessor::ProcessorPlugin
 
 
 
+  class NullLogger
+    def log msg
+    end
+  end
+
+
   class MovieMover
     require_relative 'movie_db'
 
@@ -56,6 +62,7 @@ module TorrentProcessor::ProcessorPlugin
       @tag = 'MovieMover'
       @db = movie_db
       @logger = logger
+      @logger ||= NullLogger.new
     end
 
     def process(src_dir, dest_dir, start_time, stop_time)
@@ -110,11 +117,20 @@ module TorrentProcessor::ProcessorPlugin
     def process_dir dir
       #puts "process_dir [#{dir}]"
 
+      @logger.log "#{@tag}: Processing directory: #{dir}"
+
       # Can't process the dir if there's no details file.
-      return unless details_file_exists? dir
+      if !details_file_exists? dir
+        @logger.log "    'details' file does not exist! Aborting processing of directory"
+        return
+      end
+
       # No need to process this dir if the lock file exists.
       # It's already been processed.
-      return if lock_file_exists? dir
+      if lock_file_exists? dir
+        @logger.log "    lock file exists! Aborting processing of directory"
+        return
+      end
 
       details = MovieMoverDetails.new(details_file(dir)).read
 
@@ -143,13 +159,25 @@ module TorrentProcessor::ProcessorPlugin
 
     def clean_dir dir
       #puts "clean_dir [#{dir}]"
+      @logger.log "#{@tag}: Cleaning directory: #{dir}"
 
       pc_file = File.join(dir, COMPLETE_FILE)
 
       # Can't clean the dir if there's no 'completed' file.
-      return if !File.exist?(pc_file)
-      return if dir.nil? || dir.empty? || dir == '..' || dir == '..' || dir == '/'
-      return if !File.exists?(dir) && File.directory?(dir)
+      if !File.exist?(pc_file)
+        @logger.log "    'completed' file does not exist! Aborting cleaning of directory"
+        return
+      end
+
+      if dir.nil? || dir.empty? || dir == '..' || dir == '..' || dir == '/'
+        @logger.log "    invalid directory! Aborting cleaning of directory"
+        return
+      end
+
+      if !File.exists?(dir) && File.directory?(dir)
+        @logger.log "    directory does not exist! Aborting cleaning of directory"
+        return
+      end
 
       FileUtils.remove_dir(dir)
     end
