@@ -16,4 +16,44 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
+def create_file_of_size(file_path, file_size)
+  # Create the directory path if it doesn't exist.
+  pn = Pathname.new(file_path)
+  dir = pn.dirname
+  if !dir.exist?
+    dir.mkpath
+  end
+
+  # Delete the existing file if needed.
+  pn = Pathname.new(file_path)
+  if pn.exist?
+    pn.delete
+  end
+
+  # Write a file to disk.
+  File.open(file_path, 'w') do |f|
+    f.write '1'*file_size
+  end
+end
+
+def generate_movie_set(root_dir, movie_name, movie_ext)
+  root = Pathname.new(root_dir)
+  root = root + movie_name
+  movie = root
+  movie += movie_name + movie_ext
+
+  sample = root
+  sample += movie_name + '(sample)' + movie_ext
+
+  nfo = root
+  nfo += movie_name + '.nfo'
+
+  create_file_of_size(movie.to_s, 22000)
+  create_file_of_size(sample.to_s, 10000)
+  create_file_of_size(nfo.to_s, 2000)
+
+  # Return the created dir
+  root.to_s
+end
+
 require_relative '../lib/torrentprocessor'

@@ -423,7 +423,7 @@ module TorrentProcessor
     #
     def copy_torrent( hash, fname, fdir, lbl)
       $LOG.debug "Processor::copy_torrent( #{hash}, #{fname}, #{fdir}, #{lbl} )"
-      appPath = "robocopy"
+      #appPath = "robocopy"
 
       # Setup the destination processing folder path.
       destPath = @controller.cfg[:otherprocessing]
@@ -432,7 +432,7 @@ module TorrentProcessor
 
       # Handle situation where the torrent is in a subfolder.
       pathTail = ""
-      cmdLineSwitch = ""
+      #cmdLineSwitch = ""
       isSubDir = false
 
       if (!fdir.include?( @dir_completed_download ))
@@ -447,21 +447,28 @@ module TorrentProcessor
         isSubDir = true
         pathTail = fdir.split(@dir_completed_download)[1]
         pathTail = pathTail.prepend('/') unless pathTail.start_with?('/')
-        cmdLineSwitch = "/E"
+        #cmdLineSwitch = "/E"
         # If we're using the /E switch (copy empty subdirs) we do NOT want to provide a filename (we're copying the entire dir):
       end
 
       destPath += pathTail
-      cmdLine = "#{quote(fdir)} #{quote(destPath)} #{quote(fname)}"
-      cmdLine = "#{quote(fdir)} #{quote(destPath)} #{cmdLineSwitch}" unless !isSubDir
-      appCmd = "#{appPath} #{cmdLine}"
-      @controller.log "Executing: #{appCmd}"
 
-      result = Kernel.system("#{appCmd}")
-      if result
-          @controller.log ("    ERROR: #{appPath} failed. Command line it was called with: ".concat(appCmd) )
-          return false
-      end
+      if isSubDir
+        Robocopy.copy_dir(fdir, destPath, true, @controller)
+      else
+        Robocopy.copy_file(fdir, destPath, fname, @controller)
+      end # if
+
+      #cmdLine = "#{quote(fdir)} #{quote(destPath)} #{quote(fname)}"
+      #cmdLine = "#{quote(fdir)} #{quote(destPath)} #{cmdLineSwitch}" unless !isSubDir
+      #appCmd = "#{appPath} #{cmdLine}"
+      #@controller.log "Executing: #{appCmd}"
+
+      #result = Kernel.system("#{appCmd}")
+      #if result
+      #    @controller.log ("    ERROR: #{appPath} failed. Command line it was called with: ".concat(appCmd) )
+      #    return false
+      #end
 
       targetPath = "#{destPath}\\#{fname}"
       targetPath = "#{destPath}" unless !isSubDir
@@ -481,9 +488,9 @@ module TorrentProcessor
     #
     # str:: String to apply quotes to
     #
-    def quote(str)
-      return "\"#{str}\""
-    end
+    #def quote(str)
+    #  return "\"#{str}\""
+    #end
 
 
     ###
