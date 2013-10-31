@@ -91,6 +91,33 @@ end
 
 
 #############################################################################
+desc "Build a OCRA executable with installer"
+task :exe_installer => [:init, "inno:generate_iss"] do
+  if (!File.exists?("#{BUILDDIR}/#{PROJNAME}Installer_#{PKG_VERSION}.exe"))
+      puts "*** Generating executable #{PROJNAME}Installer_#{PKG_VERSION}.exe"
+      REAL_LOCATION = File.absolute_path(".")
+      puts "REAL_LOCATION: #{REAL_LOCATION}"
+      cp("./bin/#{PROJNAME}", "#{BUILDDIR}/#{PROJNAME}.rb")
+      cd("#{REAL_LOCATION}") do |d|
+        # Using --no-lzma will turn off lzma compression. This may reduce application start up time:
+        #   From http://rubyforge.org/pipermail/wxruby-users/2009-September.txt :
+        #     Try building the executable with the --no-lzma option. The resulting 
+        #     file will be bigger but it may well start faster. LZMA is a very 
+        #     efficient compression algorithm but quite slow.
+
+        # TODO: Test with no lzma and see if the start up time improves.
+
+        output = `ocra --console #{BUILDDIR}/#{PROJNAME}.rb --chdir-first --no-lzma --gemfile gemfile --innosetup #{PROJNAME}.iss`
+        puts output
+      end
+  end
+  
+  mv("./Output/#{PROJNAME}Installer_#{PKG_VERSION}.exe", "#{BUILDDIR}/#{PROJNAME}Installer_#{PKG_VERSION}.exe")
+  rm_rf "./Output" if File.exists? './Output'
+end
+
+
+#############################################################################
 desc "Documentation for building gem and executable"
 task :help do
   hr = "-"*79
