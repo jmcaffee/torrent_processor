@@ -3,9 +3,11 @@
 #
 module TorrentProcessor
 
-  VERSION = "0.2.9" unless constants.include?("VERSION")
+  require 'date'
+
+  VERSION = "0.3.0" unless constants.include?("VERSION")
   APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
-  COPYRIGHT = "Copyright (c) 2012, kTech Systems LLC. All rights reserved." unless constants.include?("COPYRIGHT")
+  COPYRIGHT = "Copyright (c) #{Date.today.year}, kTech Systems LLC. All rights reserved." unless constants.include?("COPYRIGHT")
 
 
   def self.logo()

@@ -14,3 +14,4 @@ end # module TorrentProcessor
 
 require_relative('processor_plugin/movie_db')
 require_relative('processor_plugin/movie_mover')
+require_relative('processor_plugin/robocopy')

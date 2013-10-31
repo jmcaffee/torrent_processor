@@ -65,7 +65,21 @@ module TorrentProcessor::ProcessorPlugin
       @logger ||= NullLogger.new
     end
 
+    def within_time_frame start_time, stop_time
+      start = Time.parse(start_time)
+      stop = Time.parse(stop_time)
+      now = Time.now
+      if start >= now && now <= stop
+        return true
+      end
+      false
+    end
+
     def process(src_dir, dest_dir, start_time, stop_time)
+      if start_time != -1 && stop_time != -1
+        return unless within_time_frame(start_time, stop_time)
+      end
+
       # Build list of directories to parse.
       dirs = Dir.glob(src_dir + '/*')
       dirs.delete_if { |d| !File.directory?(d) }

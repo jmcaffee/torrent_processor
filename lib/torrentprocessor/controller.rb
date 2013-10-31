@@ -261,7 +261,7 @@ module TorrentProcessor
     def interactiveMode()
       $LOG.debug "Controller::interactiveMode"
 
-      if !@setup.checkSetupCompleted()
+      if !@setup.check_setup_completed()
         # Tell the user to configure the application if it has not yet been configured.
         puts
         puts "*"*10
@@ -280,7 +280,7 @@ module TorrentProcessor
     #
     def checkSetupCompleted()
       $LOG.debug "Controller::checkSetupCompleted"
-      if !@setup.checkSetupCompleted()
+      if !@setup.check_setup_completed()
         # Force the user to configure the application if it has not yet been configured.
         puts "Torrent Processor has not yet been configured."
         puts "Run Torrent Processor with the -init option to configure it."
@@ -295,7 +295,7 @@ module TorrentProcessor
     #
     def setupApp()
       $LOG.debug "Controller::setupApp"
-      @setup.setupApp()
+      @setup.setup_app()
 
     end
 

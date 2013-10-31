@@ -63,7 +63,8 @@ module TorrentProcessor
       @cfg[:filters] = {}
       @cfg[:tmdb_api_key] = ''
       @cfg[:target_movies_path] = ''
-      @cfg[:no_copy_movie_time] = -1
+      @cfg[:can_copy_start_time] = '00:00'
+      @cfg[:can_copy_stop_time] = '23:59'
 
       @cfgFile = "torrentprocessor.yml"
 

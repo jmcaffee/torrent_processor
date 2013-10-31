@@ -48,10 +48,10 @@ module TorrentProcessor
     ###
     # Setup application
     #
-    def setupApp()
-      $LOG.debug "TPSetup::setupApp"
-      setupConfig()
-      setupDb()
+    def setup_app()
+      $LOG.debug "TPSetup::setup_app"
+      setup_config()
+      setup_db()
     end
 
 
@@ -60,15 +60,15 @@ module TorrentProcessor
     #
     # returns:: false if setup is not yet completed
     #
-    def checkSetupCompleted()
-      $LOG.debug "TPSetup::checkSetupCompleted"
+    def check_setup_completed()
+      $LOG.debug "TPSetup::check_setup_completed"
 
       # Test for an existing config file.
-      foundConfig = configExists?
+      foundConfig = config_exists?
       return false if !foundConfig
 
       # Test for an existing DB.
-      foundDb = dbExists?
+      foundDb = db_exists?
       return false if !foundDb
 
       return true
@@ -80,8 +80,8 @@ module TorrentProcessor
     #
     # returns:: false if setup is not yet completed
     #
-    def configExists?()
-      $LOG.debug "TPSetup::configExists?()"
+    def config_exists?()
+      $LOG.debug "TPSetup::config_exists?()"
 
       # Test for an existing config file.
 
@@ -105,8 +105,8 @@ module TorrentProcessor
     #
     # returns:: false if DB doesn't exist
     #
-    def dbExists?()
-      $LOG.debug "TPSetup::dbExists?()"
+    def db_exists?()
+      $LOG.debug "TPSetup::db_exists?()"
 
       # Test for an existing DB.
 
@@ -124,7 +124,7 @@ module TorrentProcessor
     ###
     # Print a header to STDOUT. Header is surrounded with lines.
     # hdr:: header to print
-    def printHeader(hdr)
+    def print_header(hdr)
       puts
       puts '-'* hdr.size
       puts hdr
@@ -134,14 +134,18 @@ module TorrentProcessor
 
 
     ###
-    # verifyUserInputs should be called after getting user input.Asks
+    # verify_user_inputs should be called after getting user input.Asks
     # the user if they are happy with the values they supplied and gives
     # them an opportunity to change their answer or quit the program.
-    def verifyUserInputs(questions, answers)
-      printHeader("Verify Torrent Processor Settings:")
+    def verify_user_inputs(questions, answers)
+      print_header("Verify Torrent Processor Settings:")
 
       questions.each_index do |i|
-        puts "#{questions[i]} " + "#{answers[i]}"
+        if questions[i].is_a? Array
+          puts "#{questions[i][0]}: " + "#{answers[i]}"
+        else
+          puts "#{questions[i]}: " + "#{answers[i]}"
+        end
       end
       puts
       choice = getInput("Is this information correct? (Y/n/q)")
@@ -155,27 +159,39 @@ module TorrentProcessor
     # Get data from the user.
     # questions:: array of questions.
     # returns:: array of user's answers. Index of answer matches index of question.
-    def askUser(questions)
-      printHeader("Torrent Processor Setup")
+    def ask_user(questions)
+      print_header("Torrent Processor Setup")
 
       answers = []
       questions.each do |tq|
-        answers << getInput(tq)
+        if tq.is_a?(Array)
+          answers << get_input_with_default(tq[0], tq[1])
+          if answers.last.nil? || answers.last.empty?
+            answers.pop
+            answers << tq[1]
+          end
+        else
+          answers << getInput(tq)
+        end
       end
       answers
     end
 
+    def get_input_with_default question, default
+      custom_question = question + " [#{default}]: "
+      getInput custom_question
+    end
 
     ###
     # Setup the config file by building a list of questions,
     # display them to the user and collecting the answers. Once the user has
     # confirmed the submitted information we can apply the answers to the
     # config file. The answers will be in the same order as the questions.
-    def setupConfig()
-      $LOG.debug "TPSetup::setupConfig()"
+    def setup_config()
+      $LOG.debug "TPSetup::setup_config()"
       #return getTokenValues_TEST()
 
-      if configExists?
+      if config_exists?
         choice = getInput("A configuration file already exists. Do you wish to recreate it? (Y/n)")
         return if choice != 'Y'
 
@@ -185,63 +201,69 @@ module TorrentProcessor
       end
 
       questions = []
-      questions << "IP of machine running uTorrent (default: 127.0.0.1) :"
-      questions << "uTorrent webui port:"
-      questions << "uTorrent webui user name:"
-      questions << "uTorrent webui user password:"
-      questions << "Folder to store logs in [full path] (default: #{@cfg[:appPath]}):"
-      questions << "Max size of log file in bytes (default: 0 = no limit):"
-      questions << "Processing folder for TV Shows [full path]:"
-      questions << "Processing folder for Movies [full path]:"
-      questions << "Processing folder for other downloads [full path] (default: TV Shows folder):"
-      questions << "TMDB API Key (sign up at https://www.themoviedb.org/account/signup):"
-      questions << "Final destination folder for movies (can be mapped drive):"
-      questions << "No movie copying after time (24 hr format; ex: 1830):"
+      questions << ["IP of machine running uTorrent", @cfg[:ip]]
+      questions << ["uTorrent webui port", @cfg[:port]]
+      questions << ["uTorrent webui user name", @cfg[:user]]
+      questions << ["uTorrent webui user password", @cfg[:pass]]
+      questions << ["Folder to store logs in (full path)", @cfg[:appPath]]
+      questions << ["Max size of log file in bytes (0 = no limit)", @cfg[:maxlogsize]]
+      questions << ["Processing folder for TV Shows (full path)", @cfg[:tvprocessing]]
+      questions << ["Processing folder for Movies (full path)", @cfg[:movieprocessing]]
+      questions << ["Processing folder for other downloads (full path)", @cfg[:otherprocessing]]
+      questions << ["TMDB API Key (sign up at https://www.themoviedb.org/account/signup)", @cfg[:tmdb_api_key]]
+      questions << ["Final destination folder for movies (can be mapped drive)", @cfg[:target_movies_path]]
+      questions << ["Allow movie copying after time (24 hr format; ex: 00:00)", @cfg[:can_copy_start_time]]
+      questions << ["Allow movie copying until time (24 hr format; ex: 18:30)", @cfg[:can_copy_stop_time]]
 
-      answers = askUser(questions)
+      answers = ask_user(questions)
 
       # Set defaults here:
       # All questions are required (except #1, 5, and 6)
 
       # WebUI port
-      if(answers[0].empty?)
+      if is_empty?(answers[0])
         answers[0] = "127.0.0.1"
       end
 
       # Log dir
-      if(answers[4].empty?)
+      if is_empty?(answers[4])
         answers[4] = @cfg[:appPath]
       end
 
       # Max size of log file
-      if(answers[5].empty?)
+      if is_empty?(answers[5])
         answers[5] = 0
       else
         answers[5] = Integer(answers[5])
       end
 
       # Processing folder (other)
-      if(answers[8].empty?)
+      if is_empty?(answers[8])
         answers[8] = answers[6]
       end
 
       # TMDB API Key
-      if(answers[9].empty?)
+      if is_empty?(answers[9])
         answers[9] = ''
       end
 
       # Target movies folder
-      if(answers[10].empty?)
+      if is_empty?(answers[10])
         answers[10] = ''
       end
 
       # Don't copy movies after a certain time
-      if(answers[11].empty?)
-        answers[11] = -1
+      if is_empty?(answers[11])
+        answers[11] = "00:00"
       end
 
-      while(!verifyUserInputs(questions, answers))
-        answers = askUser(questions)
+      # Don't copy movies after a certain time
+      if is_empty?(answers[12])
+        answers[12] = "00:00"
+      end
+
+      while(!verify_user_inputs(questions, answers))
+        answers = ask_user(questions)
       end
 
       @cfg[:ip]                   = answers[0]
@@ -255,7 +277,8 @@ module TorrentProcessor
       @cfg[:otherprocessing]      = answers[8]
       @cfg[:tmdb_api_key]         = answers[9]
       @cfg[:target_movies_path]   = answers[10]
-      @cfg[:no_copy_movie_time]   = answers[11]
+      @cfg[:can_copy_start_time]  = answers[11]
+      @cfg[:can_copy_stop_time]   = answers[12]
 
       FileUtils.mkdir_p( @cfg[:appPath] )
       c = Config.new
@@ -264,13 +287,21 @@ module TorrentProcessor
     end
 
 
+    def is_empty? var
+      return true if var.nil?
+
+      return true if var.is_a?(String) && var.empty?
+
+      false
+    end
+
     ###
     # Setup the DB file by creating the DB and tables.
     #
-    def setupDb()
-      $LOG.debug "TPSetup::setupDb()"
+    def setup_db()
+      $LOG.debug "TPSetup::setup_db()"
 
-      if dbExists?
+      if db_exists?
         choice = getInput("A database already exists. Do you wish to recreate it? (Y/n)")
         return if choice != 'Y'
 

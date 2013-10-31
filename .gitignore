@@ -8,3 +8,5 @@ dist/
 
 install.cmd
 tmp/
+TorrentProcessor.iss
+install

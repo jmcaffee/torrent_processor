@@ -10,6 +10,7 @@
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
 require 'utorrentwebui'
+require_relative 'processor_plugin'
 
 
 module TorrentProcessor
@@ -17,6 +18,7 @@ module TorrentProcessor
   ##########################################################################
   # Processor class
   class Processor
+    include ProcessorPlugin
 
   attr_reader     :controller
   attr_reader     :srcdir
@@ -142,8 +144,13 @@ module TorrentProcessor
 
       return @moviedb unless @moviedb.nil?
 
-      cfg = @controller.cfg
-      @moviedb = MovieDB.new(cfg[:tmdb_api_key])
+      api_key = @controller.cfg[:tmdb_api_key]
+      if api_key.nil? || api_key.empty?
+        @controller.log "!!! No TMdb API key configured !!!"
+        return nil
+      end
+
+      @moviedb = MovieDB.new(api_key)
     end
 
 
@@ -192,6 +199,7 @@ module TorrentProcessor
       # Process torrents that have completed seeding.
       process_torrents_completed_seeding()
 
+      move_completed_movies()
     end
 
 
@@ -474,7 +482,6 @@ module TorrentProcessor
       targetPath = "#{destPath}" unless !isSubDir
       if( !File.exists?(targetPath) )
           @controller.log ("    ERROR: Unable to verify that target exists. Target path: #{targetPath}")
-          @controller.log ("    ERROR: #{appPath} failed to copy file. Command line it was called with: ".concat(appCmd) )
           return false
       end
 
@@ -612,6 +619,21 @@ module TorrentProcessor
       @controller.database.release_lock()
     end
 
+    ###
+    # Move completed movies to the final directory (where XBMC looks)
+    #
+    def move_completed_movies
+      $LOG.debug "Processor::move_completed_movies"
+
+      db = moviedb
+      if !db.nil?
+        mover = MovieMover.new(db, @controller)
+        mover.process(@controller.cfg[:movieprocessing],
+                      @controller.cfg[:target_movies_path],
+                      @controller.cfg[:can_copy_start_time],
+                      @controller.cfg[:can_copy_stop_time])
+      end
+    end
 
   end # class Processor
 
