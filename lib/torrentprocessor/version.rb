@@ -5,7 +5,7 @@ module TorrentProcessor
 
   require 'date'
 
-  VERSION = "0.3.0" unless constants.include?("VERSION")
+  VERSION = "0.3.1" unless constants.include?("VERSION")
   APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
   COPYRIGHT = "Copyright (c) #{Date.today.year}, kTech Systems LLC. All rights reserved." unless constants.include?("COPYRIGHT")
 
