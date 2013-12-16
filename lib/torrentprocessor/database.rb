@@ -157,7 +157,7 @@ module TorrentProcessor
 
       if updates.length > 0
         query = buildBatchUpdateQuery( updates )
-        $LOG.verbose query
+        $LOG.info query
         execute_batch( query )
       end
 
@@ -165,7 +165,7 @@ module TorrentProcessor
         query = buildBatchInsertQuery( inserts )
         #File.open("r:/tools/ruby/torrentprocessor/trunk/query.sql", 'w') {|f| f.write( query ); f.flush; }
         #puts query
-        $LOG.verbose query
+        $LOG.info query
         execute_batch( query )
       end
     end
@@ -334,7 +334,7 @@ module TorrentProcessor
 
       query = <<EOQ
 UPDATE torrents SET
-  name              = #{tdata.name},
+  name              = "#{tdata.name}",
   status            = #{tdata.status},
   percent_progress  = #{tdata.percent_progress},
   ratio             = #{tdata.ratio},
