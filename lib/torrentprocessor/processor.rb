@@ -31,9 +31,9 @@ module TorrentProcessor
 
   STATE_DOWNLOADING         = 'downloading'
   STATE_DOWNLOAD_COMPLETE   = 'downloaded'
-  STATE_AWAITING_PROCESSING = 'awaiting processing'
+  STATE_AWAITING_PROCESSING = 'processing'
   STATE_SEEDING             = 'seeding'
-  STATE_AWAITING_REMOVAL    = 'awaiting removal'
+  STATE_AWAITING_REMOVAL    = 'removing'
 
     ###
     # Processor constructor

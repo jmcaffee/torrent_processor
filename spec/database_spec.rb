@@ -125,7 +125,7 @@ describe Database do
       delete_db db_path
     end
 
-    context ".upgrade_1" do
+    context ".migrate_to_v1" do
 
       before(:each) do
         db.connect
@@ -136,25 +136,65 @@ describe Database do
       end
 
       it "upgrades the schema to version 1" do
-        Database::Schema.upgrade_1 db
+        Database::Schema.migrate_to_v1 db
         expect(db.schema_version).to eq 1
+      end
+
+      it "does not run if schema version > 1" do
+        db.execute('PRAGMA user_version = 3;')
+        Database::Schema.migrate_to_v1 db
+
+        expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+        expect(db.schema_version).to eq 3
       end
 
       it "drops app_lock table" do
         expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
 
-        Database::Schema.upgrade_1 db
+        Database::Schema.migrate_to_v1 db
         expect { db.execute('SELECT * FROM app_lock;') }.to raise_exception
       end
 
       it "changes tp_state value 'download complete' to 'downloaded'" do
 
-        db.update_torrent_state('ab0', 'download complete')
-        db.update_torrent_state('ab2', 'download complete')
+        old_state = 'download complete'
+        db.update_torrent_state('ab0', old_state)
+        db.update_torrent_state('ab2', old_state)
+
         expect(db.execute('SELECT * FROM torrents;').size).to eq 5
 
-        Database::Schema.upgrade_1 db
-        expect(db.execute('SELECT * FROM torrents WHERE tp_state ="download complete";').size).to eq 0
+        Database::Schema.migrate_to_v1 db
+        select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
+        expect(
+          db.execute( select_old_state_from_torrents ).size).to eq 0
+      end
+
+      it "changes tp_state value 'awaiting processing' to 'processing'" do
+
+        old_state = 'awaiting processing'
+        db.update_torrent_state('ab0', old_state)
+        db.update_torrent_state('ab2', old_state)
+
+        expect(db.execute('SELECT * FROM torrents;').size).to eq 5
+
+        Database::Schema.migrate_to_v1 db
+        select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
+        expect(
+          db.execute( select_old_state_from_torrents ).size).to eq 0
+      end
+
+      it "changes tp_state value 'awaiting removal' to 'removing'" do
+
+        old_state = 'awaiting removal'
+        db.update_torrent_state('ab0', old_state)
+        db.update_torrent_state('ab2', old_state)
+
+        expect(db.execute('SELECT * FROM torrents;').size).to eq 5
+
+        Database::Schema.migrate_to_v1 db
+        select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
+        expect(
+          db.execute( select_old_state_from_torrents ).size).to eq 0
       end
     end
   end

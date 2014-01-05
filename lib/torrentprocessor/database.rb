@@ -481,13 +481,19 @@ EOQ
         db.execute_batch( schema )
       end
 
-      def self.upgrade_1(db)
+      def self.migrate_to_v1(db)
         ver = db.schema_version
         return if ver >= 1
 
         result = db.execute('DROP TABLE IF EXISTS app_lock;')
 
         q = 'UPDATE torrents SET tp_state = "downloaded" WHERE tp_state = "download complete";'
+        result = db.execute q
+
+        q = 'UPDATE torrents SET tp_state = "processing" WHERE tp_state = "awaiting processing";'
+        result = db.execute q
+
+        q = 'UPDATE torrents SET tp_state = "removing" WHERE tp_state = "awaiting removal";'
         result = db.execute q
 
         db.execute('PRAGMA user_version = 1;')
