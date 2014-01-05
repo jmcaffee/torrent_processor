@@ -1,7 +1,7 @@
 ##############################################################################
 # File::    dbplugin.rb
 # Purpose:: Database Plugin class.
-# 
+#
 # Author::    Jeff McAffee 02/21/2012
 # Copyright:: Copyright (c) 2012, kTech Systems LLC. All rights reserved.
 # Website::   http://ktechsystems.com
@@ -22,8 +22,8 @@ module TorrentProcessor
     ##########################################################################
     # DBPlugin class
     class DBPlugin
-      
-      
+
+
       def DBPlugin.register_cmds
         { ".dbconnect"      => Command.new(DBPlugin, :db_connect,         "Connect to TorrentProcessor DB"),
           ".dbclose"        => Command.new(DBPlugin, :db_close,           "Close the TorrentProcessor DB connection"),
@@ -80,7 +80,7 @@ module TorrentProcessor
         # Remove all torrents in DB.
         q = "SELECT hash FROM torrents;"
         rows = db.execute(q)
-        
+
         # For each torrent in list, remove it
         rows.each do |r|
           db.delete_torrent( r[0] )
@@ -90,7 +90,7 @@ module TorrentProcessor
         cacheID = db.read_cache()
         ut.get_torrent_list( cacheID )
         db.update_cache( ut.cache )
-        
+
         # Update the db's list of torrents.
         db.update_torrents( ut.torrents )
         puts "DB updated"
@@ -111,7 +111,7 @@ module TorrentProcessor
         cmd = cmd_parts[0]
         from = cmd_parts[1]
         to = cmd_parts[2]
-        
+
         if (from.nil? || to.nil?)
           puts "usage: #{cmd} FROM TO"
           puts "  FROM: stage to change from (can be NULL or null)"
@@ -121,24 +121,24 @@ module TorrentProcessor
 
         q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{from}\";"
         q = "SELECT hash, name FROM torrents WHERE tp_state IS NULL;" if from == "NULL" || from == "null"
-        
+
         #puts "Executing query: #{q} :"
         rows = db.execute( q )
         puts "Found #{rows.length} rows matching '#{from}'."
-        
+
         return true unless rows.length > 0
-        
+
         q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE tp_state = \"#{from}\";"
         q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE tp_state IS NULL;" if from == "NULL" || from == "null"
-        
+
         #puts "Executing query: #{q} :"
         rows = db.execute( q )
         puts "Done. #{rows.length} affected."
 
         return true
       end
-    
-    
+
+
       ###
       # Display the current torrent ratios within the DB
       #
@@ -147,7 +147,7 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
-        
+
         Formatter.pHeader "ID | Ratio | Name"
         q = "SELECT id,ratio,name from torrents;"
         Formatter.pQueryResults( db.execute( q ) )
@@ -163,7 +163,7 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
-        
+
         puts "Not implemented yet."
         return true
         Formatter.pHeader "ID | Ratio | Name"
@@ -181,7 +181,7 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
-        
+
         cmd_parts = cmdtxt.split
         table = cmd_parts[1]
 
@@ -190,12 +190,12 @@ module TorrentProcessor
         else
           q = "SELECT sql FROM sqlite_master;"
         end
-        
+
         Formatter.pHeader "Table description(s)"
         Formatter.pQueryResults( db.execute( q ) )
         return true;
       end
-      
+
 
       ###
       # Display the current state of torrents in the DB
@@ -205,14 +205,14 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
-        
+
         Formatter.pHeader "ID | TP State | Name"
         q = "SELECT id,tp_state,name from torrents;"
         Formatter.pQueryResults( db.execute( q ) )
         return true
       end
-      
-      
+
+
       ###
       # Display a list of tables within the DB
       #
@@ -221,18 +221,18 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
-        
+
         Formatter.pHeader "Tables in DB"
         q = "SELECT name from sqlite_master WHERE type = 'table' ORDER BY name;"
         Formatter.pQueryResults( db.execute( q ) )
         return true
       end
-      
+
 
     end # class DBPlugin
-    
+
 
 
   end # module Plugin
-  
+
 end # module TorrentProcessor
