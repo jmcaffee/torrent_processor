@@ -589,37 +589,6 @@ module TorrentProcessor
 
 
     ###
-    # Test if app is locked
-    #
-    def appLocked?()
-      $LOG.debug "Processor::appLocked?()"
-
-      return true if @controller.database.read_lock() == "Y"
-
-      return false
-    end
-
-
-    ###
-    # Set application lock flag
-    #
-    def lockApp()
-      $LOG.debug "Processor::lockApp()"
-
-      @controller.database.aquire_lock()
-    end
-
-
-    ###
-    # UnSet application lock flag
-    #
-    def unlockApp()
-      $LOG.debug "Processor::unlockApp()"
-
-      @controller.database.release_lock()
-    end
-
-    ###
     # Move completed movies to the final directory (where XBMC looks)
     #
     def move_completed_movies

@@ -313,30 +313,8 @@ module TorrentProcessor
     def processDbCmd(cmd)
       $LOG.debug "Console::processDbCmd( #{cmd} )"
 
-      if cmd == ".db-aquire-lock"
-        result = @database.aquire_lock
-        puts "Lock aquired: #{result.to_s}"
-        return true
-      end
-
       if cmd == ".db-insert"
         dbInsert()
-        return true
-      end
-
-      if cmd == ".db-read-lock"
-        puts @database.read_lock()
-        return true
-      end
-
-      if cmd == ".db-release-lock"
-        result = @database.release_lock
-        puts "Lock released: #{result.to_s}"
-        return true
-      end
-
-      if cmd == ".db-set-lock"
-        dbSetLock()
         return true
       end
 
@@ -358,20 +336,6 @@ module TorrentProcessor
         @database.create(v)
       end
 
-    end
-
-
-    ###
-    # Set application lock value
-    #
-    def dbSetLock()
-      $LOG.debug "Console::dbSetLock"
-
-      val = getInput("Value to set lock to (Y/N): ")
-      puts "Invalid value." if val != "Y" && val != "N"
-      return if val != "Y" && val != "N"
-
-      @database.update_lock(val)
     end
 
 

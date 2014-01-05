@@ -20,7 +20,6 @@ module TorrentProcessor
 #   include KtCmdLine
 
     attr_reader :verbose
-    attr_reader :database
 
     ###
     # Database constructor
@@ -36,6 +35,20 @@ module TorrentProcessor
       @database   = nil
     end
 
+    def filename= fname
+      @filename = fname
+    end
+
+    def filename
+      @filename ||= 'tp.db'
+    end
+
+    def database
+      if (@database.nil? || @database.closed?)
+        @database = connect
+      end
+      @database
+    end
 
     ###
     # Set the verbose flag
@@ -53,11 +66,16 @@ module TorrentProcessor
     #
     def connect()
       $LOG.debug "Database::connect"
-      dbname = File.join( @cfg[:appPath], "tp.db" )
-      @database = SQLite3::Database.new( dbname )
+      dbname = File.join( @cfg[:appPath], filename )
+      db = SQLite3::Database.new( dbname )
 
-      $LOG.debug "  Connected to db: #{dbname}" if !@database.nil?
-      $LOG.error "  Unable to connect to db: #{dbname}" if @database.nil?
+      $LOG.debug "  Connected to db: #{dbname}" if !db.nil?
+      $LOG.error "  Unable to connect to db: #{dbname}" if db.nil?
+
+      unless db.nil?
+        #upgrade
+      end
+      db
     end
 
 
@@ -68,8 +86,29 @@ module TorrentProcessor
       $LOG.debug "Database::close"
       return if @database.nil? || @database.closed?
       @database.close
+      @database = nil
     end
 
+    def create_database
+      Schema.create_base_schema self
+    end
+
+    def schema_version
+      # Returns the first element of the first row of the result.
+      return execute('PRAGMA user_version;')[0][0]
+    end
+
+    ###
+    # Update the DB if needed
+    #
+    def upgrade
+      $LOG.debug "Database::upgrade"
+
+
+      # NOTE: execute will only execute the *first* statement in a query.
+      # Use execute_batch if the query contains mulitple statements.
+      rows = database.execute( query )
+    end
 
     ###
     # Execute a query against the DB
@@ -77,11 +116,9 @@ module TorrentProcessor
     def execute(query)
       $LOG.debug "Database::execute( #{query} )"
 
-      connect() if @database.nil? || @database.closed?
-
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
-      rows = @database.execute( query )
+      rows = database.execute( query )
     end
 
 
@@ -91,11 +128,9 @@ module TorrentProcessor
     def execute_batch(query)
       $LOG.debug "Database::execute_batch( query )"
 
-      connect() if @database.nil? || @database.closed?
-
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
-      rows = @database.execute_batch( query )
+      rows = database.execute_batch( query )
     end
 
 
@@ -255,76 +290,6 @@ module TorrentProcessor
 
 
     ###
-    # Read the application lock value
-    #
-    # returns:: Y or N
-    #
-    def read_lock()
-      $LOG.debug "Database::read_lock()"
-      result = execute( 'SELECT locked FROM app_lock;' )
-      result[0]
-    end
-
-
-    ###
-    # Update the application lock value
-    #
-    # applock:: Y or N
-    #
-    def update_lock(applock)
-      $LOG.debug "Database::update_lock( #{applock} )"
-      execute( "UPDATE app_lock SET locked = \"#{applock}\" WHERE id = 1;" )
-    end
-
-
-    ###
-    # Aquire lock
-    #
-    def aquire_lock()
-      $LOG.debug "Database::aquire_lock()"
-      begin
-        @database.transaction(:exclusive) do |d|
-          result = d.execute( 'SELECT locked FROM app_lock;' )
-          if result[0] == 'Y'
-            throw "Already Locked"
-          end
-          d.execute( "UPDATE app_lock SET locked = 'Y' WHERE id = 1;" )
-        end
-
-      rescue Exception => e
-        puts "Error: #{e.message}"
-        return false
-      end
-
-      return true
-    end
-
-
-    ###
-    # Release lock
-    #
-    def release_lock()
-      $LOG.debug "Database::release_lock()"
-      begin
-        #execute( "BEGIN EXCLUSIVE TRANSACTION;" )
-        @database.transaction(:exclusive) do |d|
-          result = d.execute( 'SELECT locked FROM app_lock;' )
-          if result[0] == 'N'
-            return false
-          end
-          d.execute( "UPDATE app_lock SET locked = 'N' WHERE id = 1;" )
-        end
-
-      rescue Exception => e
-        puts "Error: #{e.message}"
-        return false
-      end
-
-      return true
-    end
-
-
-    ###
     # Build an UPDATE query using data from a TorrentData object
     #
     # tdata:: TorrentData object
@@ -430,6 +395,100 @@ EOQ
     end
 
 
+    class Schema
+      def self.create_base_schema( db )
+        schema = <<EOQ
+-- Create the torrents table
+CREATE TABLE IF NOT EXISTS torrents (
+  id INTEGER PRIMARY KEY,
+  hash TEXT UNIQUE,
+  created DATE,
+  modified DATE,
+  status NUMERIC,
+  name TEXT,
+  percent_progress NUMERIC,
+  ratio NUMERIC,
+  label TEXT,
+  msg TEXT,
+  folder TEXT,
+  tp_state TEXT DEFAULT NULL
+);
+
+--  Create an update trigger
+CREATE TRIGGER IF NOT EXISTS update_torrents AFTER UPDATE  ON torrents
+BEGIN
+
+UPDATE torrents SET modified = DATETIME('NOW')
+         WHERE rowid = NEW.rowid;
+
+END;
+
+--  Also create an insert trigger
+--    Note  AFTER keyword --------------------v
+CREATE TRIGGER IF NOT EXISTS insert_torrents AFTER INSERT ON torrents
+BEGIN
+
+UPDATE torrents SET created = DATETIME('NOW')
+         WHERE rowid = NEW.rowid;
+
+UPDATE torrents SET modified = DATETIME('NOW')
+         WHERE rowid = NEW.rowid;
+
+END;
+
+-- Create the torrents_info table
+CREATE TABLE IF NOT EXISTS torrents_info (
+  id INTEGER PRIMARY KEY,
+  cache_id TEXT,
+  created DATE,
+  modified DATE
+);
+
+--  Create an update trigger
+CREATE TRIGGER IF NOT EXISTS update_torrents_info AFTER UPDATE  ON torrents_info
+BEGIN
+
+UPDATE torrents_info SET modified = DATETIME('NOW')
+         WHERE rowid = NEW.rowid;
+
+END;
+
+--  Also create an insert trigger
+--    NOTE  AFTER keyword --------------------------v
+CREATE TRIGGER IF NOT EXISTS insert_torrents_info AFTER INSERT ON torrents_info
+BEGIN
+
+UPDATE torrents_info SET created = DATETIME('NOW')
+         WHERE rowid = NEW.rowid;
+
+UPDATE torrents_info SET modified = DATETIME('NOW')
+         WHERE rowid = NEW.rowid;
+
+END;
+
+-- Insert a cache record as part of initialization
+INSERT INTO torrents_info (cache_id) values (NULL);
+
+-- Create the app_lock table
+CREATE TABLE IF NOT EXISTS app_lock (
+  id INTEGER PRIMARY KEY,
+  locked TEXT
+);
+
+-- Insert a lock record as part of initialization
+INSERT INTO app_lock (locked) values ("N");
+EOQ
+        db.execute_batch( schema )
+      end
+
+      def self.upgrade_1(db)
+        ver = db.schema_version
+        return if ver >= 1
+
+        result = db.execute('DROP TABLE IF EXISTS app_lock;')
+        db.execute('PRAGMA user_version = 1;')
+      end
+    end # class
   end # class Database
 
 
