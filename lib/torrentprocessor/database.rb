@@ -486,6 +486,10 @@ EOQ
         return if ver >= 1
 
         result = db.execute('DROP TABLE IF EXISTS app_lock;')
+
+        q = 'UPDATE torrents SET tp_state = "downloaded" WHERE tp_state = "download complete";'
+        result = db.execute q
+
         db.execute('PRAGMA user_version = 1;')
       end
     end # class

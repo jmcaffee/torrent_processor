@@ -30,7 +30,7 @@ module TorrentProcessor
   attr_reader     :verbose
 
   STATE_DOWNLOADING         = 'downloading'
-  STATE_DOWNLOAD_COMPLETE   = 'download complete'
+  STATE_DOWNLOAD_COMPLETE   = 'downloaded'
   STATE_AWAITING_PROCESSING = 'awaiting processing'
   STATE_SEEDING             = 'seeding'
   STATE_AWAITING_REMOVAL    = 'awaiting removal'

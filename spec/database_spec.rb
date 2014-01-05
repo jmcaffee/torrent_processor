@@ -18,6 +18,13 @@ def delete_db(path)
   end
 end
 
+def tdata hash, name
+  data = %w(hash 1 name 100 100 100 100 1000 10 20 1h TV 5 10 1 Y 1 0 unk1 unk2 message unk4 unk5 unk6 unk7 folder unk8)
+  data[0] = hash
+  data[2] = name
+  TorrentProcessor::TorrentData.new data
+end
+
 describe Database do
 
   let(:db) { obj = Database.new(controller); obj.filename = db_file; obj }
@@ -120,21 +127,34 @@ describe Database do
 
     context ".upgrade_1" do
 
-      it "upgrades the schema to version 1" do
+      before(:each) do
         db.connect
         db.create_database
+        5.times do |i|
+          db.create(tdata("ab#{i}", "Name #{i}"))
+        end
+      end
 
+      it "upgrades the schema to version 1" do
         Database::Schema.upgrade_1 db
         expect(db.schema_version).to eq 1
       end
 
       it "drops app_lock table" do
-        db.connect
-        db.create_database
         expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
 
         Database::Schema.upgrade_1 db
         expect { db.execute('SELECT * FROM app_lock;') }.to raise_exception
+      end
+
+      it "changes tp_state value 'download complete' to 'downloaded'" do
+
+        db.update_torrent_state('ab0', 'download complete')
+        db.update_torrent_state('ab2', 'download complete')
+        expect(db.execute('SELECT * FROM torrents;').size).to eq 5
+
+        Database::Schema.upgrade_1 db
+        expect(db.execute('SELECT * FROM torrents WHERE tp_state ="download complete";').size).to eq 0
       end
     end
   end
