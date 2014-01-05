@@ -20,6 +20,14 @@ module TorrentProcessor
   class Processor
     include ProcessorPlugin
 
+    # Torrent state constants
+
+    STATE_DOWNLOADING = 'downloading'
+    STATE_DOWNLOADED  = 'downloaded'
+    STATE_PROCESSING  = 'processing'
+    STATE_SEEDING     = 'seeding'
+    STATE_REMOVING    = 'removing'
+
   attr_reader     :controller
   attr_reader     :srcdir
   attr_reader     :srcfile
@@ -28,12 +36,6 @@ module TorrentProcessor
   attr_reader     :msg
   attr_reader     :label
   attr_reader     :verbose
-
-  STATE_DOWNLOADING         = 'downloading'
-  STATE_DOWNLOAD_COMPLETE   = 'downloaded'
-  STATE_AWAITING_PROCESSING = 'processing'
-  STATE_SEEDING             = 'seeding'
-  STATE_AWAITING_REMOVAL    = 'removing'
 
     ###
     # Processor constructor
@@ -190,7 +192,7 @@ module TorrentProcessor
       if utorrent.torrents_removed?
         remove_torrents( utorrent.removed_torrents )
       else
-        # 'Cleanup' DB by removing torrents that are in the DB (STATE_AWAITING_REMOVAL)
+        # 'Cleanup' DB by removing torrents that are in the DB (STATE_REMOVING)
         # but are no longer in the (utorrent) torrents list due to missing a cache.
         # By missing a cache, utorrent is not sending the 'removed' torrents, only what is currently in its list.
         remove_missing_torrents( utorrent.torrents )
@@ -309,8 +311,8 @@ module TorrentProcessor
             @controller.database.update_torrent_state(r[0], STATE_DOWNLOADING)
             @controller.log( "State set to STATE_DOWNLOADING: #{r[2]}" )
           else
-            @controller.database.update_torrent_state(r[0], STATE_DOWNLOAD_COMPLETE)
-            @controller.log( "State set to STATE_DOWNLOAD_COMPLETE: #{r[2]}" )
+            @controller.database.update_torrent_state(r[0], STATE_DOWNLOADED)
+            @controller.log( "State set to STATE_DOWNLOADED: #{r[2]}" )
           end
         end
 
@@ -318,22 +320,22 @@ module TorrentProcessor
         q = "SELECT hash, percent_progress, name FROM torrents WHERE tp_state = \"#{STATE_DOWNLOADING}\";"
         rows = @controller.database.execute(q)
 
-        # For each torrent where download percentage = 100, set state = STATE_DOWNLOAD_COMPLETE
+        # For each torrent where download percentage = 100, set state = STATE_DOWNLOADED
         rows.each do |r|
           if r[1] >= 1000
-            @controller.database.update_torrent_state(r[0], STATE_DOWNLOAD_COMPLETE)
-            @controller.log( "State set to STATE_DOWNLOAD_COMPLETE: #{r[2]}" )
+            @controller.database.update_torrent_state(r[0], STATE_DOWNLOADED)
+            @controller.log( "State set to STATE_DOWNLOADED: #{r[2]}" )
           end
         end
 
-        # Get list of torrents where state = STATE_DOWNLOAD_COMPLETE
-        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_DOWNLOAD_COMPLETE}\";"
+        # Get list of torrents where state = STATE_DOWNLOADED
+        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_DOWNLOADED}\";"
         rows = @controller.database.execute(q)
 
-        # For each torrent where state = STATE_DOWNLOAD_COMPLETE, set state = STATE_AWAITING_PROCESSING
+        # For each torrent where state = STATE_DOWNLOADED, set state = STATE_PROCESSING
         rows.each do |r|
-          @controller.database.update_torrent_state(r[0], STATE_AWAITING_PROCESSING)
-          @controller.log( "State set to STATE_AWAITING_PROCESSING: #{r[1]}" )
+          @controller.database.update_torrent_state(r[0], STATE_PROCESSING)
+          @controller.log( "State set to STATE_PROCESSING: #{r[1]}" )
         end
 
     end
@@ -347,8 +349,8 @@ module TorrentProcessor
     def remove_torrents(torrents)
       $LOG.debug "Processor::remove_torrents( torrents )"
 
-        # From DB - Get list of torrents that are STATE_AWAITING_REMOVAL
-        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_AWAITING_REMOVAL}\";"
+        # From DB - Get list of torrents that are STATE_REMOVING
+        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_REMOVING}\";"
         rows = @controller.database.execute(q)
 
         # For each torrent in awaiting list, remove it if the removed list contains its hash
@@ -382,8 +384,8 @@ module TorrentProcessor
 
         @controller.log( "Removing (pending removal) torrents from DB that are no longer in the uTorrent list" )
 
-        # From DB - Get list of torrents that are STATE_AWAITING_REMOVAL
-        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_AWAITING_REMOVAL}\";"
+        # From DB - Get list of torrents that are STATE_REMOVING
+        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_REMOVING}\";"
         rows = @controller.database.execute(q)
 
 
@@ -408,8 +410,8 @@ module TorrentProcessor
     def process_torrents_awaiting_processing()
       $LOG.debug "Processor::process_torrents_awaiting_processing()"
 
-        # Get list of torrents from DB where state = STATE_AWAITING_PROCESSING
-        q = "SELECT hash, name, folder, label FROM torrents WHERE tp_state = \"#{STATE_AWAITING_PROCESSING}\";"
+        # Get list of torrents from DB where state = STATE_PROCESSING
+        q = "SELECT hash, name, folder, label FROM torrents WHERE tp_state = \"#{STATE_PROCESSING}\";"
         rows = @controller.database.execute(q)
 
         # For each torrent, process it
@@ -539,9 +541,9 @@ module TorrentProcessor
         rows.each do |r|
           target_ratio = get_target_seed_ratio( r[2], r[0] )
           if ( Integer(r[1]) >= target_ratio )
-            # Set state = STATE_AWAITING_REMOVAL
-            @controller.database.update_torrent_state( r[0], STATE_AWAITING_REMOVAL )
-            @controller.log( "State set to STATE_AWAITING_REMOVAL: #{r[2]}" )
+            # Set state = STATE_REMOVING
+            @controller.database.update_torrent_state( r[0], STATE_REMOVING )
+            @controller.log( "State set to STATE_REMOVING: #{r[2]}" )
 
             # Request removal via utorrent
             utorrent.remove_torrent( r[0] )
