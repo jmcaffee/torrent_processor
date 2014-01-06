@@ -34,6 +34,7 @@ module TorrentProcessor
           ".schema"         => Command.new(DBPlugin, :db_schema,          "Display the DB schema"),
           ".states"         => Command.new(DBPlugin, :db_torrent_states,  "Display current torrent states within the DB"),
           ".tables"         => Command.new(DBPlugin, :db_list_tables,     "Display a list of DB tables"),
+          ".upgrade"        => Command.new(DBPlugin, :db_upgrade_db,      "Run DB upgrade migrations"),
           #"." => Command.new(DBPlugin, :, ""),
         }
       end
@@ -111,25 +112,40 @@ module TorrentProcessor
         cmd = cmd_parts[0]
         from = cmd_parts[1]
         to = cmd_parts[2]
+        id = cmd_parts[3] if cmd_parts.size >= 4
 
         if (from.nil? || to.nil?)
-          puts "usage: #{cmd} FROM TO"
+          puts "usage: #{cmd} FROM TO [ID]"
           puts "  FROM: stage to change from (can be NULL or null)"
           puts "  TO: stage to change to"
+          puts "  ID: ID of torrent to update - if not provided, all torrents matching the"
+          puts "      FROM state will be modified"
+          puts
+          puts "  Available States:"
+          puts "    NULL"
+          puts "    downloading"
+          puts "    downloaded"
+          puts "    processing"
+          puts "    seeding"
+          puts "    removing"
+          puts
           return true
         end
 
-        q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{from}\";"
-        q = "SELECT hash, name FROM torrents WHERE tp_state IS NULL;" if from == "NULL" || from == "null"
+        and_id = " AND id = #{id}" if !id.nil?
+        and_id ||= ''
+
+        q = "SELECT hash, name FROM torrents WHERE (tp_state = \"#{from}\"#{and_id});"
+        q = "SELECT hash, name FROM torrents WHERE (tp_state IS NULL#{and_id});" if from == "NULL" || from == "null"
 
         #puts "Executing query: #{q} :"
         rows = db.execute( q )
-        puts "Found #{rows.length} rows matching '#{from}'."
+        puts "Found #{rows.length} rows matching '#{from}'#{and_id}."
 
         return true unless rows.length > 0
 
-        q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE tp_state = \"#{from}\";"
-        q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE tp_state IS NULL;" if from == "NULL" || from == "null"
+        q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE (tp_state = \"#{from}\"#{and_id});"
+        q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE (tp_state IS NULL#{and_id});" if from == "NULL" || from == "null"
 
         #puts "Executing query: #{q} :"
         rows = db.execute( q )
@@ -228,11 +244,19 @@ module TorrentProcessor
         return true
       end
 
+      ###
+      # Run DB upgrade migrations
+      #
+      def db_upgrade_db(args)
+        $LOG.debug "DBPlugin::db_upgrade_db"
+        cmdtxt = args[0]
+        kaller = args[1]
+        db = kaller.database
 
+        Formatter.pHeader "Run all DB migrations"
+        db.upgrade
+        return true
+      end
     end # class DBPlugin
-
-
-
   end # module Plugin
-
 end # module TorrentProcessor

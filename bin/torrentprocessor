@@ -128,7 +128,6 @@ class TorrentProcessorApp < UserChoices::Command
       @controller.label(@user_choices[:label])
     end
 
-    # TODO: Replace :aswitch with a application specific switch.
     if(@user_choices[:interactive])
       puts TorrentProcessor::logo()
       puts
@@ -142,7 +141,7 @@ class TorrentProcessorApp < UserChoices::Command
      @controller.processCmdLineArgs(@user_choices[:cmdArg])    # Will raise an error of there's a problem.
     end
 
-    @controller.upgradeDb()
+    @controller.upgrade_database()
 
     @controller.process()
   end # def execute

@@ -299,8 +299,8 @@ module TorrentProcessor
 
     end
 
-    def upgradeDb
-      # FIXME: Support upgrading the DB
+    def upgrade_database
+      @database.upgrade
     end
 
     ###

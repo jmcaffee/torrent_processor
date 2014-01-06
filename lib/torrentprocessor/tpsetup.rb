@@ -31,6 +31,7 @@ module TorrentProcessor
       @controller = controller
       @cfg = @controller.cfg
       @verbose = false
+      @db = Database.new(controller)
     end
 
 
@@ -63,15 +64,8 @@ module TorrentProcessor
     def check_setup_completed()
       $LOG.debug "TPSetup::check_setup_completed"
 
-      # Test for an existing config file.
-      foundConfig = config_exists?
-      return false if !foundConfig
-
-      # Test for an existing DB.
-      foundDb = db_exists?
-      return false if !foundDb
-
-      return true
+      return true if(config_exists? && db_exists?)
+      false
     end
 
 
@@ -85,18 +79,10 @@ module TorrentProcessor
 
       # Test for an existing config file.
 
-      foundConfig = false
-      if File.exists?( File.join(@cfg[:appPath], "torrentprocessor.yml") )
-        foundConfig = true
-      end
-
-      if File.exists?( File.join(@cfg[:appPath], "config.yml") )
-        foundConfig = true
-      end
-
-      return false if !foundConfig
-
-      return true
+      return (
+        File.exists?( File.join(@cfg[:appPath], "torrentprocessor.yml") ) ||
+        File.exists?( File.join(@cfg[:appPath], "config.yml") )
+      )
     end
 
 
@@ -107,17 +93,7 @@ module TorrentProcessor
     #
     def db_exists?()
       $LOG.debug "TPSetup::db_exists?()"
-
-      # Test for an existing DB.
-
-      foundDb = false
-      if File.exists?( File.join(@cfg[:appPath], "tp.db") )
-        foundDb = true
-      end
-
-      return false if !foundDb
-
-      return true
+      return File.exists?(@db.filepath)
     end
 
 
@@ -151,7 +127,7 @@ module TorrentProcessor
       choice = getInput("Is this information correct? (Y/n/q)")
       exit if choice == 'q'
       return true if choice == 'Y'
-      return false
+      false
     end
 
 
@@ -306,101 +282,11 @@ module TorrentProcessor
         return if choice != 'Y'
 
         puts "Deleting database..."
-        FileUtils.rm( File.join(@cfg[:appPath], "tp.db") )
+        FileUtils.rm(@db.filepath)
       end
 
       puts "Creating database..."
-      database = SQLite3::Database.new( File.join(@cfg[:appPath], "tp.db") )
-
-      schema = <<EOQ
--- Create the torrents table
-CREATE TABLE torrents (
-  id INTEGER PRIMARY KEY,
-  hash TEXT UNIQUE,
-  created DATE,
-  modified DATE,
-  status NUMERIC,
-  name TEXT,
-  percent_progress NUMERIC,
-  ratio NUMERIC,
-  label TEXT,
-  msg TEXT,
-  folder TEXT,
-  tp_state TEXT DEFAULT NULL
-);
---  Create an update trigger
-CREATE TRIGGER update_torrents AFTER UPDATE  ON torrents
-BEGIN
-
-UPDATE torrents SET modified = DATETIME('NOW')
-         WHERE rowid = NEW.rowid;
-
-END;
---
---  Also create an insert trigger
---    NOTE  AFTER keyword ------v
-CREATE TRIGGER insert_torrents AFTER INSERT ON torrents
-BEGIN
-
-UPDATE torrents SET created = DATETIME('NOW')
-         WHERE rowid = NEW.rowid;
-
-UPDATE torrents SET modified = DATETIME('NOW')
-         WHERE rowid = NEW.rowid;
-
-END;
---
---
---
--- Create the torrents_info table
-CREATE TABLE torrents_info (
-  id INTEGER PRIMARY KEY,
-  cache_id TEXT,
-  created DATE,
-  modified DATE
-);
---  Create an update trigger
-CREATE TRIGGER update_torrents_info AFTER UPDATE  ON torrents_info
-BEGIN
-
-UPDATE torrents_info SET modified = DATETIME('NOW')
-         WHERE rowid = NEW.rowid;
-
-END;
---
---  Also create an insert trigger
---    NOTE  AFTER keyword ------------v
-CREATE TRIGGER insert_torrents_info AFTER INSERT ON torrents_info
-BEGIN
-
-UPDATE torrents_info SET created = DATETIME('NOW')
-         WHERE rowid = NEW.rowid;
-
-UPDATE torrents_info SET modified = DATETIME('NOW')
-         WHERE rowid = NEW.rowid;
-
-END;
---
--- Insert a cache record as part of initialization
-INSERT INTO torrents_info (cache_id) values (NULL);
---
---
---
--- Create the app_lock table
-CREATE TABLE app_lock (
-  id INTEGER PRIMARY KEY,
-  locked TEXT
-);
---
--- Insert a lock record as part of initialization
-INSERT INTO app_lock (locked) values ("N");
-EOQ
-      database.execute_batch( schema )
+      @db.create_database
     end
-
-
   end # class TPSetup
-
-
-
 end # module TorrentProcessor

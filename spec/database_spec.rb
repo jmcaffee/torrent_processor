@@ -2,11 +2,12 @@ require 'spec_helper'
 include TorrentProcessor
 
 def delete_db(path)
+  max_trys = 2000
   trys = 0
   while File.exists?(path)
-    if trys > 1000
+    if trys > max_trys
       puts "You must be on WinBLOWS!"
-      puts "Unable to delete #{path} after 1000 trys"
+      puts "Unable to delete #{path} after #{max_trys} trys"
       return
     end
     begin
@@ -123,6 +124,25 @@ describe Database do
     before(:each) do
       db.close
       delete_db db_path
+    end
+
+    context ".perform_migrations" do
+
+      before(:each) do
+        db.connect
+        db.create_database
+      end
+
+      it "runs migrations when DB schema version is less than schema VERSION" do
+        Database::Schema.perform_migrations db
+        expect(db.schema_version).to eq 1
+      end
+
+      it "doesn't run migrations when DB schema version >= schema VERSION" do
+        db.execute('PRAGMA user_version = 1;')
+        Database::Schema.perform_migrations db
+        expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+      end
     end
 
     context ".migrate_to_v1" do

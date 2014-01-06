@@ -43,6 +43,10 @@ module TorrentProcessor
       @filename ||= 'tp.db'
     end
 
+    def filepath
+      File.join( @cfg[:appPath], filename )
+    end
+
     def database
       if (@database.nil? || @database.closed?)
         @database = connect
@@ -66,15 +70,14 @@ module TorrentProcessor
     #
     def connect()
       $LOG.debug "Database::connect"
-      dbname = File.join( @cfg[:appPath], filename )
+      dbname = filepath
       db = SQLite3::Database.new( dbname )
 
       $LOG.debug "  Connected to db: #{dbname}" if !db.nil?
       $LOG.error "  Unable to connect to db: #{dbname}" if db.nil?
 
-      unless db.nil?
-        #upgrade
-      end
+      raise "ERROR: Unable to connect to database: #{dbname}" if db.nil?
+
       db
     end
 
@@ -95,19 +98,14 @@ module TorrentProcessor
 
     def schema_version
       # Returns the first element of the first row of the result.
-      return execute('PRAGMA user_version;')[0][0]
+      return (execute('PRAGMA user_version;')[0][0]).to_i
     end
 
     ###
-    # Update the DB if needed
+    # Upgrade the DB schema if needed
     #
     def upgrade
-      $LOG.debug "Database::upgrade"
-
-
-      # NOTE: execute will only execute the *first* statement in a query.
-      # Use execute_batch if the query contains mulitple statements.
-      rows = database.execute( query )
+      Schema.perform_migrations self
     end
 
     ###
@@ -396,6 +394,9 @@ EOQ
 
 
     class Schema
+      # Update SCHEMA_VERSION when new migrations are added.
+      SCHEMA_VERSION = 1 unless defined?(SCHEMA_VERSION)
+
       def self.create_base_schema( db )
         schema = <<EOQ
 -- Create the torrents table
@@ -481,9 +482,15 @@ EOQ
         db.execute_batch( schema )
       end
 
+      def self.perform_migrations(db)
+        return unless db.schema_version < SCHEMA_VERSION
+        migrate_to_v1(db)
+      end
+
       def self.migrate_to_v1(db)
         ver = db.schema_version
         return if ver >= 1
+        $LOG.debug "Migrating DB to v1..."
 
         result = db.execute('DROP TABLE IF EXISTS app_lock;')
 
@@ -497,6 +504,7 @@ EOQ
         result = db.execute q
 
         db.execute('PRAGMA user_version = 1;')
+        $LOG.debug "v1 migration complete."
       end
     end # class
   end # class Database
