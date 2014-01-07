@@ -81,6 +81,25 @@ def blocking_dir_delete(path)
   end
 end
 
+def blocking_file_delete(path)
+  return unless (File.exists?(path) && !File.directory?(path))
+
+  max_trys = 2000
+  trys = 0
+  while File.exists?(path)
+    if trys > max_trys
+      puts "You must be on WinBLOWS!"
+      puts "Unable to delete #{path} after #{max_trys} trys"
+      return
+    end
+    begin
+      FileUtils.rm path
+    rescue Errno::EACCES => e
+      trys += 1
+    end
+  end
+end
+
 class SimpleLogger
   def SimpleLogger.log msg
     puts msg
