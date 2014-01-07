@@ -1,0 +1,35 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    builder (3.2.2)
+    hoe (3.7.3)
+      rake (>= 0.8, < 11.0)
+    hpricot (0.8.6)
+    json (1.8.1)
+    ktcommon (0.0.1)
+    ocra (1.3.1)
+    rake (10.1.0)
+    s4t-utils (1.0.4)
+      hoe (>= 1.3.0)
+    sqlite3 (1.3.8-x86-mingw32)
+    torrentprocessor (0.3.1)
+    user-choices (1.1.6.1)
+      builder (>= 2.1.2)
+      s4t-utils (>= 1.0.3)
+      xml-simple (>= 1.0.11)
+    xml-simple (1.1.2)
+
+PLATFORMS
+  x86-mingw32
+
+DEPENDENCIES
+  hoe (>= 1.3)
+  hpricot
+  json
+  ktcommon
+  ocra
+  s4t-utils
+  sqlite3
+  torrentprocessor
+  user-choices
+  xml-simple
