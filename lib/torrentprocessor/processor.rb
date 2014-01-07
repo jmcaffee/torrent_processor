@@ -50,6 +50,9 @@ module TorrentProcessor
       @utorrent   = nil
       @moviedb    = nil
 
+      ProcessorPluginManager.remove_all
+      ProcessorPluginManager.register [TorrentCopierPlugin]
+
     end
 
 
@@ -416,84 +419,16 @@ module TorrentProcessor
 
         # For each torrent, process it
         rows.each do |r|
-          hash = r[0]
-          fname = r[1]
-          fdir = r[2]
-          lbl = r[3]
+          torrent = { hash: r[0], filename: r[1], filedir: r[2], label: r[3] }
 
-          @controller.log( "Processing torrent: #{fname} (in #{fdir})" )
-          success = copy_torrent( hash, fname, fdir, lbl)
+          @controller.log( "Processing torrent: #{torrent[:filename]} (in #{torrent[:filedir]})" )
+          ProcessorPluginManager.execute_each @controller, torrent
 
           # For each torrent, if processed successfully (file copied), set state = processed
           @controller.database.update_torrent_state( hash, "processed" ) if success
-          @controller.log( "    Torrent processed successfully: #{fname}" ) if success
-          @controller.log( "    ERROR: Torrent NOT processed successfully: #{fname}" ) unless success
+          @controller.log( "    Torrent processed successfully: #{torrent[:filename]}" ) if success
+          @controller.log( "    ERROR: Torrent NOT processed successfully: #{torrent[:filename]}" ) unless success
         end
-
-    end
-
-
-    ###
-    # Copy torrent files to a specific location
-    #
-    #
-    def copy_torrent( hash, fname, fdir, lbl)
-      $LOG.debug "Processor::copy_torrent( #{hash}, #{fname}, #{fdir}, #{lbl} )"
-      #appPath = "robocopy"
-
-      # Setup the destination processing folder path.
-      destPath = @controller.cfg[:otherprocessing]
-      destPath = @controller.cfg[:tvprocessing]     if (lbl.include?("TV"))
-      destPath = @controller.cfg[:movieprocessing]  if (lbl.include?("Movie"))
-
-      # Handle situation where the torrent is in a subfolder.
-      pathTail = ""
-      #cmdLineSwitch = ""
-      isSubDir = false
-
-      if (!fdir.include?( @dir_completed_download ))
-        @controller.log("    ERROR: Downloaded Torrent is not in the expected location.")
-        @controller.log("           Torrent location: #{fdir}")
-        @controller.log("           Expected location: #{@dir_completed_download} -- or a subdirectory of this location.")
-        @controller.log("    Copy operation will be attempted later.")
-        return false
-      end
-
-      if (fdir != @dir_completed_download)
-        isSubDir = true
-        pathTail = fdir.split(@dir_completed_download)[1]
-        pathTail = pathTail.prepend('/') unless pathTail.start_with?('/')
-        #cmdLineSwitch = "/E"
-        # If we're using the /E switch (copy empty subdirs) we do NOT want to provide a filename (we're copying the entire dir):
-      end
-
-      destPath += pathTail
-
-      if isSubDir
-        Robocopy.copy_dir(fdir, destPath, true, @controller)
-      else
-        Robocopy.copy_file(fdir, destPath, fname, @controller)
-      end # if
-
-      #cmdLine = "#{quote(fdir)} #{quote(destPath)} #{quote(fname)}"
-      #cmdLine = "#{quote(fdir)} #{quote(destPath)} #{cmdLineSwitch}" unless !isSubDir
-      #appCmd = "#{appPath} #{cmdLine}"
-      #@controller.log "Executing: #{appCmd}"
-
-      #result = Kernel.system("#{appCmd}")
-      #if result
-      #    @controller.log ("    ERROR: #{appPath} failed. Command line it was called with: ".concat(appCmd) )
-      #    return false
-      #end
-
-      targetPath = "#{destPath}\\#{fname}"
-      targetPath = "#{destPath}" unless !isSubDir
-      if( !File.exists?(targetPath) )
-          @controller.log ("    ERROR: Unable to verify that target exists. Target path: #{targetPath}")
-          return false
-      end
-
-      return true
 
     end
 
