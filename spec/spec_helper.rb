@@ -16,7 +16,7 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-def create_file_of_size(file_path, file_size)
+def create_file_of_size(file_path, file_size, random = false)
   # Create the directory path if it doesn't exist.
   pn = Pathname.new(file_path)
   dir = pn.dirname
@@ -32,7 +32,13 @@ def create_file_of_size(file_path, file_size)
 
   # Write a file to disk.
   File.open(file_path, 'w') do |f|
-    f.write '1'*file_size
+    if random
+      file_size.times do
+        f.write Random.rand(10)
+      end
+    else
+      f.write '1'*file_size
+    end
   end
 end
 
@@ -54,6 +60,31 @@ def generate_movie_set(root_dir, movie_name, movie_ext)
 
   # Return the created dir
   root.to_s
+end
+
+def blocking_dir_delete(path)
+  return unless (File.exists?(path) && File.directory?(path))
+
+  max_trys = 2000
+  trys = 0
+  while File.exists?(path)
+    if trys > max_trys
+      puts "You must be on WinBLOWS!"
+      puts "Unable to delete #{path} after #{max_trys} trys"
+      return
+    end
+    begin
+      FileUtils.rm_r path
+    rescue Errno::EACCES => e
+      trys += 1
+    end
+  end
+end
+
+class SimpleLogger
+  def SimpleLogger.log msg
+    puts msg
+  end
 end
 
 require_relative '../lib/torrentprocessor'
