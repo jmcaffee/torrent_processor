@@ -11,12 +11,43 @@ module TorrentProcessor::ProcessorPlugin
 
   class TorrentCopierPlugin
 
+    def execute ctx, args
+      @context = ctx
+      set_torrent_data args
+
+      # Throw exception if torrent hasn't completed the download.
+
+      verify_torrent_in_completed_download_dir
+
+      # Setup the destination processing folder path.
+
+      dest_path = final_directory
+
+      # Modify destination path if torrent is in subdirectory.
+
+      path_tail = torrent_subdir
+      is_subdir = (path_tail.nil? ? false : true)
+      dest_path += path_tail if is_subdir
+
+      # Copy the torrent.
+
+      copy_torrent dest_path, is_subdir
+
+      # Verify copy was successful.
+
+      target_path = "#{dest_path}\\#{torrent[:filename]}"
+      target_path = "#{dest_path}" if is_subdir
+      verify_successful_copy target_path
+    end
+
+  private
+
     def context
       @context
     end
 
-    def log
-      context.log
+    def log msg
+      context.log msg
     end
 
     def cfg
@@ -24,53 +55,60 @@ module TorrentProcessor::ProcessorPlugin
     end
 
     def default_args
-      {hash: nil, filename: nil, filedir: nil, label: nil}
+      {hash: nil, filename: nil, filedir: '', label: ''}
     end
 
-    def execute ctx, args
-      @context = ctx
-      torrent = default_args.merge(args)
+    def set_torrent_data args
+      @torrent = default_args.merge(args)
+    end
 
-      # Setup the destination processing folder path.
+    def torrent
+      @torrent
+    end
+
+    def final_directory
       dest_path = cfg[:otherprocessing]
       dest_path = cfg[:tvprocessing]     if (torrent[:label].include?("TV"))
       dest_path = cfg[:movieprocessing]  if (torrent[:label].include?("Movie"))
+      dest_path
+    end
 
-      # Handle situation where the torrent is in a subfolder.
-      path_tail = ""
-      #cmdLineSwitch = ""
-      is_subdir = false
+    def completed_dir
+      TorrentProcessor.configuration.utorrent.dir_completed_download
+    end
 
-      if (!torrent[:filedir].include?( @dir_completed_download ))
-        log("    ERROR: Downloaded Torrent is not in the expected location.")
-        log("           Torrent location: #{torrent[:filedir]}")
-        log("           Expected location: #{@dir_completed_download} -- or a subdirectory of this location.")
-        log("    Copy operation will be attempted later.")
-        return false
-      end
-
-      if (torrent[:filedir] != @dir_completed_download)
+    def torrent_subdir
+      if (torrent[:filedir] != completed_dir)
         is_subdir = true
-        path_tail = torrent[:filedir].split(@dir_completed_download)[1]
+        path_tail = torrent[:filedir].split(completed_dir)[1]
         path_tail = path_tail.prepend('/') unless path_tail.start_with?('/')
+        return path_tail
       end
+    end
 
-      dest_path += path_tail
-
-      if is_subdir
+    def copy_torrent dest_path, is_dir
+      if is_dir
         Robocopy.copy_dir(torrent[:filedir], dest_path, true, context)
       else
         Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context)
       end # if
+    end
 
-      target_path = "#{dest_path}\\#{torrent[:filename]}"
-      target_path = "#{dest_path}" unless !is_subdir
-      if( !File.exists?(target_path) )
-          log ("    ERROR: Unable to verify that target exists. Target path: #{target_path}")
-          return false
+    def verify_torrent_in_completed_download_dir
+      if (!torrent[:filedir].include?( completed_dir ))
+        log("    ERROR: Downloaded Torrent is not in the expected location.")
+        log("           Torrent location: #{torrent[:filedir]}")
+        log("           Expected location: #{completed_dir} -- or a subdirectory of this location.")
+        log("    Copy operation will be attempted later.")
+        raise 'Torrent download not yet completed'
       end
+    end
 
-      return true
+    def verify_successful_copy target_path
+      if( !File.exists?(target_path) )
+        log ("    ERROR: Unable to verify that target exists. Target path: #{target_path}")
+        raise 'Torrent copy failed'
+      end
     end
   end # class
 end # module
