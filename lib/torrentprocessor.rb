@@ -11,6 +11,32 @@ require 'find'
 require 'logger'
 require 'win32ole'
 
+module TorrentProcessor
+  class << self
+    attr_accessor :configuration
+  end
+
+  def self.configure
+    self.configuration ||= Configuration.new
+    yield(configuration) if block_given?
+  end
+
+  class Configuration
+    attr_accessor :utorrent
+
+    def initialize
+      @utorrent = UTorrentConfiguration.new
+    end
+
+    class UTorrentConfiguration
+      attr_accessor :dir_completed_download
+      attr_accessor :seed_ratio
+    end
+  end
+end
+
+
+TorrentProcessor.configure
 
 ##############################################################################
 # Logging
