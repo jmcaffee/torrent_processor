@@ -141,9 +141,7 @@ module TorrentProcessor
 
       return @utorrent unless @utorrent.nil?
 
-      cfg = @controller.cfg
       @utorrent = UTorrentWebUI.new(cfg[:ip], cfg[:port], cfg[:user], cfg[:pass])
-
     end
 
 
@@ -155,15 +153,23 @@ module TorrentProcessor
 
       return @moviedb unless @moviedb.nil?
 
-      api_key = @controller.cfg[:tmdb_api_key]
+      api_key = cfg[:tmdb_api_key]
       if api_key.nil? || api_key.empty?
-        @controller.log "!!! No TMdb API key configured !!!"
+        log "!!! No TMdb API key configured !!!"
         return nil
       end
 
       @moviedb = MovieDB.new(api_key)
     end
 
+
+    def log msg
+      @controller.log msg
+    end
+
+    def cfg
+      @controller.cfg
+    end
 
     ###
     # Process torrent files retrieved from UTorrent application
@@ -173,7 +179,7 @@ module TorrentProcessor
 
       retrieve_utorrent_settings()
 
-      @controller.log( "Requesting torrent list update" )
+      log( "Requesting torrent list update" )
 
       # Get a list of torrents.
       cacheID = @controller.database.read_cache()
@@ -220,26 +226,33 @@ module TorrentProcessor
     def retrieve_utorrent_settings()
       $LOG.debug "Processor::retrieve_utorrent_settings()"
 
-      @controller.log( "--- Requesting uTorrent Settings ---" )
+      log( "--- Requesting uTorrent Settings ---" )
       settings = utorrent.get_utorrent_settings()
       settings.each do |i|
         if i[0] == "seed_ratio"
-          @seed_ratio = Integer(i[2])
-          @controller.log( "    uTorrent seed ratio: #{@seed_ratio.to_s}" )
+          seed_ratio = Integer(i[2])
           next
         end
 
         if i[0] == "dir_completed_download"
-          @dir_completed_download = i[2]
+          dir_completed_download = i[2]
           # The search for an existing directory fails if the completed
-          # downloads dir string ends will a back slash (windows) so strip
+          # downloads dir string ends with a back slash (in winBLOWs) so strip
           # if off if it exists.
-          @dir_completed_download = @dir_completed_download[0..-2] if @dir_completed_download.end_with?('\\')
-          @controller.log( "    uTorrent completed download dir: #{@dir_completed_download}" )
+          dir_completed_download = dir_completed_download[0..-2] if dir_completed_download.end_with?('\\')
           next
         end
       end
 
+      # Store utorrent data in the configuration object.
+
+      TorrentProcessor.configure do |config|
+        config.utorrent.seed_ratio              = seed_ratio
+        config.utorrent.dir_completed_download  = dir_completed_download
+      end
+
+      log( "    uTorrent seed ratio: #{seed_ratio.to_s}" )
+      log( "    uTorrent completed download dir: #{dir_completed_download}" )
     end
 
 
@@ -269,7 +282,7 @@ module TorrentProcessor
 
               # Break the list of trackers into individual strings and load the filters (if any).
               trackers = raw_trackers.split("\r\n")
-              filters = @controller.cfg[:filters]
+              filters = cfg[:filters]
 
               # Check each tracker against all filters looking for a match.
               if (! trackers.nil? && trackers.length > 0 )
@@ -281,8 +294,8 @@ module TorrentProcessor
                         # Found a match... add it to the props list to be applied when we're finished here.
                         filter_props[r[0]] = {"seed_override" => 1, "seed_ratio" => Integer(limit)}
                         $LOG.debug "  filter criteria met: #{filtered_tracker}, #{limit}, #{r[2]}, for tracker #{tracker}"
-                        @controller.log( "Applying tracker filter to #{r[2]}." )
-                        @controller.log( "    seed_ratio: #{limit}" )
+                        log( "Applying tracker filter to #{r[2]}." )
+                        log( "    seed_ratio: #{limit}" )
                       end   # tracker includes filtered_tracker
                     end   # each filter
                   end   # each tracker
@@ -312,10 +325,10 @@ module TorrentProcessor
         rows.each do |r|
           if r[1] < 1000
             @controller.database.update_torrent_state(r[0], STATE_DOWNLOADING)
-            @controller.log( "State set to STATE_DOWNLOADING: #{r[2]}" )
+            log( "State set to STATE_DOWNLOADING: #{r[2]}" )
           else
             @controller.database.update_torrent_state(r[0], STATE_DOWNLOADED)
-            @controller.log( "State set to STATE_DOWNLOADED: #{r[2]}" )
+            log( "State set to STATE_DOWNLOADED: #{r[2]}" )
           end
         end
 
@@ -327,7 +340,7 @@ module TorrentProcessor
         rows.each do |r|
           if r[1] >= 1000
             @controller.database.update_torrent_state(r[0], STATE_DOWNLOADED)
-            @controller.log( "State set to STATE_DOWNLOADED: #{r[2]}" )
+            log( "State set to STATE_DOWNLOADED: #{r[2]}" )
           end
         end
 
@@ -338,7 +351,7 @@ module TorrentProcessor
         # For each torrent where state = STATE_DOWNLOADED, set state = STATE_PROCESSING
         rows.each do |r|
           @controller.database.update_torrent_state(r[0], STATE_PROCESSING)
-          @controller.log( "State set to STATE_PROCESSING: #{r[1]}" )
+          log( "State set to STATE_PROCESSING: #{r[1]}" )
         end
 
     end
@@ -363,7 +376,7 @@ module TorrentProcessor
             @controller.database.delete_torrent( r[0] )
             torrents.delete( r[0] )
             # Log it
-            @controller.log( "Torrent removed (as requested): #{r[1]}" )
+            log( "Torrent removed (as requested): #{r[1]}" )
           end
         end
 
@@ -371,7 +384,7 @@ module TorrentProcessor
         torrents.each do |hash, t|
           @controller.database.delete_torrent( hash )
           # Log it
-          @controller.log( "Torrent removed (NOT requested): #{t.name}" )
+          log( "Torrent removed (NOT requested): #{t.name}" )
         end
 
     end
@@ -385,7 +398,7 @@ module TorrentProcessor
     def remove_missing_torrents(torrents)
       $LOG.debug "Processor::remove_missing_torrents( torrents )"
 
-        @controller.log( "Removing (pending removal) torrents from DB that are no longer in the uTorrent list" )
+        log( "Removing (pending removal) torrents from DB that are no longer in the uTorrent list" )
 
         # From DB - Get list of torrents that are STATE_REMOVING
         q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_REMOVING}\";"
@@ -397,13 +410,13 @@ module TorrentProcessor
         rows.each do |r|
           if !torrents.has_key?(r[0])
             # Remove it from DB
-            @controller.log( "    Torrent removed from DB: #{r[1]}" )
+            log( "    Torrent removed from DB: #{r[1]}" )
             @controller.database.delete_torrent( r[0] )
             removed_count += 1
           end
         end
 
-        @controller.log("    No torrents were removed.") if (removed_count < 1)
+        log("    No torrents were removed.") if (removed_count < 1)
     end
 
 
@@ -421,27 +434,16 @@ module TorrentProcessor
         rows.each do |r|
           torrent = { hash: r[0], filename: r[1], filedir: r[2], label: r[3] }
 
-          @controller.log( "Processing torrent: #{torrent[:filename]} (in #{torrent[:filedir]})" )
+          log( "Processing torrent: #{torrent[:filename]} (in #{torrent[:filedir]})" )
           ProcessorPluginManager.execute_each @controller, torrent
 
           # For each torrent, if processed successfully (file copied), set state = processed
           @controller.database.update_torrent_state( hash, "processed" ) if success
-          @controller.log( "    Torrent processed successfully: #{torrent[:filename]}" ) if success
-          @controller.log( "    ERROR: Torrent NOT processed successfully: #{torrent[:filename]}" ) unless success
+          log( "    Torrent processed successfully: #{torrent[:filename]}" ) if success
+          log( "    ERROR: Torrent NOT processed successfully: #{torrent[:filename]}" ) unless success
         end
 
     end
-
-
-    ###
-    # Quote a string
-    #
-    # str:: String to apply quotes to
-    #
-    #def quote(str)
-    #  return "\"#{str}\""
-    #end
-
 
     ###
     # Process torrents that have completed processing
@@ -456,7 +458,7 @@ module TorrentProcessor
         # For each torrent, set state = STATE_SEEDING
         rows.each do |r|
           @controller.database.update_torrent_state( r[0], STATE_SEEDING )
-          @controller.log( "State set to STATE_SEEDING: #{r[1]}" )
+          log( "State set to STATE_SEEDING: #{r[1]}" )
         end
 
     end
@@ -478,11 +480,11 @@ module TorrentProcessor
           if ( Integer(r[1]) >= target_ratio )
             # Set state = STATE_REMOVING
             @controller.database.update_torrent_state( r[0], STATE_REMOVING )
-            @controller.log( "State set to STATE_REMOVING: #{r[2]}" )
+            log( "State set to STATE_REMOVING: #{r[2]}" )
 
             # Request removal via utorrent
             utorrent.remove_torrent( r[0] )
-            @controller.log( "Removal request sent: #{r[2]}" )
+            log( "Removal request sent: #{r[2]}" )
           end
         end
 
@@ -494,7 +496,7 @@ module TorrentProcessor
     #
     def get_target_seed_ratio(name, hash)
       $LOG.debug "Processor::get_target_seed_ratio( #{name} )"
-      target_ratio = @seed_ratio
+      target_ratio = TorrentProcessor.configuration.utorrent.seed_ratio
       $LOG.debug "  target_ratio set to default: #{target_ratio}"
             # This torrent may have an overridden target seed ratio.
             # Pull down the torrent job properties to check and see.
@@ -507,8 +509,8 @@ module TorrentProcessor
         if (seed_override == 1)
           target_ratio = Integer(seed_ratio)
           $LOG.debug "  target_ratio set to override value: #{target_ratio}"
-          @controller.log( "Torrent [#{name}] has overridden target seed ratio" )
-          @controller.log( "  target ratio = #{target_ratio}" )
+          log( "Torrent [#{name}] has overridden target seed ratio" )
+          log( "  target ratio = #{target_ratio}" )
         end
       end
       # Add some padding to the target ratio since the final ratio is almost
@@ -540,10 +542,10 @@ module TorrentProcessor
       db = moviedb
       if !db.nil?
         mover = MovieMover.new(db, @controller)
-        mover.process(@controller.cfg[:movieprocessing],
-                      @controller.cfg[:target_movies_path],
-                      @controller.cfg[:can_copy_start_time],
-                      @controller.cfg[:can_copy_stop_time])
+        mover.process(cfg[:movieprocessing],
+                      cfg[:target_movies_path],
+                      cfg[:can_copy_start_time],
+                      cfg[:can_copy_stop_time])
       end
     end
 
