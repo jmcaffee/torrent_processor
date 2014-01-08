@@ -92,7 +92,7 @@ module TorrentProcessor::ProcessorPlugin
       logger.log "Executing: #{app_cmd}" unless logger.nil?
 
       result = Kernel.system("#{app_cmd}")
-      if result
+      unless result
           logger.log ("    ERROR: #{app_path} failed. Command line it was called with: ".concat(app_cmd) ) unless logger.nil?
           return false
       end
