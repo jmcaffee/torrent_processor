@@ -51,7 +51,8 @@ module TorrentProcessor
       @moviedb    = nil
 
       ProcessorPluginManager.remove_all
-      ProcessorPluginManager.register [TorrentCopierPlugin]
+      ProcessorPluginManager.register [TorrentCopierPlugin,
+                                       UnrarPlugin]
 
     end
 
