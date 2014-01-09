@@ -46,8 +46,14 @@ module TorrentProcessor::ProcessorPlugin
       @context
     end
 
-    def log msg
-      context.log msg
+    def log msg = ''
+      if context.respond_to? :log
+        context.log msg
+      elsif context.respond_to? :logger
+        context.logger.log msg
+      else
+        puts msg
+      end
     end
 
     def cfg
@@ -100,14 +106,14 @@ module TorrentProcessor::ProcessorPlugin
         log("           Torrent location: #{torrent[:filedir]}")
         log("           Expected location: #{completed_dir} -- or a subdirectory of this location.")
         log("    Copy operation will be attempted later.")
-        raise 'Torrent download not yet completed'
+        raise PluginError, 'Torrent download not yet completed'
       end
     end
 
     def verify_successful_copy target_path
       if( !File.exists?(target_path) )
         log ("    ERROR: Unable to verify that target exists. Target path: #{target_path}")
-        raise 'Torrent copy failed'
+        raise PluginError, 'Torrent copy failed'
       end
     end
   end # class

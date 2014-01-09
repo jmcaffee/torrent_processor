@@ -36,8 +36,14 @@ module TorrentProcessor::ProcessorPlugin
       @context
     end
 
-    def log msg
-      context.log msg
+    def log msg = ''
+      if context.respond_to? :log
+        context.log msg
+      elsif context.respond_to? :logger
+        context.logger.log msg
+      else
+        puts msg
+      end
     end
 
     def cfg
@@ -88,7 +94,7 @@ module TorrentProcessor::ProcessorPlugin
       end
 
       unless SevenZip.extract_rar(dest_path, dest_path, context) == true
-        raise 'Unrar failed'
+        raise PluginError, 'Unrar failed'
       end
     end
   end # class

@@ -10,7 +10,10 @@
 ##########################################################################
 # TorrentProcessor module
 module TorrentProcessor::ProcessorPlugin
+  class PluginError < StandardError; end
+
 end # module TorrentProcessor
+
 
 require_relative('processor_plugin/movie_db')
 require_relative('processor_plugin/movie_mover')
