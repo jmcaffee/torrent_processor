@@ -124,3 +124,4 @@ class SimpleLogger
 end
 
 require_relative '../lib/torrentprocessor'
+require_relative '../lib/torrentprocessor/service/seven_zip'

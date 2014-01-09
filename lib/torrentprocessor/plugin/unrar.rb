@@ -151,13 +151,13 @@ module TorrentProcessor::Plugin
     end
 
     def unrar_path path
-      SevenZip.extract_rar(path, path, context.logger)
+      TorrentProcessor::Service::SevenZip.extract_rar(path, path, context.logger)
     end
 
     def unrar_torrent id
       set_torrent_data database.find_torrent_by_id(id)
       path = destination_location
-      SevenZip.extract_rar(path, path, context.logger)
+      TorrentProcessor::Service::SevenZip.extract_rar(path, path, context.logger)
     end
   end # class
 end # module

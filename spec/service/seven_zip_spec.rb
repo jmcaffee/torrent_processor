@@ -7,10 +7,10 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require_relative './spec_helper'
+require_relative '../spec_helper'
 
 include FileUtils
-include TorrentProcessor::ProcessorPlugin
+include TorrentProcessor::Service
 
 describe SevenZip do
 

@@ -51,7 +51,7 @@
 ##############################################################################
 
 
-module TorrentProcessor::Plugin
+module TorrentProcessor::Service
 
   class SevenZip
 
@@ -108,4 +108,4 @@ module TorrentProcessor::Plugin
       return "\"#{str}\""
     end
   end # class SevenZip
-end # module TorrentProcessor::Plugin
+end # module TorrentProcessor::Service
