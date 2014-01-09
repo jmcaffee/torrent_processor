@@ -9,11 +9,11 @@
 
 require_relative '../spec_helper'
 
-include TorrentProcessor::ConsolePlugin
+include TorrentProcessor
 
-describe UnrarPlugin do
+describe ConsolePlugin::UnrarPlugin do
 
-    let(:plug)  { UnrarPlugin.new }
+    let(:unrar_plug)  { ConsolePlugin::UnrarPlugin.new }
     let(:ctx)   { double("console",
                         { :logger => SimpleLogger,
                           :cfg    => { :otherprocessing => torrent_dir, :tvprocessing => torrent_dir, :movieprocessing => torrent_dir },
@@ -27,7 +27,7 @@ describe UnrarPlugin do
   context '#new' do
 
     it 'instantiates a plugin instance' do
-      obj = UnrarPlugin.new
+      obj = ConsolePlugin::UnrarPlugin.new
     end
   end
 
@@ -42,13 +42,13 @@ describe UnrarPlugin do
       end
 
     it 'raises an exception if caller is not provided' do
-      expect { plug.unrar [] }.to raise_exception
+      expect { unrar_plug.unrar [] }.to raise_exception
     end
 
     context 'given a path' do
 
       it 'unrars an archive' do
-        plug.unrar([torrent_dir, ctx])
+        unrar_plug.unrar([torrent_dir, ctx])
         expect(File.exists?(torrent_file)).to be true
       end
     end
@@ -56,7 +56,7 @@ describe UnrarPlugin do
     context 'given a torrent ID' do
 
       it 'unrars an archive' do
-        plug.unrar(['1', ctx])
+        unrar_plug.unrar(['1', ctx])
       end
     end
   end
@@ -68,11 +68,11 @@ describe UnrarPlugin do
   context '#text_to_id' do
 
     it 'returns a numeric ID from a string' do
-      expect(plug.text_to_id('10')).to eq 10
+      expect(unrar_plug.text_to_id('10')).to eq 10
     end
 
     it 'returns -1 if string is not an integer' do
-      expect(plug.text_to_id('1a')).to eq -1
+      expect(unrar_plug.text_to_id('1a')).to eq -1
     end
   end
 =end
