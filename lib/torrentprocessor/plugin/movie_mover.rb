@@ -51,7 +51,7 @@ module TorrentProcessor::Plugin
 
   class MovieMover
     require_relative 'movie_db'
-    require_relative 'service/robocopy'
+    require_relative '../service/robocopy'
 
     include Service
 
