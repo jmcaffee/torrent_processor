@@ -66,6 +66,7 @@ module TorrentProcessor
       configureDbCommands()
       configureUTorrentCommands()
       configureRSSCommands()
+      configure_utility_commands()
     end
 
 
@@ -174,6 +175,16 @@ module TorrentProcessor
       end
     end
 
+    def configure_utility_commands
+      PluginManager.register_plugin(:util, UnrarPlugin)
+      PluginManager.register_plugin(:util, MovieDBPlugin)
+      @util_cmds = PluginManager.command_list :util
+
+      # Add commands to cmd array.
+      @util_cmds.each do |c|
+        @cmds << c[0]
+      end
+    end
 
     ###
     # Set the verbose flag
@@ -209,6 +220,7 @@ module TorrentProcessor
       displayCommandList( "DB Commands:", @db_cmds )
       displayCommandList( "uTorrent Commands:", @utorrent_cmds )
       displayCommandList( "RSS Commands:", @rss_cmds )
+      displayCommandList( "Utility Commands:", @util_cmds )
 
       puts
     end
