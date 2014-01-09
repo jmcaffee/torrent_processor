@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-module TorrentProcessor::Plugin::Service
+module TorrentProcessor::Service
 
   class Robocopy
 
@@ -64,5 +64,5 @@ module TorrentProcessor::Plugin::Service
       return "\"#{str}\""
     end
   end # class Robocopy
-end # module TorrentProcessor::Plugin::Service
+end # module TorrentProcessor::Service
 

@@ -13,7 +13,7 @@ module TorrentProcessor::Plugin
   class TorrentCopier
     require_relative '../service/robocopy'
 
-    include Service
+    include TorrentProcessor::Service
 
     def execute ctx, args
       @context = ctx

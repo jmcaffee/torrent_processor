@@ -53,7 +53,7 @@ module TorrentProcessor::Plugin
     require_relative 'movie_db'
     require_relative '../service/robocopy'
 
-    include Service
+    include TorrentProcessor::Service
 
     DETAILS_FILE  = 'mover.details'
     LOCK_FILE     = 'mover.lock'
