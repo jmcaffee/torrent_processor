@@ -133,6 +133,9 @@ module TorrentProcessor
       @verbose = arg
     end
 
+    def utorrent=(ut)
+      @utorrent = ut
+    end
 
     ###
     # Return a utorrent instance
@@ -163,9 +166,14 @@ module TorrentProcessor
       @moviedb = MovieDB.new(api_key)
     end
 
-
-    def log msg
-      @controller.log msg
+    def log msg = ''
+      if @controller.respond_to? :log
+        @controller.log msg
+      elsif @controller.respond_to? :logger
+        @controller.logger.log msg
+      else
+        puts msg
+      end
     end
 
     def cfg
@@ -229,6 +237,10 @@ module TorrentProcessor
 
       log( "--- Requesting uTorrent Settings ---" )
       settings = utorrent.get_utorrent_settings()
+
+      seed_ratio = 0
+      dir_completed_download = ''
+
       settings.each do |i|
         if i[0] == "seed_ratio"
           seed_ratio = Integer(i[2])
@@ -436,12 +448,21 @@ module TorrentProcessor
           torrent = { hash: r[0], filename: r[1], filedir: r[2], label: r[3] }
 
           log( "Processing torrent: #{torrent[:filename]} (in #{torrent[:filedir]})" )
-          ProcessorPluginManager.execute_each @controller, torrent
 
-          # For each torrent, if processed successfully (file copied), set state = processed
-          @controller.database.update_torrent_state( hash, "processed" ) if success
-          log( "    Torrent processed successfully: #{torrent[:filename]}" ) if success
-          log( "    ERROR: Torrent NOT processed successfully: #{torrent[:filename]}" ) unless success
+          begin
+
+            ProcessorPluginManager.execute_each @controller, torrent
+
+            # For each torrent, if processed successfully (file copied), set state = processed
+            @controller.database.update_torrent_state( hash, "processed" )
+            log( "    Torrent processed successfully: #{torrent[:filename]}" )
+
+          rescue ProcessorPlugin::PluginError => e
+
+            log "    Processing aborted for torrent: #{torrent[:filename]}"
+            log "      Reason: #{e.message}"
+
+          end
         end
 
     end
@@ -549,9 +570,5 @@ module TorrentProcessor
                       cfg[:can_copy_stop_time])
       end
     end
-
   end # class Processor
-
-
-
 end # module TorrentProcessor
