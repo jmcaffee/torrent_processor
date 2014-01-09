@@ -1,7 +1,7 @@
 ##############################################################################
 # File::    torrent_copier_plugin_spec.rb
 # Purpose:: TorrentCopierPlugin specification
-# 
+#
 # Author::    Jeff McAffee 01/06/2014
 # Copyright:: Copyright (c) 2014, kTech Systems LLC. All rights reserved.
 # Website::   http://ktechsystems.com
@@ -38,25 +38,50 @@ describe TorrentCopierPlugin do
     let(:test_root_dir)       { 'tmp/spec/torrent_copier_plugin' }
     let(:data_dir)            { 'spec/data/rar_source' }
     let(:test_torrent)        { 'test_250kb.avi' }
-    let(:ctx)           { double("controller", { :log => SimpleLogger, :cfg => { :otherprocessing => target_dir, :tvprocessing => target_dir, :movieprocessing => target_dir } }) }
-    let(:torrent_data)  { { :filename => test_torrent, :filedir => completed_downloads, :label => 'TV' } }
+
+    let(:controller_stub) do
+      obj = double("controller")
+      obj.stub(:log) { SimpleLogger }
+      obj.stub(:cfg) do
+        {
+          :otherprocessing  => target_dir,
+          :tvprocessing     => target_dir,
+          :movieprocessing  => target_dir
+        }
+      end
+      obj
+    end
+
+    let(:torrent_data) do
+      {
+        :filename => test_torrent,
+        :filedir  => completed_downloads,
+        :label    => 'TV'
+      }
+    end
 
     context 'given a single media file' do
 
       it "copies a file to the configured destination directory" do
-        TorrentCopierPlugin.new.execute(ctx, torrent_data)
+        TorrentCopierPlugin.new.execute(controller_stub, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
       end
     end
 
     context 'given media file(s) in nested dir' do
 
-      let(:data_dir)            { 'spec/data' }
-      let(:test_torrent)        { 'multi_rar' }
-      let(:torrent_data)  { { :filename => test_torrent, :filedir => File.join(completed_downloads, test_torrent), :label => 'TV' } }
+      let(:data_dir)      { 'spec/data' }
+      let(:test_torrent)  { 'multi_rar' }
+      let(:torrent_data) do
+        {
+          :filename => test_torrent,
+          :filedir  => File.join(completed_downloads, test_torrent),
+          :label    => 'TV'
+        }
+      end
 
       it "copies a directory to the configured destination directory" do
-        TorrentCopierPlugin.new.execute(ctx, torrent_data)
+        TorrentCopierPlugin.new.execute(controller_stub, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         expect(File.exists?(File.join(target_dir, test_torrent, 'test_250kb.part06.rar'))).to be true
       end

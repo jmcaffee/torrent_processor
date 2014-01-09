@@ -33,9 +33,19 @@ describe UnrarPlugin do
     let(:completed_downloads) { File.join(test_root_dir, 'completed_downloads') }
     let(:target_root_dir)     { File.join(test_root_dir, 'target') }
     let(:test_root_dir)       { 'tmp/spec/unrar_plugin' }
-    let(:ctx)                 { double("controller",
-                                       { :log => SimpleLogger,
-                                         :cfg => { :otherprocessing => target_root_dir, :tvprocessing => target_root_dir, :movieprocessing => target_root_dir } }) }
+
+    let(:controller_stub) do
+      obj = double("controller")
+      obj.stub(:log) { SimpleLogger }
+      obj.stub(:cfg) do
+        {
+          :otherprocessing  => target_root_dir,
+          :tvprocessing     => target_root_dir,
+          :movieprocessing  => target_root_dir
+        }
+      end
+      obj
+    end
 
     context 'given a .rar archive' do
 
@@ -46,11 +56,17 @@ describe UnrarPlugin do
         let(:test_torrent_name) { 'test_250kb' }
         let(:test_torrent)      { test_torrent_name + '.avi' }
         let(:target_dir)        { File.join(target_root_dir, test_torrent_name) }
-        let(:torrent_data)      {
-          { :filename => test_torrent_name, :filedir => File.join(completed_downloads, test_torrent_name), :label => 'TV' } }
+
+        let(:torrent_data) do
+          {
+            :filename => test_torrent_name,
+            :filedir  => File.join(completed_downloads, test_torrent_name),
+            :label    => 'TV'
+          }
+        end
 
         it "extracts a file from a rar archive in the destination directory" do
-          UnrarPlugin.new.execute(ctx, torrent_data)
+          UnrarPlugin.new.execute(controller_stub, torrent_data)
           expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         end
       end
@@ -65,11 +81,17 @@ describe UnrarPlugin do
         let(:test_torrent_name) { 'test_250kb' }
         let(:test_torrent)      { test_torrent_name + '.avi' }
         let(:target_dir)        { File.join(target_root_dir, test_torrent_name) }
-        let(:torrent_data)      {
-          { :filename => test_torrent, :filedir => File.join(completed_downloads, test_torrent_name), :label => 'TV' } }
+
+        let(:torrent_data) do
+          {
+            :filename => test_torrent,
+            :filedir  => File.join(completed_downloads, test_torrent_name),
+            :label    => 'TV'
+          }
+        end
 
         it "skips (does not fail) directories with no .rar archives" do
-          UnrarPlugin.new.execute(ctx, torrent_data)
+          UnrarPlugin.new.execute(controller_stub, torrent_data)
         end
       end
 
@@ -80,11 +102,17 @@ describe UnrarPlugin do
         let(:test_torrent_name) { 'test_250kb' }
         let(:test_torrent)      { test_torrent_name + '.avi' }
         let(:target_dir)        { File.join(target_root_dir, test_torrent_name) }
-        let(:torrent_data)      {
-          { :filename => test_torrent, :filedir => completed_downloads, :label => 'TV' } }
+
+        let(:torrent_data) do
+          {
+            :filename => test_torrent,
+            :filedir  => completed_downloads,
+            :label    => 'TV'
+          }
+        end
 
         it "skips (does not fail) torrents that are not in a subdirectory" do
-          UnrarPlugin.new.execute(ctx, torrent_data)
+          UnrarPlugin.new.execute(controller_stub, torrent_data)
         end
       end
     end

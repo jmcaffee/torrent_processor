@@ -3,7 +3,6 @@ include TorrentProcessor
 
 describe TPSetup do
 
-  context "when setting up the application configuration" do
       let(:cfg)           do
                             cfg = {}
                             tmp_path = File.absolute_path(File.join(File.dirname(__FILE__), '../../tmp/spec/tpsetup'))
@@ -21,33 +20,24 @@ describe TPSetup do
                             cfg[:can_copy_stop_time] = "23:59"
                             cfg
                           end
-      let(:controller)    do
-                            class SpecController
-                              def initialize(cfg)
-                                @cfg = cfg
-                              end
 
-                              def cfg
-                                return @cfg
-                              end
-                            end
-
-                            SpecController.new(cfg)
-                          end
-
-
-      subject(:setup)   { TPSetup.new(controller) }
-
-      before(:each) do
-        puts "cfg:"
-        cfg.each do |k,v|
-          puts "#{k}\t#{v}"
+      let(:controller_stub) do
+        obj = double('controller')
+        obj.stub(:cfg) do
+          {}
         end
+        obj
       end
 
 
-    it "#setup_config" do
-      expect(setup.setup_config)
+      subject(:setup)   { TPSetup.new(controller_stub) }
+
+
+  context "#new" do
+
+    it "instantiates without an exception" do
+      #expect(setup.setup_config)
+      setup
     end
-  end # context 'when movies need to be processed'
+  end
 end
