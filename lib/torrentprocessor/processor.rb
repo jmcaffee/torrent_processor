@@ -51,7 +51,7 @@ module TorrentProcessor
       @moviedb    = nil
 
       ProcessorPluginManager.remove_all
-      ProcessorPluginManager.register [TorrentCopierPlugin,
+      ProcessorPluginManager.register [TorrentCopier,
                                        Unrar]
 
     end
@@ -457,7 +457,7 @@ module TorrentProcessor
             @controller.database.update_torrent_state( hash, "processed" )
             log( "    Torrent processed successfully: #{torrent[:filename]}" )
 
-          rescue ProcessorPlugin::PluginError => e
+          rescue Plugin::PluginError => e
 
             log "    Processing aborted for torrent: #{torrent[:filename]}"
             log "      Reason: #{e.message}"

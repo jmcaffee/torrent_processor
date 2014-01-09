@@ -1,18 +1,18 @@
 ##############################################################################
 # File::    torrent_copier_plugin_spec.rb
-# Purpose:: TorrentCopierPlugin specification
+# Purpose:: TorrentCopier specification
 #
 # Author::    Jeff McAffee 01/06/2014
 # Copyright:: Copyright (c) 2014, kTech Systems LLC. All rights reserved.
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require_relative './spec_helper'
+require_relative '../spec_helper'
 
-include TorrentProcessor::ProcessorPlugin
+include TorrentProcessor::Plugin
 include FileUtils
 
-describe TorrentCopierPlugin do
+describe TorrentCopier do
 
   context '#execute' do
 
@@ -41,7 +41,7 @@ describe TorrentCopierPlugin do
 
     let(:controller_stub) do
       obj = double("controller")
-      obj.stub(:log) { SimpleLogger }
+      obj.stub(:logger) { SimpleLogger }
       obj.stub(:cfg) do
         {
           :otherprocessing  => target_dir,
@@ -63,7 +63,7 @@ describe TorrentCopierPlugin do
     context 'given a single media file' do
 
       it "copies a file to the configured destination directory" do
-        TorrentCopierPlugin.new.execute(controller_stub, torrent_data)
+        TorrentCopier.new.execute(controller_stub, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
       end
     end
@@ -81,7 +81,7 @@ describe TorrentCopierPlugin do
       end
 
       it "copies a directory to the configured destination directory" do
-        TorrentCopierPlugin.new.execute(controller_stub, torrent_data)
+        TorrentCopier.new.execute(controller_stub, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         expect(File.exists?(File.join(target_dir, test_torrent, 'test_250kb.part06.rar'))).to be true
       end

@@ -1,5 +1,5 @@
 ##############################################################################
-# File::    torrent_copier_plugin.rb
+# File::    torrent_copier.rb
 # Purpose:: Processor plugin to copy downloaded torrents
 #
 # Author::    Jeff McAffee 01/06/2014
@@ -7,9 +7,13 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-module TorrentProcessor::ProcessorPlugin
 
-  class TorrentCopierPlugin
+module TorrentProcessor::Plugin
+
+  class TorrentCopier
+    require_relative 'service/robocopy'
+
+    include Service
 
     def execute ctx, args
       @context = ctx
@@ -94,9 +98,9 @@ module TorrentProcessor::ProcessorPlugin
 
     def copy_torrent dest_path, is_dir
       if is_dir
-        Robocopy.copy_dir(torrent[:filedir], dest_path, true, context)
+        Robocopy.copy_dir(torrent[:filedir], dest_path, true, context.logger)
       else
-        Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context)
+        Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context.logger)
       end # if
     end
 
