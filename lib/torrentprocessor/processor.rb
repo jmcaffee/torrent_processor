@@ -10,7 +10,7 @@
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
 require 'utorrentwebui'
-require_relative 'processor_plugin'
+require_relative 'plugin'
 
 
 module TorrentProcessor
@@ -18,7 +18,7 @@ module TorrentProcessor
   ##########################################################################
   # Processor class
   class Processor
-    include ProcessorPlugin
+    include Plugin
 
     # Torrent state constants
 

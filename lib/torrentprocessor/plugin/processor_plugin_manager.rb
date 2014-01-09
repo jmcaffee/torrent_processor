@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-module TorrentProcessor::ProcessorPlugin
+module TorrentProcessor::Plugin
 
   class ProcessorPluginManager < TorrentProcessor::PluginManagerBase
 
