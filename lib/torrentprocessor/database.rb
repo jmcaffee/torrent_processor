@@ -392,6 +392,23 @@ values ("#{tdata.hash}", #{tdata.status}, "#{tdata.name}", #{tdata.percent_progr
 EOQ
     end
 
+    def find_torrent_by_id id
+      q = "SELECT * FROM torrents WHERE id = #{id};"
+      row = execute(q).first
+      { :id               => row[0],
+        :hash             => row[1],
+        :created          => row[2],
+        :modified         => row[3],
+        :status           => row[4],
+        :name             => row[5],
+        :percent_progress => row[6],
+        :ratio            => row[7],
+        :label            => row[8],
+        :msg              => row[9],
+        :folder           => row[10],
+        :tp_state         => row[11],
+      }
+    end
 
     class Schema
       # Update SCHEMA_VERSION when new migrations are added.

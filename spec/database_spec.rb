@@ -105,6 +105,24 @@ describe Database do
     end
   end
 
+  context "#find_torrent_by_id" do
+
+      before(:each) do
+        db.close
+        delete_db db_path
+        db.connect
+        db.create_database
+        5.times do |i|
+          db.create(tdata("ab#{i+1}", "Name #{i+1}"))
+        end
+      end
+
+    it "returns a hash of torrent data" do
+      actual = db.find_torrent_by_id(1)
+      expect(actual[:name]).to eq 'Name 1'
+    end
+  end
+
   context "#schema_version" do
 
     before(:each) do
