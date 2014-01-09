@@ -16,6 +16,8 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
+include FileUtils
+
 def create_file_of_size(file_path, file_size, random = false)
   # Create the directory path if it doesn't exist.
   pn = Pathname.new(file_path)
@@ -98,6 +100,21 @@ def blocking_file_delete(path)
       trys += 1
     end
   end
+end
+
+def create_downloaded_torrent(src, destdir)
+  if ! File.exists? src
+    raise '!!! spec_helper::create_downloaded_torrent #{src} does not exist'
+  end
+
+  mkdir_p destdir
+
+  if File.directory? src
+    cp_r src, destdir
+    return
+  end
+
+  cp src, destdir
 end
 
 class SimpleLogger
