@@ -10,7 +10,7 @@
 require_relative './spec_helper'
 
 include FileUtils
-include TorrentProcessor::ProcessorPlugin
+include TorrentProcessor::Plugin
 
 describe UnrarPlugin do
 

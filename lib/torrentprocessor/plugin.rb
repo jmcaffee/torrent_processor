@@ -9,31 +9,16 @@
 
 ##########################################################################
 # TorrentProcessor module
-module TorrentProcessor
+module TorrentProcessor::Plugin
 
+  class PluginError < StandardError; end
 
-
-  ##########################################################################
-  # Plugin module
-  module Plugin
-
-
-    ##########################################################################
-    # Tester class
-    class Tester
-
-      def run_test
-        PluginManager.register_plugin(:db, DBPluginBase)
-        puts PluginManager.command_list(:db).inspect
-        PluginManager.command(".test", self, ".test data")
-        PluginManager.command(".test2", self, ".test2 data")
-      end
-    end # class Tester
-  end # module Plugin
-end # module TorrentProcessor
+end # module TorrentProcessor::Plugin
 
 require_relative('plugin/plugin_manager')
 require_relative('plugin/command')
 require_relative('plugin/db_plugin_base')
 require_relative('plugin/movie_db_plugin')
 require_relative('plugin/rss_plugin')
+require_relative('plugin/movie_db')
+

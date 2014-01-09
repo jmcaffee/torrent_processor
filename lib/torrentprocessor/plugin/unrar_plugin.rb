@@ -7,9 +7,45 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-module TorrentProcessor::ProcessorPlugin
+module TorrentProcessor::Plugin
 
   class UnrarPlugin
+
+    def UnrarPlugin.register_cmds
+      { ".unrar"            => Command.new(UnrarPlugin, :cmd_unrar, "Un-rar an archive"),
+        #".tmdbmoviesearch"  => Command.new(UnrarPlugin, :search_movie,       "Search for a movie"),
+        #"." => Command.new(IMDBPlugin, :, ""),
+      }
+    end
+
+    def cmd_unrar(args)
+      cmdtxt  = args[0]
+      @kaller  = args[1]
+
+      raise 'UnrarPlugin: Caller object must be provided as second element of argument array' if kaller.nil?
+
+      if cmdtxt.nil?
+        log 'Error: path to directory or torrent ID expected'
+        cmd_help
+        return
+      end
+
+      id = text_to_id cmdtxt
+      if id >= 0
+        unrar_torrent id
+      else
+        unrar_path cmdtxt
+      end
+    end
+
+    def cmd_help
+      log 'Unrar Commands'
+      log
+      log '.unrar [FILE_PATH or TORRENT_ID]'
+      log '    Extracts file(s) from a .rar archive.'
+      log '    Extracted files are placed in the directory the archive resides in.'
+      log
+    end
 
     def execute ctx, args
       @context = ctx
