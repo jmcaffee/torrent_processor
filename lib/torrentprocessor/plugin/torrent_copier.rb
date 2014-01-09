@@ -13,8 +13,6 @@ module TorrentProcessor::Plugin
   class TorrentCopier
     require_relative '../service/robocopy'
 
-    include TorrentProcessor::Service
-
     def execute ctx, args
       @context = ctx
       set_torrent_data args
@@ -98,9 +96,9 @@ module TorrentProcessor::Plugin
 
     def copy_torrent dest_path, is_dir
       if is_dir
-        Robocopy.copy_dir(torrent[:filedir], dest_path, true, context.logger)
+        TorrentProcessor::Servce::Robocopy.copy_dir(torrent[:filedir], dest_path, true, context.logger)
       else
-        Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context.logger)
+        TorrentProcessor::Servce::Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context.logger)
       end # if
     end
 
