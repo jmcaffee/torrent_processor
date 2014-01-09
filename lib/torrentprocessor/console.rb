@@ -179,7 +179,7 @@ module TorrentProcessor
 
     def configure_utility_commands
       PluginManager.register_plugin(:util, UnrarPlugin)
-      PluginManager.register_plugin(:util, MovieDBPlugin)
+      PluginManager.register_plugin(:util, MovieDB)
       @util_cmds = PluginManager.command_list :util
 
       # Add commands to cmd array.

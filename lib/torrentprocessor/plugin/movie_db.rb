@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-module TorrentProcessor::ProcessorPlugin
+module TorrentProcessor::Plugin
 
   class MovieDB
     require 'themoviedb'
@@ -44,12 +44,75 @@ module TorrentProcessor::ProcessorPlugin
       ]
 
 
+    def MovieDB.register_cmds
+      { ".tmdbtestcon"      => Command.new(MovieDB, :cmd_test_connection,    "Test the TMdb connection"),
+        ".tmdbmoviesearch"  => Command.new(MovieDB, :cmd_search_movie,       "Search for a movie"),
+        #"." => Command.new(IMDBPlugin, :, ""),
+      }
+    end
+
     def initialize(api_key)
       @tag = 'MovieDB'
       Tmdb::Api.key(api_key)
       Tmdb::Api.language("en")
     end
 
+
+    ###
+    # Test the TMDB.org connection
+    #
+    def cmd_test_connection(args)
+      $LOG.debug "#{@tag}::test_connection"
+      cmdtxt  = args[0]
+      kaller  = args[1]
+      mdb     = kaller.moviedb
+
+      puts "Attempting to connect to TMDB"
+      puts "..."
+
+      result = mdb.test_connection
+
+      if result
+        puts "Successful connection."
+        return true
+      end
+
+      puts "Connection failed"
+      return false
+    end
+
+    def cmd_search_movie(args)
+      $LOG.debug "#{@tag}::search_movie"
+      cmdtxt  = args[0]
+      kaller  = args[1]
+      mdb     = kaller.moviedb
+
+      if cmdtxt.nil?
+        puts 'Error: movie title argument expected'
+        return
+      end
+
+      # Parse the title so we can tell user what the search text will be.
+      # Not needed otherwise.
+      search_text = mdb.parse_search_text(cmdtxt)
+      puts "Searching for #{search_text}"
+
+      movies = mdb.search_movie search_text
+
+      if movies.size <= 0
+        puts '...No results'
+        puts
+      else
+        puts
+        puts "Results:"
+        movies.each do |movie|
+          puts movie.title + " (#{movie.release_date[0..3]})"
+        end
+        puts
+      end
+
+      return movies
+    end
 
     ###
     # Test the TMDB.org connection

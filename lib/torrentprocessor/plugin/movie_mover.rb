@@ -10,7 +10,7 @@
 require_relative 'robocopy'
 require 'YAML'
 
-module TorrentProcessor::ProcessorPlugin
+module TorrentProcessor::Plugin
 
   class MovieMoverDetails
 
