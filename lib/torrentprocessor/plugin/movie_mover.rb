@@ -7,7 +7,6 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require_relative 'robocopy'
 require 'YAML'
 
 module TorrentProcessor::Plugin
@@ -52,6 +51,9 @@ module TorrentProcessor::Plugin
 
   class MovieMover
     require_relative 'movie_db'
+    require_relative 'service/robocopy'
+
+    include Service
 
     DETAILS_FILE  = 'mover.details'
     LOCK_FILE     = 'mover.lock'
