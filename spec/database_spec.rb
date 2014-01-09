@@ -1,24 +1,6 @@
 require 'spec_helper'
 include TorrentProcessor
 
-def delete_db(path)
-  max_trys = 2000
-  trys = 0
-  while File.exists?(path)
-    if trys > max_trys
-      puts "You must be on WinBLOWS!"
-      puts "Unable to delete #{path} after #{max_trys} trys"
-      return
-    end
-    begin
-      #puts "trys: #{trys}"
-      FileUtils.rm path
-    rescue Errno::EACCES => e
-      trys += 1
-    end
-  end
-end
-
 def tdata hash, name
   data = %w(hash 1 name 100 100 100 100 1000 10 20 1h TV 5 10 1 Y 1 0 unk1 unk2 message unk4 unk5 unk6 unk7 folder unk8)
   data[0] = hash
@@ -28,11 +10,25 @@ end
 
 describe Database do
 
-  let(:db) { obj = Database.new(controller); obj.filename = db_file; obj }
-  let(:controller) { double("controller", :cfg => {:appPath => app_data_path}) }
+  let(:db) do
+    obj = Database.new(controller_stub)
+    obj.filename = db_file
+    obj
+  end
+
+  let(:controller_stub) do
+    obj = double("controller")
+    obj.stub(:cfg) do
+      {
+        :appPath => app_data_path
+      }
+    end
+    obj
+  end
+
   let(:app_data_path) { FileUtils.mkdir_p('tmp/spec/database'); 'tmp/spec/database' }
-  let(:db_path) { File.join(app_data_path, db_file) }
-  let(:db_file) { 'test.db' }
+  let(:db_path)       { File.join(app_data_path, db_file) }
+  let(:db_file)       { 'test.db' }
 
   it "database file name can be overridden" do
     db.filename = 'testing.db'
@@ -40,13 +36,13 @@ describe Database do
   end
 
   it "defaults to 'tp.db'" do
-    test_db = Database.new(controller)
+    test_db = Database.new(controller_stub)
     expect(test_db.filename).to eq 'tp.db'
   end
 
   it "creates a new database at cfg[:appPath]" do
     db.connect
-    expect(File.exists?(db_path))
+    expect(File.exists?(db_path)).to be true
   end
 
   context "#database" do
@@ -79,8 +75,8 @@ describe Database do
     it "connects to a database and returns the instance" do
       database = db.connect
       expect(database).to_not be nil
-      expect(database.public_methods.include?(:execute))
-      expect(database.public_methods.include?(:execute_batch))
+      expect(database.public_methods.include?(:execute)).to be true
+      expect(database.public_methods.include?(:execute_batch)).to be true
     end
   end
 
@@ -88,7 +84,7 @@ describe Database do
 
     before(:each) do
       db.close
-      delete_db db_path
+      blocking_file_delete db_path
     end
 
     it "creates the database schema" do
@@ -109,7 +105,7 @@ describe Database do
 
       before(:each) do
         db.close
-        delete_db db_path
+        blocking_file_delete db_path
         db.connect
         db.create_database
         5.times do |i|
@@ -127,7 +123,7 @@ describe Database do
 
     before(:each) do
       db.close
-      delete_db db_path
+      blocking_file_delete db_path
     end
 
     it "returns the current schema version" do
@@ -141,7 +137,7 @@ describe Database do
 
     before(:each) do
       db.close
-      delete_db db_path
+      blocking_file_delete db_path
     end
 
     context ".perform_migrations" do

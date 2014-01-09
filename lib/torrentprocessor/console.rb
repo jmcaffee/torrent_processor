@@ -15,6 +15,7 @@ require 'plugin'
 require 'plugin/db_plugin'
 require 'plugin/ut_plugin'
 require 'plugin/cfg_plugin'
+require_relative 'console_plugin'
 
 
 module TorrentProcessor
@@ -25,6 +26,7 @@ module TorrentProcessor
 
     include KtCmdLine
     include Plugin
+    include ConsolePlugin
 
   attr_reader     :controller
   attr_reader     :verbose
