@@ -36,7 +36,7 @@ describe Unrar do
 
     let(:controller_stub) do
       obj = double("controller")
-      obj.stub(:log) { SimpleLogger }
+      obj.stub(:logger) { SimpleLogger }
       obj.stub(:cfg) do
         {
           :otherprocessing  => target_root_dir,

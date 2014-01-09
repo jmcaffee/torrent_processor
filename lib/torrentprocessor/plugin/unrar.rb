@@ -32,9 +32,9 @@ module TorrentProcessor::Plugin
 
       id = text_to_id cmdtxt
       if id >= 0
-        cmd_unrar_torrent id
+        unrar_torrent id
       else
-        cmd_unrar_path cmdtxt
+        unrar_path cmdtxt
       end
     end
 
@@ -63,7 +63,7 @@ module TorrentProcessor::Plugin
 
       # Extract the torrent.
 
-      unrar_torrent dest_path, is_subdir
+      extract_rar dest_path, is_subdir
     end
 
   private
@@ -122,7 +122,19 @@ module TorrentProcessor::Plugin
       end
     end
 
-    def unrar_torrent dest_path, is_dir
+    def text_to_id id
+      begin
+        return Integer(id)
+      rescue ArgumentError => e
+        return -1
+      end
+    end
+
+    def destination_location
+      return File.join(final_directory, torrent[:filename])
+    end
+
+    def extract_rar dest_path, is_dir
       unless is_dir
         log 'Skipping unrar attempt: Torrent not in subdirectory'
         return
@@ -133,31 +145,19 @@ module TorrentProcessor::Plugin
         return
       end
 
-      unless SevenZip.extract_rar(dest_path, dest_path, context) == true
+      unless unrar_path(dest_path) == true
         raise PluginError, 'Unrar failed'
       end
     end
 
-    def text_to_id id
-      begin
-        return Integer(id)
-      rescue ArgumentError => e
-        return -1
-      end
+    def unrar_path path
+      SevenZip.extract_rar(path, path, context.logger)
     end
 
-    def cmd_unrar_path path
-      SevenZip.extract_rar(path, path, nil)
-    end
-
-    def cmd_unrar_torrent id
+    def unrar_torrent id
       set_torrent_data database.find_torrent_by_id(id)
       path = destination_location
-      SevenZip.extract_rar(path, path, nil)
-    end
-
-    def destination_location
-      return File.join(final_directory, torrent[:filename])
+      SevenZip.extract_rar(path, path, context.logger)
     end
   end # class
 end # module
