@@ -14,15 +14,30 @@ include TorrentProcessor
 describe ConsolePlugin::UnrarPlugin do
 
     let(:unrar_plug)  { ConsolePlugin::UnrarPlugin.new }
-    let(:ctx)   { double("console",
-                        { :logger => SimpleLogger,
-                          :cfg    => { :otherprocessing => torrent_dir, :tvprocessing => torrent_dir, :movieprocessing => torrent_dir },
-                          :database => database }) }
-    let(:database)  { double("database",
-                             { :find_torrent_by_id => torrent }) }
-    let(:torrent)   {
-      { :filename => 'multi_rar', :filedir => 'tmp/spec/unrar_plugin_console/completed/multi-rar', :label => 'TV' }
-    }
+
+    let(:console_stub) do
+      obj = double("console")
+      obj.stub(:logger) { SimpleLogger }
+      obj.stub(:cfg)    do
+        { :otherprocessing => torrent_dir, :tvprocessing => torrent_dir, :movieprocessing => torrent_dir }
+      end
+      obj.stub(:database) { db_stub }
+      obj
+    end
+
+    let(:db_stub) do
+      obj = double("database")
+      obj.stub(:find_torrent_by_id) { torrent }
+      obj
+    end
+
+    let(:torrent) do
+      {
+        :filename => 'multi_rar',
+        :filedir => 'tmp/spec/unrar_plugin_console/completed/multi-rar',
+        :label => 'TV'
+      }
+    end
 
   context '#new' do
 
@@ -48,7 +63,7 @@ describe ConsolePlugin::UnrarPlugin do
     context 'given a path' do
 
       it 'unrars an archive' do
-        unrar_plug.unrar([torrent_dir, ctx])
+        unrar_plug.unrar([torrent_dir, console_stub])
         expect(File.exists?(torrent_file)).to be true
       end
     end
@@ -56,7 +71,7 @@ describe ConsolePlugin::UnrarPlugin do
     context 'given a torrent ID' do
 
       it 'unrars an archive' do
-        unrar_plug.unrar(['1', ctx])
+        unrar_plug.unrar(['1', console_stub])
       end
     end
   end
