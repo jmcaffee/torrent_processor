@@ -21,4 +21,6 @@ require_relative('plugin/db_plugin_base')
 require_relative('plugin/rss_plugin')
 require_relative('plugin/movie_mover')
 require_relative('plugin/movie_db')
+require_relative('plugin/seven_zip')
+require_relative('plugin/unrar')
 

@@ -1,6 +1,6 @@
 ##############################################################################
-# File::    unrar_plugin.rb
-# Purpose:: UnrarPlugin
+# File::    unrar.rb
+# Purpose:: Extract .rar archives using 7Zip
 #
 # Author::    Jeff McAffee 01/07/2014
 # Copyright:: Copyright (c) 2014, kTech Systems LLC. All rights reserved.
@@ -9,20 +9,20 @@
 
 module TorrentProcessor::Plugin
 
-  class UnrarPlugin
+  class Unrar
 
-    def UnrarPlugin.register_cmds
-      { ".unrar"            => Command.new(UnrarPlugin, :cmd_unrar, "Un-rar an archive"),
-        #".tmdbmoviesearch"  => Command.new(UnrarPlugin, :search_movie,       "Search for a movie"),
+    def Unrar.register_cmds
+      { ".unrar"            => Command.new(Unrar, :cmd_unrar, "Un-rar an archive"),
+        #".tmdbmoviesearch"  => Command.new(Unrar, :search_movie,       "Search for a movie"),
         #"." => Command.new(IMDBPlugin, :, ""),
       }
     end
 
     def cmd_unrar(args)
       cmdtxt  = args[0]
-      @kaller  = args[1]
+      @context  = args[1]
 
-      raise 'UnrarPlugin: Caller object must be provided as second element of argument array' if kaller.nil?
+      raise 'Unrar: Caller object must be provided as second element of argument array' if context.nil?
 
       if cmdtxt.nil?
         log 'Error: path to directory or torrent ID expected'
@@ -32,9 +32,9 @@ module TorrentProcessor::Plugin
 
       id = text_to_id cmdtxt
       if id >= 0
-        unrar_torrent id
+        cmd_unrar_torrent id
       else
-        unrar_path cmdtxt
+        cmd_unrar_path cmdtxt
       end
     end
 
@@ -86,6 +86,10 @@ module TorrentProcessor::Plugin
       context.cfg
     end
 
+    def database
+      context.database
+    end
+
     def default_args
       {hash: nil, filename: nil, filedir: '', label: ''}
     end
@@ -132,6 +136,28 @@ module TorrentProcessor::Plugin
       unless SevenZip.extract_rar(dest_path, dest_path, context) == true
         raise PluginError, 'Unrar failed'
       end
+    end
+
+    def text_to_id id
+      begin
+        return Integer(id)
+      rescue ArgumentError => e
+        return -1
+      end
+    end
+
+    def cmd_unrar_path path
+      SevenZip.extract_rar(path, path, nil)
+    end
+
+    def cmd_unrar_torrent id
+      set_torrent_data database.find_torrent_by_id(id)
+      path = destination_location
+      SevenZip.extract_rar(path, path, nil)
+    end
+
+    def destination_location
+      return File.join(final_directory, torrent[:filename])
     end
   end # class
 end # module

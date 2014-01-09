@@ -52,7 +52,7 @@ module TorrentProcessor
 
       ProcessorPluginManager.remove_all
       ProcessorPluginManager.register [TorrentCopierPlugin,
-                                       UnrarPlugin]
+                                       Unrar]
 
     end
 

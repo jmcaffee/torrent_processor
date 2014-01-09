@@ -15,7 +15,6 @@ require 'plugin'
 require 'plugin/db_plugin'
 require 'plugin/ut_plugin'
 require 'plugin/cfg_plugin'
-require_relative 'console_plugin'
 
 
 module TorrentProcessor
@@ -26,7 +25,6 @@ module TorrentProcessor
 
     include KtCmdLine
     include Plugin
-    include ConsolePlugin
 
   attr_reader     :controller
   attr_reader     :verbose
@@ -178,7 +176,7 @@ module TorrentProcessor
     end
 
     def configure_utility_commands
-      PluginManager.register_plugin(:util, UnrarPlugin)
+      PluginManager.register_plugin(:util, Unrar)
       PluginManager.register_plugin(:util, MovieDB)
       @util_cmds = PluginManager.command_list :util
 
