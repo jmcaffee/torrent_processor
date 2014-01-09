@@ -51,7 +51,6 @@ module TorrentProcessor::Plugin
 
   class MovieMover
     require_relative 'movie_db'
-    require_relative '../service/robocopy'
 
     DETAILS_FILE  = 'mover.details'
     LOCK_FILE     = 'mover.lock'
@@ -161,7 +160,7 @@ module TorrentProcessor::Plugin
       target_path = Pathname.new File.join(dir, target_file)
       FileUtils.mv src_path, target_path
 
-      if TorrentProcessor::Servce::Robocopy.copy_file(dir, target_dir, target_file, @logger)
+      if TorrentProcessor::Service::Robocopy.copy_file(dir, target_dir, target_file, @logger)
         create_process_complete_file(dir)
       else
         # The copy failed. Rename the file back to the original for the next attempt.
@@ -270,4 +269,4 @@ module TorrentProcessor::Plugin
       glob << '}'
     end
   end # class MovieMover
-end # module TorrentProcessor::ProcessorPlugin
+end # module TorrentProcessor::Plugin

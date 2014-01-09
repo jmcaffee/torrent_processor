@@ -1,5 +1,5 @@
 require 'spec_helper'
-include TorrentProcessor::ProcessorPlugin
+include TorrentProcessor::Plugin
 
 describe MovieMover do
 
@@ -58,6 +58,8 @@ describe MovieMover do
       subject(:mover)   { MovieMover.new(mdb, logger) }
 
       before(:each) do
+        blocking_dir_delete root_src_dir
+
         # Create the test files.
         total_recall_dir
         bridesmaids_dir
