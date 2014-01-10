@@ -96,9 +96,9 @@ module TorrentProcessor::Plugin
 
     def copy_torrent dest_path, is_dir
       if is_dir
-        TorrentProcessor::Servce::Robocopy.copy_dir(torrent[:filedir], dest_path, true, context.logger)
+        TorrentProcessor::Service::Robocopy.copy_dir(torrent[:filedir], dest_path, true, context.logger)
       else
-        TorrentProcessor::Servce::Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context.logger)
+        TorrentProcessor::Service::Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context.logger)
       end # if
     end
 

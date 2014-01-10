@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require_relative './spec_helper'
+require 'spec_helper'
 
 describe TorrentProcessor do
 
