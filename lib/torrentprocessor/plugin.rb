@@ -15,6 +15,9 @@ module TorrentProcessor::Plugin
 
 end # module TorrentProcessor::Plugin
 
+require_relative('plugin/cfg_plugin')
+require_relative('plugin/db_plugin')
+require_relative('plugin/ut_plugin')
 require_relative('plugin/cmd_plugin_manager')
 require_relative('plugin/command')
 require_relative('plugin/rss_plugin')

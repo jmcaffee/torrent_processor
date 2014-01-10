@@ -12,9 +12,6 @@ require 'ktcommon/ktcmdline'
 require_relative 'service/utorrent'
 require 'formatter'
 require 'plugin'
-require 'plugin/db_plugin'
-require 'plugin/ut_plugin'
-require 'plugin/cfg_plugin'
 
 
 module TorrentProcessor
