@@ -51,7 +51,7 @@ module TorrentProcessor
         puts "..."
 
         begin
-          ut = TorrentProcessor::Service::UTorrentWebUI.new(ctrl.cfg[:ip], ctrl.cfg[:port], ctrl.cfg[:user], ctrl.cfg[:pass])
+          ut = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(ctrl.cfg[:ip], ctrl.cfg[:port], ctrl.cfg[:user], ctrl.cfg[:pass])
           ut.sendGetQuery("/gui/?list=1")
 
         rescue Exception => e
