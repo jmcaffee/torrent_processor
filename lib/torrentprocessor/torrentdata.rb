@@ -1,7 +1,7 @@
 ##############################################################################
 # File::    torrentdata.rb
 # Purpose:: Torrent Data object encapsulates data for one torrent.
-# 
+#
 # Author::    Jeff McAffee 08/07/2011
 # Copyright:: Copyright (c) 2011, kTech Systems LLC. All rights reserved.
 # Website::   http://ktechsystems.com
@@ -9,15 +9,15 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require 'utorrentwebui'
+require_relative 'service/utorrentwebui'
 
 
 module TorrentProcessor
-    
+
   ##########################################################################
   # TorrentData class
   class TorrentData
-  
+
     attr_accessor :hash
     attr_accessor :status
     attr_accessor :name
@@ -46,7 +46,7 @@ module TorrentProcessor
     attr_accessor :unk7
     attr_accessor :folder
     attr_accessor :unk8
-    
+
     ###
     # TorrentData constructor
     #
@@ -54,7 +54,7 @@ module TorrentProcessor
     #
     def initialize(torrent)
       $LOG.debug "TorrentData::initialize"
-      
+
       @hash                 = torrent[0]
       @status               = torrent[1]
       @name                 = torrent[2]
@@ -83,9 +83,9 @@ module TorrentProcessor
       @unk7                 = torrent[25]
       @folder               = torrent[26]
       @unk8                 = torrent[27]
-      
+
     end
-    
+
 
     ###
     # Set the verbose flag
@@ -96,7 +96,7 @@ module TorrentProcessor
       $LOG.debug "TorrentData::verbose=( #{arg} )"
       @verbose = arg
     end
-      
+
 
     ###
     # Convert the data to a hash

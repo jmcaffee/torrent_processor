@@ -21,7 +21,7 @@ describe PluginManagerBase do
     context 'given a class name' do
 
       it "adds a plugin class to the registration list" do
-        ProcessorPluginManager.remove_all
+        PluginManagerBase.remove_all
         PluginManagerBase.register TestClass1
         expect(PluginManagerBase.registered_plugins.size).to eq 1
       end

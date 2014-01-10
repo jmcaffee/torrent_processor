@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require 'utorrentwebui'
+require_relative 'service/utorrentwebui'
 
 module TorrentProcessor
   

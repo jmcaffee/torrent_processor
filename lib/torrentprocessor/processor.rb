@@ -9,7 +9,7 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require 'utorrentwebui'
+require_relative 'service/utorrentwebui'
 require_relative 'plugin'
 
 
@@ -145,7 +145,7 @@ module TorrentProcessor
 
       return @utorrent unless @utorrent.nil?
 
-      @utorrent = UTorrentWebUI.new(cfg[:ip], cfg[:port], cfg[:user], cfg[:pass])
+      @utorrent = TorrentProcessor::Service::UTorrentWebUI.new(cfg[:ip], cfg[:port], cfg[:user], cfg[:pass])
     end
 
 

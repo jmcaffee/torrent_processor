@@ -16,7 +16,7 @@ require 'torrentdata'
 require "rss_torrent_data"
 
 
-module TorrentProcessor
+module TorrentProcessor::Service
 
   ##########################################################################
   # UTorrentWebUI class
@@ -430,4 +430,5 @@ module TorrentProcessor
 
 
 
-end # module TorrentProcessor
+end # module TorrentProcessor::Service
+

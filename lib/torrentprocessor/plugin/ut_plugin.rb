@@ -1,7 +1,7 @@
 ##############################################################################
 # File::    utplugin.rb
 # Purpose:: uTorrent Plugin class.
-# 
+#
 # Author::    Jeff McAffee 02/21/2012
 # Copyright:: Copyright (c) 2012, kTech Systems LLC. All rights reserved.
 # Website::   http://ktechsystems.com
@@ -22,8 +22,9 @@ module TorrentProcessor
     ##########################################################################
     # UTPlugin class
     class UTPlugin
+      require_relative '../service/utorrentwebui'
       include KtCmdLine
-      
+
       def UTPlugin.register_cmds
         { ".testcon" =>     Command.new(UTPlugin, :ut_test_connection,  "Test the uTorrent WebUI connection"),
           ".utsettings" =>  Command.new(UTPlugin, :ut_settings,         "Grab the current uTorrent settings"),
@@ -48,11 +49,11 @@ module TorrentProcessor
 
         puts "Attempting to connect to #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]} using login #{ctrl.cfg[:user]}/#{ctrl.cfg[:pass]}"
         puts "..."
-        
+
         begin
-          ut = UTorrentWebUI.new(ctrl.cfg[:ip], ctrl.cfg[:port], ctrl.cfg[:user], ctrl.cfg[:pass])
+          ut = TorrentProcessor::Service::UTorrentWebUI.new(ctrl.cfg[:ip], ctrl.cfg[:port], ctrl.cfg[:user], ctrl.cfg[:pass])
           ut.sendGetQuery("/gui/?list=1")
-          
+
         rescue Exception => e
           puts
           puts "* Connection attempt has failed with the following reason:"
@@ -61,7 +62,7 @@ module TorrentProcessor
           puts
           return true
         end
-        
+
         puts "Connected successfully!"
         return true
       end
@@ -72,7 +73,7 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         ut = kaller.utorrent
-        
+
         ut.get_utorrent_settings()
         response = ut.parseResponse()
         Formatter.pHr
@@ -101,7 +102,7 @@ module TorrentProcessor
         ut.get_torrent_list()
         hashes = select_torrent_hashes( ut.torrents )
         return true if hashes.nil?
-        
+
         puts "  Retrieving Job Properties..."
         dump_jobprops( ut, hashes )
         return true
@@ -136,21 +137,21 @@ module TorrentProcessor
           puts "No torrents to dump"
           return true
         end
-        
+
         Formatter.pHr
         puts " Hash  | Name"
         #puts "Torrent Names"
         Formatter.pHr
         puts
-        
+
         ut.torrents.each do |k,v|
           puts "...#{k.slice(-4,4)}\t#{v.name}"
         end
-        
+
         puts
         Formatter.pHr
         puts
-        
+
         return true
       end
 
@@ -163,17 +164,17 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         ut = kaller.utorrent
-        
+
         ut.get_torrent_list()
         hashes = select_torrent_hashes( ut.torrents )
         return true if hashes.nil?
-        
+
         hashes.each do |torr|
           puts Formatter.pHr
           hsh = torr[0]
           Formatter.pHash(ut.torrents[hsh].to_hsh)
         end # each torr
-        
+
         puts Formatter.pHr
 
         return true
@@ -196,7 +197,7 @@ module TorrentProcessor
         cmdtxt = args[0]
         kaller = args[1]
         ut = kaller.utorrent
-        
+
         response = ut.get_torrent_list()
         Formatter.pHr
         puts response.inspect
@@ -212,13 +213,13 @@ module TorrentProcessor
       def dump_jobprops( ut, hashes )
 
         hashes.each do |hsh|
-          
+
           thsh = hsh[0]
           tname = hsh[1]
           response = ut.get_torrent_job_properties( thsh )
           #puts rows.inspect
           puts "Name: #{tname}"
-          
+
           puts "Error: Not found in uTorrent." if response["props"].nil?
           return if response["props"].nil?
 
@@ -248,7 +249,7 @@ module TorrentProcessor
         end
       end
 
-    
+
       ###
       # Display and return an indexed hash of the current torrents
       #
@@ -260,13 +261,13 @@ module TorrentProcessor
           puts "No torrents to display"
           return nil
         end
-        
+
         Formatter.pHr
         puts " #  | Name"
         Formatter.pHr
         puts
-        
-        # Have to build an accompanying hash because we can't fetch a value 
+
+        # Have to build an accompanying hash because we can't fetch a value
         # from a hash using an index.
         indexed_hsh = {}
         #puts "-*"*30
@@ -277,7 +278,7 @@ module TorrentProcessor
           puts "#{i}\t#{v.name}"
           indexed_hsh[i] = [v.hash, v.name]
         end
-        
+
         puts
         Formatter.pHr
         puts
@@ -292,7 +293,7 @@ module TorrentProcessor
       def select_torrent_hashes( tdata )
         indexed_hsh = display_current_torrent_list( tdata )
         index = getInput(" Select a torrent (0 for all, <blank> for none): ")
-        
+
         # Return all torrent hashes in an array of arrays containing the hash and the name
         hashes = []
         if index == "0"
@@ -303,7 +304,7 @@ module TorrentProcessor
         end
 
         return nil if index.empty?
-        
+
         begin
           index = Integer(index)
         rescue Exception => e
@@ -321,12 +322,12 @@ module TorrentProcessor
 
         # Return the selected hash in an array
         return ([] << indexed_hsh[index])
-        
+
       end
     end # class UTPlugin
-    
+
 
 
   end # module Plugin
-  
+
 end # module TorrentProcessor
