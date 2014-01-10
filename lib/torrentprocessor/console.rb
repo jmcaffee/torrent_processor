@@ -118,8 +118,8 @@ module TorrentProcessor
     def configureConfigCommands()
       $LOG.debug "Console::configureConfigCommands()"
 
-      PluginManager.register_plugin(:cfg, CfgPlugin)
-      @cfg_cmds = PluginManager.command_list(:cfg)
+      CmdPluginManager.register_plugin(:cfg, CfgPlugin)
+      @cfg_cmds = CmdPluginManager.command_list(:cfg)
 
       # Add the commands to a cmd array.
       @cfg_cmds.each do |c|
@@ -134,8 +134,8 @@ module TorrentProcessor
     def configureDbCommands()
       $LOG.debug "Console::configureDbCommands()"
 
-      PluginManager.register_plugin(:db, DBPlugin)
-      @db_cmds = PluginManager.command_list(:db)
+      CmdPluginManager.register_plugin(:db, DBPlugin)
+      @db_cmds = CmdPluginManager.command_list(:db)
 
       # Add the commands to a cmd array.
       @db_cmds.each do |c|
@@ -150,8 +150,8 @@ module TorrentProcessor
     def configureUTorrentCommands()
       $LOG.debug "Console::configureUTorrentCommands()"
 
-      PluginManager.register_plugin(:ut, UTPlugin)
-      @utorrent_cmds = PluginManager.command_list(:ut)
+      CmdPluginManager.register_plugin(:ut, UTPlugin)
+      @utorrent_cmds = CmdPluginManager.command_list(:ut)
 
       # Add the commands to a cmd array.
       @utorrent_cmds.each do |c|
@@ -166,8 +166,8 @@ module TorrentProcessor
     def configureRSSCommands()
       $LOG.debug "Console::configureRSSCommands()"
 
-      PluginManager.register_plugin(:rss, RSSPlugin)
-      @rss_cmds = PluginManager.command_list(:rss)
+      CmdPluginManager.register_plugin(:rss, RSSPlugin)
+      @rss_cmds = CmdPluginManager.command_list(:rss)
 
       # Add the commands to a cmd array.
       @rss_cmds.each do |c|
@@ -176,9 +176,9 @@ module TorrentProcessor
     end
 
     def configure_utility_commands
-      PluginManager.register_plugin(:util, Unrar)
-      PluginManager.register_plugin(:util, MovieDB)
-      @util_cmds = PluginManager.command_list :util
+      CmdPluginManager.register_plugin(:util, Unrar)
+      CmdPluginManager.register_plugin(:util, MovieDB)
+      @util_cmds = CmdPluginManager.command_list :util
 
       # Add commands to cmd array.
       @util_cmds.each do |c|
@@ -252,7 +252,7 @@ module TorrentProcessor
     def processCmd(cmd)
       $LOG.debug "Console::processCmd( #{cmd} )"
 
-      result = PluginManager.command(cmd, self)
+      result = CmdPluginManager.command(cmd, self)
       return result unless result.nil?
 
       cmd_parts = cmd.split
