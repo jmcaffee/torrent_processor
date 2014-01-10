@@ -5,7 +5,7 @@ def tdata hash, name
   data = %w(hash 1 name 100 100 100 100 1000 10 20 1h TV 5 10 1 Y 1 0 unk1 unk2 message unk4 unk5 unk6 unk7 folder unk8)
   data[0] = hash
   data[2] = name
-  TorrentProcessor::TorrentData.new data
+  TorrentProcessor::Service::UTorrent::TorrentData.new data
 end
 
 describe Database do

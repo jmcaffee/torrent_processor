@@ -9,7 +9,7 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require_relative 'service/utorrentwebui'
+require_relative 'service/utorrent'
 require_relative 'plugin'
 
 

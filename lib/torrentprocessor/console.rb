@@ -9,7 +9,7 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require_relative 'service/utorrentwebui'
+require_relative 'service/utorrent'
 require 'formatter'
 require 'plugin'
 require 'plugin/db_plugin'
@@ -46,7 +46,7 @@ module TorrentProcessor
       @rmode      = :body
 
       cfg         = @controller.cfg
-      @utorrent   = UTorrentWebUI.new(cfg[:ip], cfg[:port], cfg[:user], cfg[:pass])
+      @utorrent   = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(cfg[:ip], cfg[:port], cfg[:user], cfg[:pass])
       @utorrent.verbose = false
 
       @database   = @controller.database

@@ -12,14 +12,13 @@ require 'ktcommon/ktcmdline'
 require 'json/pure'
 require 'net/http'
 require 'hpricot'
-require 'torrentdata'
-require "rss_torrent_data"
+
+require_relative 'torrent_data'
+require_relative 'rss_torrent_data'
 
 
-module TorrentProcessor::Service
+module TorrentProcessor::Service::UTorrent
 
-  ##########################################################################
-  # UTorrentWebUI class
   class UTorrentWebUI
 
     attr_accessor :verbose

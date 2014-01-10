@@ -22,7 +22,7 @@ module TorrentProcessor
     ##########################################################################
     # UTPlugin class
     class UTPlugin
-      require_relative '../service/utorrentwebui'
+      require_relative '../service/utorrent'
       include KtCmdLine
 
       def UTPlugin.register_cmds
