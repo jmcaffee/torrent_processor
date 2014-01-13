@@ -21,22 +21,45 @@ module TorrentProcessor
     yield(configuration) if block_given?
   end
 
+  def self.load_configuration cfg_file
+    @configuration = YAML.load_file(cfg_file)
+  end
+
+  def self.save_configuration cfg_file
+    File.open(cfg_file, 'w') do |out|
+      YAML.dump(configuration, out)
+    end
+  end
+
   class Configuration
     attr_accessor :utorrent
+    attr_accessor :tmdb
 
     def initialize
       @utorrent = UTorrentConfiguration.new
+      @tmdb = TMdbConfiguration.new
     end
 
     class UTorrentConfiguration
+      attr_accessor :ip
+      attr_accessor :port
+      attr_accessor :user
+      attr_accessor :pass
       attr_accessor :dir_completed_download
       attr_accessor :seed_ratio
+    end
+
+    class TMdbConfiguration
+      attr_accessor :api_key
+      attr_accessor :language
     end
   end
 end
 
 
-TorrentProcessor.configure
+TorrentProcessor.configure do |config|
+  config.tmdb.language = 'en'
+end
 
 ##############################################################################
 # Logging
