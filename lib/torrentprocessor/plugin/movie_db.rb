@@ -43,72 +43,109 @@ module TorrentProcessor::Plugin
         '.m4v',
       ]
 
+    TEST_CONNECTION_CMD = '.tmdbtestcon'
+    MOVIE_SEARCH_CMD    = '.tmdbmoviesearch'
+
 
     def MovieDB.register_cmds
-      { ".tmdbtestcon"      => Command.new(MovieDB, :cmd_test_connection,    "Test the TMdb connection"),
-        ".tmdbmoviesearch"  => Command.new(MovieDB, :cmd_search_movie,       "Search for a movie"),
+      { TEST_CONNECTION_CMD => Command.new(MovieDB, :cmd_test_connection,    "Test the TMdb connection",
+                                                {
+                                                  :api_key => TorrentProcessor.configuration.tmdb.api_key,
+                                                  :language => TorrentProcessor.configuration.tmdb.language
+                                                }),
+        MOVIE_SEARCH_CMD    => Command.new(MovieDB, :cmd_search_movie,       "Search for a movie",
+                                                {
+                                                  :api_key => TorrentProcessor.configuration.tmdb.api_key,
+                                                  :language => TorrentProcessor.configuration.tmdb.language
+                                                }),
         #"." => Command.new(IMDBPlugin, :, ""),
       }
     end
 
-    def initialize(api_key)
+    def initialize( args = {} )
       @tag = 'MovieDB'
-      Tmdb::Api.key(api_key)
-      Tmdb::Api.language("en")
+      parse_args args
     end
 
+    def api_key=(key)
+      Tmdb::Api.key(key)
+    end
+
+    def language=(lang)
+      Tmdb::Api.language(lang)
+    end
+
+    def logger=(logger_obj)
+      @logger = logger_obj
+    end
+
+    def log msg = ''
+      @logger.log msg
+    end
+
+    def defaults
+      {
+        :logger     => NullLogger
+      }
+    end
 
     ###
     # Test the TMDB.org connection
     #
     def cmd_test_connection(args)
-      $LOG.debug "#{@tag}::test_connection"
-      cmdtxt  = args[0]
-      kaller  = args[1]
-      mdb     = kaller.moviedb
+      parse_args args
 
-      puts "Attempting to connect to TMDB"
-      puts "..."
+      log "Attempting to connect to TMDB"
+      log "..."
 
-      result = mdb.test_connection
+      result = test_connection
 
       if result
-        puts "Successful connection."
+        log "Successful connection."
         return true
       end
 
-      puts "Connection failed"
+      log "Connection failed"
       return false
     end
 
-    def cmd_search_movie(args)
-      $LOG.debug "#{@tag}::search_movie"
-      cmdtxt  = args[0]
-      kaller  = args[1]
-      mdb     = kaller.moviedb
+    def parse_args args
+      args = defaults.merge(args)
+      self.logger    = args[:logger]   if args[:logger]
+      self.api_key   = args[:api_key]  if args[:api_key]
+      self.language  = args[:language] if args[:language]
 
-      if cmdtxt.nil?
-        puts 'Error: movie title argument expected'
+      #raise ArgumentError, 'Missing api_key' if args[:api_key].nil?
+    end
+
+    def cmd_search_movie(args)
+      parse_args args
+
+      # Strip off the actual command.
+      movie_title  = args[:cmd].gsub(MOVIE_SEARCH_CMD, '').strip
+
+      if movie_title.nil? || movie_title.empty?
+        log 'Error: movie title argument expected'
         return
       end
 
       # Parse the title so we can tell user what the search text will be.
       # Not needed otherwise.
-      search_text = mdb.parse_search_text(cmdtxt)
-      puts "Searching for #{search_text}"
+      search_text = parse_search_text(movie_title)
+      log "Searching for #{search_text}"
 
-      movies = mdb.search_movie search_text
+      movies = search_movie search_text
 
       if movies.size <= 0
-        puts '...No results'
-        puts
+        log '...No results'
+        log
       else
-        puts
-        puts "Results:"
+        log
+        log "Results:"
         movies.each do |movie|
-          puts movie.title + " (#{movie.release_date[0..3]})"
+          log movie.title + " (#{movie.release_date[0..3]})"
         end
-        puts
+        log
       end
 
       return movies
@@ -118,46 +155,42 @@ module TorrentProcessor::Plugin
     # Test the TMDB.org connection
     #
     def test_connection()
-      $LOG.debug "#{@tag}::test_connection"
-
       tmdb_config = Tmdb::Configuration.new
-      $LOG.info "#{@tag} Attempting to connect to #{tmdb_config.base_url}"
+      log "Attempting to connect to #{tmdb_config.base_url}"
 
       movie = Tmdb::Movie.find('Fight Club')
       # Returns an array of suggested movies with the best suggestion first.
       movie = movie[0] if movie.size > 0
 
       if movie.title == 'Fight Club'
-        $LOG.info "#{@tag} Successful connection."
+        log "Successful connection."
         return true
       end
 
-      $LOG.error "#{@tag} Unable to connect"
+      log "Unable to connect"
       return false
     end
 
     def search_movie(text)
-      $LOG.debug "#{@tag}::search_movie[ #{text} ]"
-
       if text.nil?
-        $LOG.error "#{@tag} Error: movie title argument expected"
+        log "Error: movie title argument expected"
         return []
       end
 
       year = get_year(text)
       search_text = parse_search_text(text)
 
-      $LOG.info "#{@tag}   search for #{search_text}"
+      log "  search for #{search_text}"
 
       movies = Tmdb::Movie.find(search_text)
 
       if movies.size <= 0
-        $LOG.info "#{@tag}  ...no results"
+        log " ...no results"
 
-        $LOG.info "#{@tag}  trying search again with no spaces"
+        log " trying search again with no spaces"
         search_text = search_text.gsub(' ', '')
 
-        $LOG.info "#{@tag}   search for #{search_text}"
+        log "  search for #{search_text}"
         movies = Tmdb::Movie.find(search_text)
       end
 

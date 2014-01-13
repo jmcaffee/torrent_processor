@@ -81,14 +81,15 @@ module TorrentProcessor::Plugin
     #
     # +args+ -- a list of arguments to be passed to the plugin command
     #
-    def CmdPluginManager.command(cmdname, *args)
+    def CmdPluginManager.command(cmdname, args)
       cmd_parts = cmdname.split
       cmdpart = cmd_parts[0]
 
       @registered_cmds.each do |plugin_type, cmd_names|
         cmd_names.each do |cmdsig,cmd|
           if (cmdsig == cmdpart)
-            return cmd.execute( cmdname, *args )
+            args[:cmd] = cmdname
+            return cmd.execute( args )
           end
         end   # each plugin_type command
       end   # each plugin_type

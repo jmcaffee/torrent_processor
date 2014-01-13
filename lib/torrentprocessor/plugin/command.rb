@@ -34,10 +34,11 @@ module TorrentProcessor
       #
       # +desc+ -- description of the command
       #
-      def initialize(klass, mthd, desc)
+      def initialize(klass, mthd, desc, init_args = {})
         @klass = klass
         @mthd = mthd
         @desc = desc
+        @init_args = init_args
       end
 
 
@@ -56,8 +57,12 @@ module TorrentProcessor
       #
       # +args+ -- argument list to be passed to the command
       #
-      def execute(*args)
-        @klass.new.send( @mthd, args )
+      def execute(args)
+        if @init_args.size > 0
+          @klass.new(@init_args).send( @mthd, args )
+        else
+          @klass.new.send( @mthd, args )
+        end
       end
 
 
