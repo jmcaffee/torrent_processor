@@ -169,7 +169,7 @@ module TorrentProcessor::Service::UTorrent
       @url = "/gui/?action=getsettings"
 
       sendGetQuery(@url)
-      result = parseResponse()
+      result = parse_response()
 
       @settings = result["settings"]
 
@@ -185,7 +185,7 @@ module TorrentProcessor::Service::UTorrent
       @url = "/gui/?action=getprops&hash=#{hash}"
 
       sendGetQuery(@url)
-      result = parseResponse()
+      result = parse_response()
     end
 
 
@@ -212,7 +212,7 @@ module TorrentProcessor::Service::UTorrent
       raise "Invalid job properties provided to UTorrentWebUI:set_job_properties: #{props.inspect}" if jobprops.empty?
       @url = urlRoot + jobprops
       sendGetQuery(@url)
-      result = parseResponse()
+      result = parse_response()
     end
 
 
@@ -225,7 +225,7 @@ module TorrentProcessor::Service::UTorrent
       @url = "/gui/?action=removedata&hash=#{hash}"
 
       sendGetQuery(@url)
-      result = parseResponse()
+      result = parse_response()
     end
 
 
@@ -239,7 +239,7 @@ module TorrentProcessor::Service::UTorrent
       @url = "/gui/?list=1&cache=#{cache_id}" if !cache_id.nil?
 
       sendGetQuery(@url)
-      result = parseResponse()
+      result = parse_response()
 
       return parseListRequestResponse( result )
 
@@ -255,7 +255,7 @@ module TorrentProcessor::Service::UTorrent
       @url = "/gui/?list=1&cache=#{cache_id}"
 
       sendGetQuery(@url)
-      result = parseResponse()
+      result = parse_response()
 
       return parseListRequestResponse( result )
 
@@ -416,8 +416,8 @@ module TorrentProcessor::Service::UTorrent
     ###
     # Parse the response data (using JSON)
     #
-    def parseResponse
-      $LOG.debug "UTorrentWebUI::parseResponse()"
+    def parse_response
+      $LOG.debug "UTorrentWebUI::parse_response()"
       if @response.nil? || !@response
         $LOG.debug "Response is NIL or empty."
         return
