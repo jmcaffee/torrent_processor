@@ -78,6 +78,10 @@ module TorrentProcessor
           @rootDir = FileUtils.pwd()
           @cfgFile = "torrentprocessor.yml"
         end
+      else
+        if File.exists?(File.join(@rootDir, 'config.yml'))
+          @cfgFile = 'config.yml'
+        end
       end
     end
 
