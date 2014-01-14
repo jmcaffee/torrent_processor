@@ -226,6 +226,7 @@ module TorrentProcessor::Service::UTorrent
       req["cookie"] = @cookie if @cookie
 
       if @verbose
+        # FIXME: Replace 'puts' with 'log'
         puts "  REQUEST HEADERS:"
         req.each_header do |k,v|
           puts "    #{k}  =>  #{v}"

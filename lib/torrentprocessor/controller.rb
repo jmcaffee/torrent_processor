@@ -189,6 +189,7 @@ module TorrentProcessor
     #
     def verbose(arg)
       $LOG.debug "Controller::verbose( #{arg} )"
+      # FIXME: Replace 'puts' with 'log'
       puts "Verbose mode: #{arg.to_s}" if @verbose
       @model.verbose = arg
       @setup.verbose = arg
