@@ -1,0 +1,20 @@
+---
+:appPath: tmp/spec
+:version: 0.0.1
+:logging: true
+:ip: 127.0.0.1
+:port: '8082'
+:user: admin
+:pass: abc
+:logdir: tmp/spec
+:maxlogsize: 10000
+:tvprocessing: C:\Media\Unsorted Media
+:movieprocessing: C:\Media\UnsortedMovies
+:otherprocessing: C:\Media\Unsorted Media
+:filters:
+  thepiratebay: '0'
+  announce.torrentday.com: '2500'
+:tmdb_api_key: ***REMOVED***
+:target_movies_path: M:\
+:can_copy_start_time: '03:00'
+:can_copy_stop_time: '22:00'

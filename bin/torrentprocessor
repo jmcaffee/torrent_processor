@@ -63,6 +63,11 @@ class TorrentProcessorApp < UserChoices::Command
                               "Interactive Mode.")
     }
 
+    builder.add_choice(:upgrade, :type=>:boolean, :default=>false) { |command_line|
+      command_line.uses_switch("--upgrade",
+                              "Upgrade config file and database.")
+    }
+
     # Options
     builder.add_choice(:option, :type=>:string) { |command_line|
       command_line.uses_option("-o", "--option ARG",
@@ -74,12 +79,12 @@ class TorrentProcessorApp < UserChoices::Command
   # This method is called automatically by UserChoices.
   # Use it to handle simple post processing of user choices.
   def postprocess_user_choices
-    @user_choices[:srcdir] = @user_choices[:cmdArg].shift
-    @user_choices[:srcfile] = @user_choices[:cmdArg].shift
-    @user_choices[:state] = @user_choices[:cmdArg].shift
+    @user_choices[:srcdir]    = @user_choices[:cmdArg].shift
+    @user_choices[:srcfile]   = @user_choices[:cmdArg].shift
+    @user_choices[:state]     = @user_choices[:cmdArg].shift
     @user_choices[:prevstate] = @user_choices[:cmdArg].shift
-    @user_choices[:msg] = @user_choices[:cmdArg].shift
-    @user_choices[:label] = @user_choices[:cmdArg].shift
+    @user_choices[:msg]       = @user_choices[:cmdArg].shift
+    @user_choices[:label]     = @user_choices[:cmdArg].shift
   end
 
 
@@ -132,6 +137,13 @@ class TorrentProcessorApp < UserChoices::Command
       puts TorrentProcessor::logo()
       puts
       @controller.interactiveMode()
+      return
+    end
+
+    if(@user_choices[:upgrade])
+      puts TorrentProcessor::logo()
+      puts
+      @controller.upgrade_app()
       return
     end
 

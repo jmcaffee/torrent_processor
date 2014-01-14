@@ -303,6 +303,20 @@ module TorrentProcessor
       @database.upgrade
     end
 
+    def upgrade_app
+      if ! @setup.config_needs_upgrade?
+        puts 'Configuration file is up to date. Skipping config upgrade.'
+      else
+        @setup.upgrade_config @cfg[:appData]
+      end
+
+      puts 'Attempting database upgrade'
+      upgrade_database
+
+      puts
+      puts 'Finished.'
+    end
+
     ###
     # Write message to torrentprocessor log
     #

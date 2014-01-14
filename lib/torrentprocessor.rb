@@ -32,6 +32,14 @@ module TorrentProcessor
   end
 
   class Configuration
+    attr_accessor :app_path
+    attr_accessor :logging
+    attr_accessor :max_log_size
+    attr_accessor :log_dir
+    attr_accessor :tv_processing
+    attr_accessor :movie_processing
+    attr_accessor :other_processing
+    attr_accessor :filters
     attr_accessor :utorrent
     attr_accessor :tmdb
 
@@ -52,6 +60,9 @@ module TorrentProcessor
     class TMdbConfiguration
       attr_accessor :api_key
       attr_accessor :language
+      attr_accessor :target_movies_path
+      attr_accessor :can_copy_start_time
+      attr_accessor :can_copy_stop_time
     end
   end
 end

@@ -33,7 +33,7 @@ module TorrentProcessor
     # Console constructor
     #
     def initialize(controller)
-      $LOG.debug "Console::initialize"
+      # FIXME: Change parameter from controller to hash (args)
 
       @controller = controller
       @verbose    = false
@@ -44,8 +44,6 @@ module TorrentProcessor
       @rmode      = :body
 
       cfg         = @controller.cfg
-      @utorrent   = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(cfg[:ip], cfg[:port], cfg[:user], cfg[:pass])
-      @utorrent.verbose = false
       Runtime.configure do |service|
         service.utorrent = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(
           TorrentProcessor.configuration.utorrent.ip,
@@ -58,8 +56,6 @@ module TorrentProcessor
            :language => TorrentProcessor.configuration.tmdb.language } )
         service.logger = ::ScreenLogger
       end
-
-      @database   = @controller.database
 
       configure_commands
     end
@@ -79,7 +75,7 @@ module TorrentProcessor
 
         q = getInput(@prompt)
         if ( (q == ".quit") || (q == ".exit") )
-          @database.close
+          database.close
           q = ".quit"
           next
         end
@@ -89,18 +85,18 @@ module TorrentProcessor
         end
 
         begin
-          result = (@qmode == :webui ? @utorrent.sendGetQuery(q) : @database.execute(q))
+          result = (@qmode == :webui ? utorrent.sendGetQuery(q) : database.execute(q))
           if @qmode == :webui
-            puts result if @rmode == :body
+            log result if @rmode == :body
             if @rmode == :raw
-              puts @utorrent.response.inspect
-              puts @utorrent.response.body
+              log utorrent.response.inspect
+              log utorrent.response.body
             end
           end # qmode is webui
 
           if @qmode == :db
             Formatter.pHr
-            puts "Query returned #{result.length} rows."
+            log "Query returned #{result.length} rows."
             Formatter.pHr
             Formatter.pQueryResults(result)
             #result.each do |r|
@@ -109,12 +105,12 @@ module TorrentProcessor
           end # qmode is db
 
         rescue Exception => e
-          puts e.message
-          puts
+          log e.message
+          log
           if @verbose
-            puts "Exception type: #{e.class.to_s}"
-            puts e.backtrace
-            puts
+            log "Exception type: #{e.class.to_s}"
+            log e.backtrace
+            log
           end
         end
 
@@ -135,8 +131,10 @@ module TorrentProcessor
       #result = CmdPluginManager.command(cmd, self)
       result = CmdPluginManager.command(cmd,
         {
-          :cmd => cmd,
-          :logger => Runtime.service.logger,
+          :cmd      => cmd,
+          :logger   => Runtime.service.logger,
+          :utorrent => Runtime.service.utorrent,
+          :database => Runtime.service.database,
         })
       return result unless result.nil?
 
@@ -155,17 +153,14 @@ module TorrentProcessor
 
     def database
       Runtime.service.database
-      # FIXME: replace @database with database
     end
 
     def utorrent
       Runtime.service.utorrent
-      # FIXME: replace @utorrent with utorrent
     end
 
     def log msg = ''
       Runtime.service.logger.log msg
-      # FIXME: replace puts with log
     end
 
     ###
@@ -308,10 +303,10 @@ module TorrentProcessor
     #
     def console_header
       hr = "="*79
-      puts hr
-      puts "Torrent Processer Interactive Console".center(79)
-      puts hr
-      puts
+      log hr
+      log "Torrent Processer Interactive Console".center(79)
+      log hr
+      log
     end
 
     ###
@@ -327,7 +322,7 @@ module TorrentProcessor
       display_command_list( "RSS Commands:", @rss_cmds )
       display_command_list( "Utility Commands:", @util_cmds )
 
-      puts
+      log
     end
 
     ###
@@ -336,14 +331,14 @@ module TorrentProcessor
     def display_command_list( hdr, cmds )
       $LOG.debug "Console::display_command_list( #{hdr}, cmds )"
 
-      puts
+      log
       hr = "-"*hdr.size
-      puts "  #{hdr}"
-      puts "  #{hr}"
+      log "  #{hdr}"
+      log "  #{hr}"
       cmds.each do |c|
         o = "  #{c[0]}".ljust(22)
         o += c[1] unless c[1].nil?
-        puts o
+        log o
       end
     end
 
@@ -369,27 +364,27 @@ module TorrentProcessor
 
       if cmd == ".omode"
         Formatter.toggleOutputMode
-        puts "Output Mode: #{Formatter.outputMode.to_s}"
+        log "Output Mode: #{Formatter.outputMode.to_s}"
         return true
       end
 
       if cmd == ".qmode"
         @qmode = (@qmode == :webui ? :db : :webui )
         @prompt = (@qmode == :webui ? "tp>" : "db>" )
-        puts "Query Mode: #{@qmode.to_s}"
+        log "Query Mode: #{@qmode.to_s}"
         return true
       end
 
       if cmd == ".rmode"
         @rmode = (@rmode == :body ? :raw : :body )
-        puts "Request Mode: #{@rmode.to_s}"
+        log "Request Mode: #{@rmode.to_s}"
         return true
       end
 
       if cmd == ".verbose"
         @verbose = (@verbose == true ? false : true )
-        @utorrent.verbose = @verbose
-        puts "Verbose Mode: #{@verbose.to_s}"
+        utorrent.verbose = @verbose
+        log "Verbose Mode: #{@verbose.to_s}"
         return true
       end
 
@@ -418,12 +413,12 @@ module TorrentProcessor
     def db_insert
       $LOG.debug "Console::db_insert"
 
-      data = @utorrent.getTorrentList
-      puts "Torrents count: #{@utorrent.torrents.length.to_s}"
-      torrents = @utorrent.torrents
-      @database.connect
+      data = utorrent.getTorrentList
+      log "Torrents count: #{utorrent.torrents.length.to_s}"
+      torrents = utorrent.torrents
+      database.connect
       torrents.each do |k,v|
-        @database.create(v)
+        database.create(v)
       end
     end
   end # class Console
