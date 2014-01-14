@@ -72,11 +72,11 @@ describe UTPlugin do
       {}
     end
 
-    obj.stub(:parseResponse) do
+    obj.stub(:settings) do
       {}
     end
 
-    obj.stub(:settings) do
+    obj.stub(:sendGetQuery) do
       {}
     end
 

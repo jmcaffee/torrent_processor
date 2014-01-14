@@ -159,19 +159,6 @@ module TorrentProcessor::Service::UTorrent
     end
 
 
-    ###
-    # Parse the response data (using JSON)
-    #
-    def parseResponse
-      $LOG.debug "UTorrentWebUI::parseResponse()"
-      if @response.nil? || !@response
-        $LOG.debug "Response is NIL or empty."
-        return
-      end
-
-      result = JSON.parse(@response.body)
-    end
-
 
     ###
     # Get uTorrent settings
@@ -424,10 +411,20 @@ module TorrentProcessor::Service::UTorrent
       return @torrentc
     end
 
+  private
 
+    ###
+    # Parse the response data (using JSON)
+    #
+    def parseResponse
+      $LOG.debug "UTorrentWebUI::parseResponse()"
+      if @response.nil? || !@response
+        $LOG.debug "Response is NIL or empty."
+        return
+      end
+
+      result = JSON.parse(@response.body)
+    end
   end # class UTorrentWebUI
-
-
-
 end # module TorrentProcessor::Service
 

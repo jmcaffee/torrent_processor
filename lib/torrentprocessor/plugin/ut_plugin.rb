@@ -58,7 +58,7 @@ module TorrentProcessor::Plugin
       cmdtxt = args[:cmd]
 
       utorrent.get_utorrent_settings()
-      response = utorrent.parseResponse()
+
       Formatter.pHr
       log "  uTorrent Settings"
       Formatter.pHr
