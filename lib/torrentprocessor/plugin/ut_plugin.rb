@@ -75,9 +75,6 @@ module TorrentProcessor::Plugin
       parse_args args
       cmdtxt = args[:cmd]
 
-      cmd_parts = cmdtxt.split
-      cmd = cmd_parts[0]
-
       utorrent.get_torrent_list()
       hashes = select_torrent_hashes( utorrent.torrents )
       return true if hashes.nil?
@@ -170,6 +167,19 @@ module TorrentProcessor::Plugin
 
   private
 
+    def parse_args args
+      args = defaults.merge(args)
+      self.logger    = args[:logger]   if args[:logger]
+      self.utorrent  = args[:utorrent] if args[:utorrent]
+      self.database  = args[:database] if args[:database]
+    end
+
+    def defaults
+      {
+        :logger     => NullLogger
+      }
+    end
+
     def utorrent=(ut_obj)
       @utorrent = ut_obj
     end
@@ -194,21 +204,8 @@ module TorrentProcessor::Plugin
       @logger.log msg
     end
 
-    def defaults
-      {
-        :logger     => NullLogger
-      }
-    end
-
     def cfg
       TorrentProcessor.configuration
-    end
-
-    def parse_args args
-      args = defaults.merge(args)
-      self.logger    = args[:logger]   if args[:logger]
-      self.utorrent  = args[:utorrent] if args[:utorrent]
-      self.database  = args[:database] if args[:database]
     end
 
     ###
@@ -293,6 +290,8 @@ module TorrentProcessor::Plugin
     # Return an array containing torrent hashes and names. The data is selected by the user via index
     #
     def select_torrent_hashes( tdata )
+      return [] unless tdata.size > 0
+
       indexed_hsh = display_current_torrent_list( tdata )
       index = getInput(" Select a torrent (0 for all, <blank> for none): ")
 
