@@ -7,6 +7,13 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
+###
+# FIXME: This is a 'bad' specification. It should only test the in/out interface
+# and it actually contains many tests touching dependent plugins.
+# This should be fixed.
+###
+
+
 require 'spec_helper'
 
 include TorrentProcessor
