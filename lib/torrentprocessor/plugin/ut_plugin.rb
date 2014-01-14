@@ -38,7 +38,7 @@ module TorrentProcessor::Plugin
 
       begin
         ut = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(cfg.utorrent.ip, cfg.utorrent.port, cfg.utorrent.user, cfg.utorrent.pass)
-        utorrent.sendGetQuery("/gui/?list=1")
+        utorrent.send_get_query("/gui/?list=1")
 
       rescue Exception => e
         log

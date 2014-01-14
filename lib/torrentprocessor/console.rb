@@ -85,7 +85,7 @@ module TorrentProcessor
         end
 
         begin
-          result = (@qmode == :webui ? utorrent.sendGetQuery(q) : database.execute(q))
+          result = (@qmode == :webui ? utorrent.send_get_query(q) : database.execute(q))
           if @qmode == :webui
             log result if @rmode == :body
             if @rmode == :raw

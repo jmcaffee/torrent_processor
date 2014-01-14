@@ -145,8 +145,8 @@ module TorrentProcessor::Service::UTorrent
     #
     # query:: Query to send
     #
-    def sendGetQuery(query)
-      $LOG.debug "UTorrentWebUI::sendQuery( #{query} )"
+    def send_get_query(query)
+      $LOG.debug "UTorrentWebUI::send_get_query( #{query} )"
 
       data = nil
       startSession()
@@ -168,7 +168,7 @@ module TorrentProcessor::Service::UTorrent
 
       @url = "/gui/?action=getsettings"
 
-      sendGetQuery(@url)
+      send_get_query(@url)
       result = parse_response()
 
       @settings = result["settings"]
@@ -184,7 +184,7 @@ module TorrentProcessor::Service::UTorrent
 
       @url = "/gui/?action=getprops&hash=#{hash}"
 
-      sendGetQuery(@url)
+      send_get_query(@url)
       result = parse_response()
     end
 
@@ -211,7 +211,7 @@ module TorrentProcessor::Service::UTorrent
 
       raise "Invalid job properties provided to UTorrentWebUI:set_job_properties: #{props.inspect}" if jobprops.empty?
       @url = urlRoot + jobprops
-      sendGetQuery(@url)
+      send_get_query(@url)
       result = parse_response()
     end
 
@@ -224,7 +224,7 @@ module TorrentProcessor::Service::UTorrent
 
       @url = "/gui/?action=removedata&hash=#{hash}"
 
-      sendGetQuery(@url)
+      send_get_query(@url)
       result = parse_response()
     end
 
@@ -238,7 +238,7 @@ module TorrentProcessor::Service::UTorrent
       @url = "/gui/?list=1"
       @url = "/gui/?list=1&cache=#{cache_id}" if !cache_id.nil?
 
-      sendGetQuery(@url)
+      send_get_query(@url)
       result = parse_response()
 
       return parseListRequestResponse( result )
@@ -254,7 +254,7 @@ module TorrentProcessor::Service::UTorrent
       # TODO: Remove this method
       @url = "/gui/?list=1&cache=#{cache_id}"
 
-      sendGetQuery(@url)
+      send_get_query(@url)
       result = parse_response()
 
       return parseListRequestResponse( result )
