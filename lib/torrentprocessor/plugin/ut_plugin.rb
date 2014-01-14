@@ -7,20 +7,10 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-##########################################################################
-# TorrentProcessor module
 module TorrentProcessor
 
-
-
-  ##########################################################################
-  # Plugin module
   module Plugin
 
-
-
-    ##########################################################################
-    # UTPlugin class
     class UTPlugin
       require_relative '../service/utorrent'
       include KtCmdLine
@@ -37,6 +27,149 @@ module TorrentProcessor
         }
       end
 
+      ###
+      # Test the webui connection
+      #
+      def ut_test_connection(args)
+        parse_args args
+        cmdtxt = args[:cmd]
+
+        log "Attempting to connect to #{cfg.utorrent.ip}:#{cfg.utorrent.port} using login #{cfg.utorrent.user}/#{cfg.utorrent.pass}"
+        log "..."
+
+        begin
+          ut = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(cfg.utorrent.ip, cfg.utorrent.port, cfg.utorrent.user, cfg.utorrent.pass)
+          utorrent.sendGetQuery("/gui/?list=1")
+
+        rescue Exception => e
+          log
+          log "* Connection attempt has failed with the following reason:"
+          log
+          log e.message
+          log
+          return true
+        end
+
+        log "Connected successfully!"
+        return true
+      end
+
+      def ut_settings(args)
+        parse_args args
+        cmdtxt = args[:cmd]
+
+        utorrent.get_utorrent_settings()
+        response = utorrent.parseResponse()
+        Formatter.pHr
+        log "  uTorrent Settings"
+        Formatter.pHr
+        log
+        #log utorrent.settings.class
+        utorrent.settings.each do |i|
+          #log utorrent.settings.inspect
+          log i.inspect
+        end
+        return true
+      end
+
+      def ut_jobprops(args)
+        parse_args args
+        cmdtxt = args[:cmd]
+
+        cmd_parts = cmdtxt.split
+        cmd = cmd_parts[0]
+
+        utorrent.get_torrent_list()
+        hashes = select_torrent_hashes( utorrent.torrents )
+        return true if hashes.nil?
+
+        log "  Retrieving Job Properties..."
+        dump_jobprops( utorrent, hashes )
+        return true
+      end
+
+      def ut_list(args)
+        parse_args args
+
+        data = utorrent.get_torrent_list()
+        display_current_torrent_list( utorrent.torrents )
+        log " #{utorrent.torrents.length} Torrent(s) found."
+        log
+
+        return true
+      end
+
+      def ut_names(args)
+        parse_args args
+
+        data = utorrent.get_torrent_list()
+        len = utorrent.torrents.length
+        if len == 0
+          log "No torrents to dump"
+          return true
+        end
+
+        Formatter.pHr
+        log " Hash  | Name"
+        #log "Torrent Names"
+        Formatter.pHr
+        log
+
+        utorrent.torrents.each do |k,v|
+          log "...#{k.slice(-4,4)}\t#{v.name}"
+        end
+
+        log
+        Formatter.pHr
+        log
+
+        return true
+      end
+
+      ###
+      # Display torrent details
+      #
+      def ut_torrent_details(args)
+        parse_args args
+
+        utorrent.get_torrent_list()
+        hashes = select_torrent_hashes( utorrent.torrents )
+        return true if hashes.nil?
+
+        hashes.each do |torr|
+          log Formatter.pHr
+          hsh = torr[0]
+          Formatter.pHash(utorrent.torrents[hsh].to_hsh)
+        end # each torr
+
+        log Formatter.pHr
+
+        return true
+      end
+
+      ###
+      # Return the response data from a uTorrent list query
+      #
+      # *Args*
+      #
+      # +args+ -- args passed from caller
+      #
+      # *Returns*
+      #
+      # nothing
+      #
+      def ut_list_query(args)
+        parse_args args
+
+        response = utorrent.get_torrent_list()
+        Formatter.pHr
+        log response.inspect
+        Formatter.pHr
+
+        return true
+      end
+
+    private
 
       def utorrent=(ut_obj)
         @utorrent = ut_obj
@@ -80,155 +213,6 @@ module TorrentProcessor
       end
 
       ###
-      # Test the webui connection
-      #
-      def ut_test_connection(args)
-        parse_args args
-        cmdtxt = args[:cmd]
-
-        log "Attempting to connect to #{cfg.utorrent.ip}:#{cfg.utorrent.port} using login #{cfg.utorrent.user}/#{cfg.utorrent.pass}"
-        log "..."
-
-        begin
-          ut = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(cfg.utorrent.ip, cfg.utorrent.port, cfg.utorrent.user, cfg.utorrent.pass)
-          utorrent.sendGetQuery("/gui/?list=1")
-
-        rescue Exception => e
-          log
-          log "* Connection attempt has failed with the following reason:"
-          log
-          log e.message
-          log
-          return true
-        end
-
-        log "Connected successfully!"
-        return true
-      end
-
-
-      def ut_settings(args)
-        parse_args args
-        cmdtxt = args[:cmd]
-
-        utorrent.get_utorrent_settings()
-        response = utorrent.parseResponse()
-        Formatter.pHr
-        log "  uTorrent Settings"
-        Formatter.pHr
-        log
-        #log utorrent.settings.class
-        utorrent.settings.each do |i|
-          #log utorrent.settings.inspect
-          log i.inspect
-        end
-        return true
-      end
-
-
-      def ut_jobprops(args)
-        parse_args args
-        cmdtxt = args[:cmd]
-
-        cmd_parts = cmdtxt.split
-        cmd = cmd_parts[0]
-
-        utorrent.get_torrent_list()
-        hashes = select_torrent_hashes( utorrent.torrents )
-        return true if hashes.nil?
-
-        log "  Retrieving Job Properties..."
-        dump_jobprops( utorrent, hashes )
-        return true
-      end
-
-
-      def ut_list(args)
-        parse_args args
-
-        data = utorrent.get_torrent_list()
-        display_current_torrent_list( utorrent.torrents )
-        log " #{utorrent.torrents.length} Torrent(s) found."
-        log
-
-        return true
-      end
-
-
-      def ut_names(args)
-        parse_args args
-
-        data = utorrent.get_torrent_list()
-        len = utorrent.torrents.length
-        if len == 0
-          log "No torrents to dump"
-          return true
-        end
-
-        Formatter.pHr
-        log " Hash  | Name"
-        #log "Torrent Names"
-        Formatter.pHr
-        log
-
-        utorrent.torrents.each do |k,v|
-          log "...#{k.slice(-4,4)}\t#{v.name}"
-        end
-
-        log
-        Formatter.pHr
-        log
-
-        return true
-      end
-
-
-      ###
-      # Display torrent details
-      #
-      def ut_torrent_details(args)
-        parse_args args
-
-        utorrent.get_torrent_list()
-        hashes = select_torrent_hashes( utorrent.torrents )
-        return true if hashes.nil?
-
-        hashes.each do |torr|
-          log Formatter.pHr
-          hsh = torr[0]
-          Formatter.pHash(utorrent.torrents[hsh].to_hsh)
-        end # each torr
-
-        log Formatter.pHr
-
-        return true
-      end
-
-
-      ###
-      # Return the response data from a uTorrent list query
-      #
-      # *Args*
-      #
-      # +args+ -- args passed from caller
-      #
-      # *Returns*
-      #
-      # nothing
-      #
-      def ut_list_query(args)
-        parse_args args
-
-        response = utorrent.get_torrent_list()
-        Formatter.pHr
-        log response.inspect
-        Formatter.pHr
-
-        return true
-      end
-
-
-      ###
       # Display torrent job property data
       #
       def dump_jobprops( ut, hashes )
@@ -270,7 +254,6 @@ module TorrentProcessor
         end
       end
 
-
       ###
       # Display and return an indexed hash of the current torrents
       #
@@ -307,7 +290,6 @@ module TorrentProcessor
         return indexed_hsh
       end
 
-
       ###
       # Return an array containing torrent hashes and names. The data is selected by the user via index
       #
@@ -343,12 +325,7 @@ module TorrentProcessor
 
         # Return the selected hash in an array
         return ([] << indexed_hsh[index])
-
       end
     end # class UTPlugin
-
-
-
   end # module Plugin
-
 end # module TorrentProcessor
