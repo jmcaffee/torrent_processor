@@ -9,176 +9,191 @@
 
 require 'ktcommon/ktcmdline'
 
-module TorrentProcessor
+module TorrentProcessor::Plugin
 
-  module Plugin
+  class CfgPlugin
+    include ::KtCmdLine
+    include TorrentProcessor
 
-    class CfgPlugin
-      include ::KtCmdLine
+    def CfgPlugin.register_cmds
+      { ".user" =>        Command.new(CfgPlugin, :cfg_user,       "Configure uTorrent user"),
+        ".pwd" =>         Command.new(CfgPlugin, :cfg_pwd,        "Configure uTorrent password"),
+        ".ip" =>          Command.new(CfgPlugin, :cfg_ip,         "Configure uTorrent IP address"),
+        ".port" =>        Command.new(CfgPlugin, :cfg_port,       "Configure uTorrent Port"),
+        ".addfilter" =>   Command.new(CfgPlugin, :cfg_addfilter,  "Add a tracker seed filter"),
+        ".delfilter" =>   Command.new(CfgPlugin, :cfg_delfilter,  "Delete a tracker seed filter"),
+        ".listfilters" => Command.new(CfgPlugin, :cfg_listfilters,"List current tracker filters"),
+        #"." => Command.new(CfgPlugin, :, ""),
+      }
+    end
 
-      def CfgPlugin.register_cmds
-        { ".setup" =>       Command.new(CfgPlugin, :cfg_setup,      "Run TorrentProcessor setup"),
-          ".user" =>        Command.new(CfgPlugin, :cfg_user,       "Configure uTorrent user"),
-          ".pwd" =>         Command.new(CfgPlugin, :cfg_pwd,        "Configure uTorrent password"),
-          ".ip" =>          Command.new(CfgPlugin, :cfg_ip,         "Configure uTorrent IP address"),
-          ".port" =>        Command.new(CfgPlugin, :cfg_port,       "Configure uTorrent Port"),
-          ".addfilter" =>   Command.new(CfgPlugin, :cfg_addfilter,  "Add a tracker seed filter"),
-          ".delfilter" =>   Command.new(CfgPlugin, :cfg_delfilter,  "Delete a tracker seed filter"),
-          ".listfilters" => Command.new(CfgPlugin, :cfg_listfilters,"List current tracker filters"),
-          #"." => Command.new(CfgPlugin, :, ""),
-        }
+    ###
+    # Configure uTorrent user
+    #
+    def cfg_user(args)
+      parse_args args
+      user_name = cmd_arguments('.user', args[:cmd])
+
+      log " Current username: #{cfg.utorrent.user}"
+      unless user_name.empty?
+        cfg.utorrent.user = user_name
+        save_cfg
+
+        log " Username changed to: #{cfg.utorrent.user}"
       end
 
-      ###
-      # Run TorrentProcessor setup
-      #
-      def cfg_setup(args)
-        $LOG.debug "CfgPlugin::cfg_setup"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
+      return true
+    end
 
-        ctrl.setupApp()
+    ###
+    # Configure uTorrent password
+    #
+    def cfg_pwd(args)
+      parse_args args
+      user_pwd = cmd_arguments('.pwd', args[:cmd])
 
+      log " Current password: #{cfg.utorrent.pass}"
+      unless user_pwd.empty?
+        cfg.utorrent.pass = user_pwd
+        save_cfg
+
+        log " Password changed to: #{cfg.utorrent.pass}"
+      end
+
+      return true
+    end
+
+    ###
+    # Configure uTorrent IP address
+    #
+    def cfg_ip(args)
+      parse_args args
+      ip = cmd_arguments('.ip', args[:cmd])
+
+      log " Current address: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+      unless ip.empty?
+        cfg.utorrent.ip = ip
+        save_cfg
+
+        log " Address changed to: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+      end
+
+      return true
+    end
+
+    ###
+    # Configure uTorrent Port
+    #
+    def cfg_port(args)
+      parse_args args
+      port = cmd_arguments('.port', args[:cmd])
+
+      log " Current address: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+      unless port.empty?
+        cfg.utorrent.port = port
+        save_cfg
+
+        log " Address changed to: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+      end
+
+      return true
+    end
+
+    ###
+    # Add a tracker seed filter
+    #
+    def cfg_addfilter(args)
+      parse_args args
+
+      new_filter = cmd_arguments('.addfilter', args[:cmd])
+      new_filter = new_filter.split
+
+      if new_filter.size == 2
+        cfg.filters[new_filter[0]] = new_filter[1]
+        save_cfg
+
+        log " Filter added. Tracker: #{new_filter[0]}, Max ratio: #{new_filter[1]}"
+      end
+
+      return true
+    end
+
+    ###
+    # Delete a tracker seed filter
+    #
+    def cfg_delfilter(args)
+      parse_args args
+
+      del_filter = cmd_arguments('.delfilter', args[:cmd])
+      return true if del_filter.empty?
+
+      if cfg.filters[del_filter].nil?
+        log " Unknown filter: #{del_filter}"
         return true
       end
 
-      ###
-      # Configure uTorrent user
-      #
-      def cfg_user(args)
-        $LOG.debug "CfgPlugin::cfg_user"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
+      cfg.filters.delete del_filter
+      save_cfg
 
-        puts " Current username: #{ctrl.cfg[:user]}"
-        newuser = getInput( " New username: " )
-        ctrl.set_user(newuser)
+      log " Filter deleted (#{del_filter})"
 
-        puts " Username changed to: #{ctrl.cfg[:user]}"
+      return true
+    end
+
+    ###
+    # List all tracker seed filters
+    #
+    def cfg_listfilters(args)
+      parse_args args
+
+      log "Current Filters:"
+      Formatter.pHr
+      filters = cfg.filters
+      if (filters.nil? || filters.length < 1)
+        log " None"
         return true
       end
 
-      ###
-      # Configure uTorrent password
-      #
-      def cfg_pwd(args)
-        $LOG.debug "CfgPlugin::cfg_pwd"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
-
-        puts " Current password: #{ctrl.cfg[:pass]}"
-        newpass = getInput( " New password: " )
-        ctrl.set_pwd(newpass)
-
-        puts " Password changed to: #{ctrl.cfg[:pass]}"
-        return true
+      filters.each do |tracker, seedlimit|
+        log " #{tracker} : #{seedlimit}"
       end
 
-      ###
-      # Configure uTorrent IP address
-      #
-      def cfg_ip(args)
-        $LOG.debug "CfgPlugin::cfg_ip"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
+      return true
+    end
 
-        puts " Current address: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}"
-        newip = getInput( " New IP address: " )
-        ctrl.set_ip(newip)
+  private
 
-        puts " Address changed to: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}"
-        return true
-      end
+    def parse_args args
+      args = defaults.merge(args)
+      self.logger = args[:logger] if args[:logger]
+    end
 
-      ###
-      # Configure uTorrent Port
-      #
-      def cfg_port(args)
-        $LOG.debug "CfgPlugin::cfg_port"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
+    def defaults
+      {
+        :logger => NullLogger
+      }
+    end
 
-        puts " Current address: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}"
-        newport = getInput( " New port #: " )
-        ctrl.set_port(newport)
+    ###
+    # Strips a command off of a string.
+    def cmd_arguments cmd, cmd_string
+      args = cmd_string.gsub(cmd, '').strip
+    end
 
-        puts " Address changed to: #{ctrl.cfg[:ip]}:#{ctrl.cfg[:port]}"
-        return true
-      end
+    def logger=(log_obj)
+      @logger = log_obj
+    end
 
-      ###
-      # Add a tracker seed filter
-      #
-      def cfg_addfilter(args)
-        $LOG.debug "CfgPlugin::cfg_addfilter"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
+    def log msg = ''
+      @logger.log msg
+    end
 
-        tracker = getInput( " trackers contains:" )
-        seedval = getInput( " set seed limit to: " )
+    def cfg
+      TorrentProcessor.configuration
+    end
 
-        if tracker.empty? || seedval.empty?
-          puts "Add filter cancelled (invalid input)."
-          return true
-        end
-
-        ctrl.add_filter( tracker, seedval )
-        puts "Filter added for #{tracker} with a seed limit of #{seedval}"
-        puts
-        return true
-      end
-
-      ###
-      # Delete a tracker seed filter
-      #
-      def cfg_delfilter(args)
-        $LOG.debug "CfgPlugin::cfg_delfilter"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
-
-        cfg_listfilters([nil,kaller])
-        puts
-        tracker = getInput( " tracker:" )
-
-        if tracker.empty?
-          puts "Delete filter cancelled (invalid input)."
-          return true
-        end
-
-        ctrl.delete_filter( tracker )
-        puts "Filter removed for #{tracker}"
-        puts
-        return true
-      end
-
-      ###
-      # List all tracker seed filters
-      #
-      def cfg_listfilters(args)
-        $LOG.debug "CfgPlugin::cfg_listfilters"
-        cmdtxt = args[0]
-        kaller = args[1]
-        ctrl = kaller.controller
-
-        puts "Current Filters:"
-        Formatter.pHr
-        filters = ctrl.cfg[:filters]
-        puts " None" if (filters.nil? || filters.length < 1)
-        return true if (filters.nil? || filters.length < 1)
-
-        filters.each do |tracker, seedlimit|
-          puts " #{tracker} : #{seedlimit}"
-        end
-        puts
-        return true
-      end
-    end # class CfgPlugin
-  end # module Plugin
-end # module TorrentProcessor
+    def save_cfg
+      TorrentProcessor.save_configuration
+    end
+  end # class CfgPlugin
+end # module TorrentProcessor::Plugin
