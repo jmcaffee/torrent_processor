@@ -50,6 +50,7 @@ module TorrentProcessor
     attr_accessor :movie_processing
     attr_accessor :other_processing
     attr_accessor :filters
+
     attr_accessor :utorrent
     attr_accessor :tmdb
 
@@ -79,7 +80,10 @@ end
 
 
 TorrentProcessor.configure do |config|
-  config.tmdb.language = 'en'
+  config.app_path       = File.join(ENV['APPDATA'].gsub('\\', '/'), 'torrentprocessor')
+  config.log_dir        = config.app_path
+
+  config.tmdb.language  = 'en'
 end
 
 ##############################################################################

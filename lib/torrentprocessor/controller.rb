@@ -17,194 +17,51 @@ module TorrentProcessor
   # Controller class
   class Controller
 
-  attr_reader     :aswitch
   attr_accessor   :model
   attr_reader     :verbose
   attr_reader     :cfg
   attr_reader     :setup
-  attr_reader     :database
 
     ###
     # Constructor
     #
     def initialize()
-      $LOG.debug "Controller::initialize"
-      @cfg            = Config.new.load
+      @cfg            = TorrentProcessor.configuration
       @model          = Processor.new(self)
-      @setup          = TPSetup.new(self)
-      @database       = Database.new(self)
       @model.verbose  = false
-      @aswitch        = false
-      @logfile        = "tp-processing.log"
+
+      FileLogger.logdir   = @cfg.log_dir
+      FileLogger.logfile  = 'tp-processing.log'
+
+      Runtime.service.logger    = FileLogger
+      Runtime.service.database  = Database.new( :cfg => @cfg )
+
+      @setup = TPSetup.new(
+        {
+          :logger   => Runtime.service.logger,
+          :database => Runtime.service.database
+        }
+      )
     end
-
-
-    ###
-    # Set the srcdir. The value is actually maintained/stored in the model.
-    # srcdirpath:: input file directory path
-    # returns:: previous srcdir
-    #
-    def srcdir(srcdirpath)
-      $LOG.debug "Controller::srcdir( #{srcdirpath} )"
-      ret = @model.srcdir
-      @model.srcdir = srcdirpath
-      ret
-    end
-
-
-    ###
-    # Assignment operator for setting the srcdir.
-    # srcdirpath:: input file directory path
-    # returns:: previous srcdir
-    #
-    def srcdir=(srcdirpath)
-      $LOG.debug "Controller::srcdir=( #{srcdirpath} )"
-      return srcdir(srcdirpath)
-    end
-
-
-    ###
-    # Set the srcfile. The value is actually maintained/stored in the model.
-    # srcfilepath:: source file path
-    # returns:: previous srcfile
-    #
-    def srcfile(srcfilepath)
-      $LOG.debug "Controller::srcfile( #{srcfilepath} )"
-      ret = @model.srcfile
-      @model.srcfile = srcfilepath
-      ret
-    end
-
-
-    ###
-    # Assignment operator for setting the srcfile.
-    # srcfilepath:: source file path
-    # returns:: previous srcfile
-    #
-    def srcfile=(srcfilepath)
-      $LOG.debug "Controller::srcfile=( #{srcfilepath} )"
-      return srcfile(srcfilepath)
-    end
-
-
-    ###
-    # Set the torrent state. The value is actually maintained/stored in the model.
-    # state:: current torrent state
-    # returns:: previous 'current' torrent state
-    #
-    def state(stateval)
-      $LOG.debug "Controller::state( #{stateval} )"
-      ret = @model.state
-      @model.state = stateval
-      ret
-    end
-
-
-    ###
-    # Assignment operator for setting the state.
-    # state:: current torrent state
-    # returns:: previous 'current' torrent state
-    #
-    def state=(stateval)
-      $LOG.debug "Controller::state=( #{stateval} )"
-      return state(stateval)
-    end
-
-
-    ###
-    # Set the torrent's prevstate. The value is actually maintained/stored in the model.
-    # stateval:: previous torrent state
-    # returns:: previous 'previous' torrent state
-    #
-    def prevstate(stateval)
-      $LOG.debug "Controller::prevstate( #{stateval} )"
-      ret = @model.prevstate
-      @model.prevstate = stateval
-      ret
-    end
-
-
-    ###
-    # Assignment operator for setting the previous state.
-    # stateval:: previous torrent state
-    # returns:: previous 'previous' torrent state
-    #
-    def prevstate=(stateval)
-      $LOG.debug "Controller::prevstate=( #{stateval} )"
-      return prevstate(stateval)
-    end
-
-
-    ###
-    # Set the torrent's msg. The value is actually maintained/stored in the model.
-    # msgval:: msg value from uTorrent
-    # returns:: previous msg value
-    #
-    def msg(msgval)
-      $LOG.debug "Controller::msg( #{msgval} )"
-      ret = @model.msg
-      @model.msg = msgval
-      ret
-    end
-
-
-    ###
-    # Assignment operator for setting the uTorrent msg.
-    # msgval:: msg value from uTorrent
-    # returns:: previous msg value
-    #
-    def msg=(msgval)
-      $LOG.debug "Controller::msg=( #{msgval} )"
-      return msg(msgval)
-    end
-
-
-    ###
-    # Set the torrent's label. The value is actually maintained/stored in the model.
-    # labelval:: label value from uTorrent
-    # returns:: previous label value
-    #
-    def label(labelval)
-      $LOG.debug "Controller::label( #{labelval} )"
-      ret = @model.label
-      @model.label = labelval
-      ret
-    end
-
-
-    ###
-    # Assignment operator for setting the uTorrent label.
-    # labelval:: label value from uTorrent
-    # returns:: previous label value
-    #
-    def label=(labelval)
-      $LOG.debug "Controller::label=( #{labelval} )"
-      return label(labelval)
-    end
-
 
     ###
     # Set the verbose flag. The flag is actually maintained/stored in the model.
     # arg:: True = verbose on
     #
     def verbose(arg)
-      $LOG.debug "Controller::verbose( #{arg} )"
       # FIXME: Replace 'puts' with 'log'
       puts "Verbose mode: #{arg.to_s}" if @verbose
       @model.verbose = arg
       @setup.verbose = arg
     end
 
-
     ###
     # Assignment operator for setting the verbose flag.
     # arg:: True = verbose on
     #
     def verbose=(arg)
-      $LOG.debug "Controller::verbose=( #{arg} )"
       return verbose(arg)
     end
-
 
     ###
     # Write the default config file to disk
@@ -212,10 +69,8 @@ module TorrentProcessor
     #
     #
     def writeCfg()
-      $LOG.debug "Controller::writeCfg()"
       Config.new.save
     end
-
 
     ###
     # User supplied a command line argument(s).
@@ -224,12 +79,10 @@ module TorrentProcessor
     # returns:: False to indicate that the application should exit. False by default.
     #   <em><b>Note:</b> ArgumentError exception is raised as well.</em>
     #
-    def processCmdLineArgs(arg)
-      $LOG.debug "Controller::processCmdLineArgs( #{arg} )"
+    def process_cmd_line_args(arg)
       raise ArgumentError.new("Unexpected argument: #{arg}")
       return false    # Indicate that we have a problem - we are not expecting command line args.
     end
-
 
     ###
     # User supplied no command line arguments.
@@ -237,8 +90,7 @@ module TorrentProcessor
     #
     # returns:: True to indicate that the application should <b>NOT</b> exit. False by default.
     #
-    def noCmdLineArg()
-      $LOG.debug "Controller::noCmdLineArg"
+    def no_cmd_line_arg()
       #raise ArgumentError.new("Argument expected.")
       return true     # Indicate that we don't care if there is no command line arg.
     end
@@ -248,20 +100,20 @@ module TorrentProcessor
     # TODO: write process() description
     #
     def process()
-      $LOG.debug "Controller::process"
-
-      checkSetupCompleted()
+      if !@setup.check_setup_completed()
+        # Force the user to configure the application if it has not yet been configured.
+        puts "Torrent Processor has not yet been configured."
+        puts "Run Torrent Processor with the -init option to configure it."
+        exit
+      end
 
       @model.process()
     end
 
-
     ###
     # Run Torrent Processor in interactive mode
     #
-    def interactiveMode()
-      $LOG.debug "Controller::interactiveMode"
-
+    def interactive_mode()
       if !@setup.check_setup_completed()
         # Tell the user to configure the application if it has not yet been configured.
         puts
@@ -272,36 +124,19 @@ module TorrentProcessor
         puts "*"*10
         puts
       end
-      @model.interactiveMode()
+      @model.interactive_mode()
     end
-
-
-    ###
-    # Check to make sure the user has setup the application
-    #
-    def checkSetupCompleted()
-      $LOG.debug "Controller::checkSetupCompleted"
-      if !@setup.check_setup_completed()
-        # Force the user to configure the application if it has not yet been configured.
-        puts "Torrent Processor has not yet been configured."
-        puts "Run Torrent Processor with the -init option to configure it."
-        exit
-      end
-
-    end
-
 
     ###
     # Setup the application
     #
-    def setupApp()
-      $LOG.debug "Controller::setupApp"
+    def setup_app()
       @setup.setup_app()
 
     end
 
     def upgrade_database
-      @database.upgrade
+      Runtime.service.database.upgrade
     end
 
     def upgrade_app
@@ -322,124 +157,8 @@ module TorrentProcessor
     # Write message to torrentprocessor log
     #
     def log(msg)
-      $LOG.debug "Controller::log( msg )"
-      logfile = File.join( @cfg[:logdir], @logfile )
-      timestamp = DateTime.now.strftime()
-
-      File.open( logfile, 'a' ) {|f| f.write( "#{timestamp}:  #{msg}\n" ); f.flush; }
-
+      FileLogger.log msg
     end
-
-
-    ###
-    # Rotate torrentprocessor logs
-    #
-    def rotate_logs()
-      $LOG.debug "Controller::rotate_logs()"
-      max_size = @cfg[:maxlogsize]
-      return if max_size == 0
-
-      logfile = File.join( @cfg[:logdir], @logfile )
-
-      if (File.new( logfile ).size > max_size)
-        FileUtils.rm( "#{logfile}.3" ) if File.exists?( "#{logfile}.3" )
-        FileUtils.mv( "#{logfile}.2", "#{logfile}.3" ) if File.exists?( "#{logfile}.2" )
-        FileUtils.mv( "#{logfile}.1", "#{logfile}.2" ) if File.exists?( "#{logfile}.1" )
-        FileUtils.mv( "#{logfile}", "#{logfile}.1" ) if File.exists?( "#{logfile}" )
-      end
-
-    end
-
-
-    ###
-    # Add a tracker seedlimit filter to the config file
-    #
-    def add_filter(tracker, seedlimit)
-      $LOG.debug "Controller::add_filter( #{tracker}, #{seedlimit} )"
-
-      filters = @cfg[:filters]
-      filters = {} if filters.nil?
-      filters[tracker] = seedlimit
-      @cfg[:filters] = filters
-      c = Config.new
-      c.cfg = @cfg
-      c.save
-
-    end
-
-
-    ###
-    # Remove a tracker seedlimit filter from the config file
-    #
-    def delete_filter(tracker)
-      $LOG.debug "Controller::delete_filter( #{tracker} )"
-      filters = @cfg[:filters]
-      return if filters.nil?
-      return if (! filters.include?( tracker ) )
-      filters.delete( tracker )
-      @cfg[:filters] = filters
-      c = Config.new
-      c.cfg = @cfg
-      c.save
-    end
-
-
-    ###
-    # Set the uTorrent WebUI username
-    #
-    def set_user(user)
-      $LOG.debug "Controller::set_user( #{user} )"
-
-      @cfg[:user] = user
-      c = Config.new
-      c.cfg = @cfg
-      c.save
-
-    end
-
-
-    ###
-    # Set the uTorrent WebUI password
-    #
-    def set_pwd(pwd)
-      $LOG.debug "Controller::set_pwd( #{pwd} )"
-
-      @cfg[:pass] = pwd
-      c = Config.new
-      c.cfg = @cfg
-      c.save
-
-    end
-
-
-    ###
-    # Set the uTorrent IP address
-    #
-    def set_ip(ip)
-      $LOG.debug "Controller::set_ip( #{ip} )"
-
-      @cfg[:ip] = ip
-      c = Config.new
-      c.cfg = @cfg
-      c.save
-
-    end
-
-
-    ###
-    # Set the uTorrent Port number
-    #
-    def set_port(port)
-      $LOG.debug "Controller::set_port( #{port} )"
-
-      @cfg[:port] = port
-      c = Config.new
-      c.cfg = @cfg
-      c.save
-
-    end
-
-
   end # class Controller
 
 
