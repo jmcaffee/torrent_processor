@@ -545,9 +545,7 @@ module TorrentProcessor
     ###
     # Run interactive console
     #
-    def interactiveMode()
-      $LOG.debug "Processor::interactiveMode"
-
+    def interactive_mode()
       console = Console.new(@controller)
       console.verbose = @verbose
 
