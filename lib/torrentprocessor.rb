@@ -25,7 +25,15 @@ module TorrentProcessor
     @configuration = YAML.load_file(cfg_file)
   end
 
-  def self.save_configuration cfg_file
+  def self.save_configuration cfg_file = nil
+    if cfg_file.nil?
+      if configuration.app_path.nil? || configuration.app_path.empty?
+        raise ArgumentError, 'Filename must be provided if app_path not provided'
+      end
+
+      cfg_file = File.join(configuration.app_path, 'config.yml')
+    end
+
     File.open(cfg_file, 'w') do |out|
       YAML.dump(configuration, out)
     end

@@ -12,8 +12,9 @@ require 'spec_helper'
 describe TorrentProcessor do
 
   let(:tmp_path) do
-    #File.absolute_path(File.join(File.dirname(__FILE__), '../../tmp/spec/tpsetup'))
-    File.absolute_path('tmp/spec/configuration')
+    pth = File.absolute_path('tmp/spec/configuration')
+    mkpath pth
+    pth
   end
 
   context '.configuration' do
@@ -129,27 +130,73 @@ describe TorrentProcessor do
 
   context '.save_configuration' do
 
-    let(:cfg_file) { 'tmp/spec/save-config.yml' }
+    let(:cfg_file)          { 'tmp/spec/save-config.yml' }
+    let(:cfg_file_default)  { File.join(tmp_path, 'config.yml') }
 
-    it 'writes the current configuration to disk' do
-      TorrentProcessor.configure do |config|
-        config.utorrent.ip = '127.0.0.1'
-        config.utorrent.port = 8080
-        config.utorrent.user = 'ut_user'
-        config.utorrent.pass = 'ut_pass'
-        config.utorrent.dir_completed_download = tmp_path
-        config.utorrent.seed_ratio = 1500
+    context 'given a specific filename' do
 
-        config.tmdb.api_key = 'apikey'
-        config.tmdb.language = 'es'
+      it 'writes the current configuration to disk' do
+        TorrentProcessor.configure do |config|
+          config.utorrent.ip = '127.0.0.1'
+          config.utorrent.port = 8080
+          config.utorrent.user = 'ut_user'
+          config.utorrent.pass = 'ut_pass'
+          config.utorrent.dir_completed_download = tmp_path
+          config.utorrent.seed_ratio = 1500
+
+          config.tmdb.api_key = 'apikey'
+          config.tmdb.language = 'es'
+        end
+
+        blocking_file_delete cfg_file
+        TorrentProcessor.save_configuration cfg_file
+
+        contents = File.read cfg_file
+        expect(contents.include?('127.0.0.1')).to be true
       end
+    end # context given a specific filename
 
-      blocking_file_delete cfg_file
-      TorrentProcessor.save_configuration cfg_file
+    context 'no filename specified' do
 
-      contents = File.read cfg_file
-      expect(contents.include?('127.0.0.1')).to be true
-    end
+      context 'app_path is empty' do
+
+        it 'raises exception' do
+          TorrentProcessor.configure do |config|
+            config.app_path = ''
+          end
+
+          blocking_file_delete cfg_file_default
+          expect { TorrentProcessor.save_configuration }.to raise_exception
+        end
+      end # context app_path is empty
+
+      context 'app_path is nil' do
+
+        it 'writes the current configuration to disk' do
+          TorrentProcessor.configure do |config|
+            config.app_path = nil
+          end
+
+          blocking_file_delete cfg_file_default
+          expect { TorrentProcessor.save_configuration }.to raise_exception
+        end
+      end # context app_path is nil
+
+      context 'app_path is populated' do
+
+        it 'writes the current configuration to disk' do
+          TorrentProcessor.configure do |config|
+            config.app_path = tmp_path
+          end
+
+          blocking_file_delete cfg_file_default
+          expect { TorrentProcessor.save_configuration }.to_not raise_exception
+
+          contents = File.read cfg_file
+          expect(contents.include?(tmp_path)).to be true
+        end
+      end # context app_path is nil
+    end # context no filename specified
   end # context .save_configuration
 
   context '.load_configuration' do
