@@ -34,6 +34,8 @@ module TorrentProcessor
       cfg_file = File.join(configuration.app_path, 'config.yml')
     end
 
+    raise ArgumentError, 'Directory provided. Need file path' if File.directory?(cfg_file)
+
     File.open(cfg_file, 'w') do |out|
       YAML.dump(configuration, out)
     end
@@ -93,29 +95,29 @@ end
 # exceptions are thrown.
 
 $LOGGING = false
-$LOGGING = true           # Uncomment this line to force logging
+#$LOGGING = true           # Uncomment this line to force logging
 
 
-require "#{File.join( File.dirname(__FILE__), 'torrentprocessor','config')}"
-  logcfg = TorrentProcessor::Config.new.load
-  if(logcfg.key?(:logging) && (true == logcfg[:logging]) )
-    $LOGGING = true
-  end
-
-  if($LOGGING)
-    # Create a new log file each time:
-    file = File.open('torrentprocessor.log', File::WRONLY | File::APPEND | File::CREAT | File::TRUNC)
-    $LOG = Logger.new(file)
-    $LOG.level = Logger::DEBUG
-    #$LOG.level = Logger::INFO
-  else
-    if(File.exists?('torrentprocessor.log'))
-      FileUtils.rm('torrentprocessor.log')
-    end
-  end
-  $LOG.info "**********************************************************************"
-  $LOG.info "Logging started for TorrentProcessor library."
-  $LOG.info "**********************************************************************"
+#require "#{File.join( File.dirname(__FILE__), 'torrentprocessor','config')}"
+#  logcfg = TorrentProcessor::Config.new.load
+#  if(logcfg.key?(:logging) && (true == logcfg[:logging]) )
+#    $LOGGING = true
+#  end
+#
+#  if($LOGGING)
+#    # Create a new log file each time:
+#    file = File.open('torrentprocessor.log', File::WRONLY | File::APPEND | File::CREAT | File::TRUNC)
+#    $LOG = Logger.new(file)
+#    $LOG.level = Logger::DEBUG
+#    #$LOG.level = Logger::INFO
+#  else
+#    if(File.exists?('torrentprocessor.log'))
+#      FileUtils.rm('torrentprocessor.log')
+#    end
+#  end
+#  $LOG.info "**********************************************************************"
+#  $LOG.info "Logging started for TorrentProcessor library."
+#  $LOG.info "**********************************************************************"
 
 
 ##############################################################################

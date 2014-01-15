@@ -22,7 +22,12 @@ describe Console do
 
   subject(:console) { Console.new(controller_stub) }
 
-  let(:tmp_path) { 'tmp/spec/console' }
+  let(:tmp_path) do
+    pth = 'tmp/spec/console'
+    mkpath pth
+    pth
+  end
+
 
   let(:controller_stub) do
     obj = double('controller')

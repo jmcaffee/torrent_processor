@@ -1,71 +1,65 @@
 require 'spec_helper'
 include TorrentProcessor
 
+def delete_all_configs
+  targets = Dir[File.join(app_data_path, '*.yml')]
+  targets.each do |target|
+    blocking_file_delete(target) if File.exists?(target)
+  end
+end
+
 describe TPSetup do
 
-      let(:data_dir) { 'spec/data' }
+  let(:tmp_path) do
+    pth = 'tmp/spec/tpsetup'
+    mkpath pth
+    pth
+  end
 
-      let(:old_cfg_stub) do
-        cfg = {}
-        #tmp_path = File.absolute_path(File.join(File.dirname(__FILE__), '../../tmp/spec/tpsetup'))
-        cfg[:appPath] = tmp_path
-        cfg[:version]  = TorrentProcessor::VERSION
-        cfg[:logging]  = false
-        cfg[:filters] = {}
-        cfg[:ip] = '127.0.0.1'
-        cfg[:port] = '8082'
-        cfg[:user] = 'testuser'
-        cfg[:pass] = 'testpass'
-        cfg[:tmdb_api_key] = 'apikey'
-        cfg[:target_movies_path] = File.join(tmp_path, 'movies_final')
-        cfg[:can_copy_start_time] = "00:00"
-        cfg[:can_copy_stop_time] = "23:59"
-        cfg
-      end
+  let(:data_dir) { 'spec/data' }
 
-      let(:new_cfg_stub) do
-        cfg = TorrentProcessor.configuration
-        #tmp_path = File.absolute_path(File.join(File.dirname(__FILE__), '../../tmp/spec/tpsetup'))
-        cfg.app_path          = tmp_path
-        cfg.logging           = false
-        cfg.max_log_size      = 0
-        cfg.log_dir           = tmp_path
-        cfg.tv_processing     = File.join(tmp_path, 'media/tv')
-        cfg.movie_processing  = File.join(tmp_path, 'media/movies')
-        cfg.other_processing  = File.join(tmp_path, 'media/other')
-        cfg.filters           = {}
+  let(:db_stub) do
+    obj = double('database')
+    obj.stub(:close) { true }
+    obj
+  end
 
-        cfg.utorrent.ip                     = '127.0.0.1'
-        cfg.utorrent.port                   = '8081'
-        cfg.utorrent.user                   = 'testuser'
-        cfg.utorrent.pass                   = 'testpass'
-        cfg.utorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
-        cfg.utorrent.seed_ratio             = 0
+  let(:cfg_path) do
+    File.join(app_data_path, 'config.yml')
+  end
 
-        cfg.tmdb.api_key              = 'apikey'
-        cfg.tmdb.language             = 'en'
-        cfg.tmdb.target_movies_path   = File.join(tmp_path, 'movies_final')
-        cfg.tmdb.can_copy_start_time  = "00:00"
-        cfg.tmdb.can_copy_stop_time   = "23:59"
-        cfg
-      end
+  let(:app_data_path) do
+    appdata = ENV['APPDATA'].gsub('\\', '/')
+    File.join(appdata, 'torrentprocessor')
+  end
 
-      let(:tmp_path) do
-        #File.absolute_path(File.join(File.dirname(__FILE__), '../../tmp/spec/tpsetup'))
-        File.absolute_path('tmp/spec/tpsetup')
-      end
+  let(:data_old_cfg_file) do
+    File.join(data_dir, 'old_config.yml')
+  end
 
-      let(:controller_stub) do
-        obj = double('controller')
-        obj.stub(:cfg) do
-          old_cfg_stub
-        end
-        obj
-      end
+  let(:data_new_cfg_file) do
+    File.join(data_dir, 'new_config.yml')
+  end
 
+  let(:setup_old_cfg) do
+    blocking_file_delete cfg_path
+    cp data_old_cfg_file, cfg_path
+  end
 
-      subject(:setup)   { TPSetup.new(controller_stub) }
+  let(:setup_new_cfg) do
+    blocking_file_delete cfg_path
+    cp data_new_cfg_file, cfg_path
+  end
 
+  subject(:setup)   { TPSetup.new(args) }
+
+  # Common set of args passed to plugins by the console object.
+  let(:args) do
+    {
+      :logger   => SimpleLogger,
+      :database => db_stub,
+    }
+  end
 
   context "#new" do
 
@@ -82,21 +76,15 @@ describe TPSetup do
       context 'configuration file has not been upgraded' do
 
         it 'returns true' do
+          setup_old_cfg
           expect(setup.config_needs_upgrade?).to eq true
         end
       end
 
       context 'configuration file has been upgraded' do
 
-        let(:controller_stub) do
-          obj = double('controller')
-          obj.stub(:cfg) do
-            new_cfg_stub
-          end
-          obj
-        end
-
         it 'returns false' do
+          setup_new_cfg
           expect(setup.config_needs_upgrade?).to eq false
         end
       end
@@ -105,43 +93,30 @@ describe TPSetup do
     context '#backup_config' do
 
       before(:each) do
-        mkpath tmp_path
-        targets = Dir[File.join(tmp_path, '*.yml')]
-        targets.each do |target|
-          rm target if File.exists?(target)
-        end
-
-        old_config_yml = File.join(tmp_path, 'config.yml')
-        rm old_config_yml if File.exists?(old_config_yml)
-        cp File.join(data_dir, 'old_config.yml'), File.join(tmp_path, 'config.yml')
+        delete_all_configs
       end
 
       it 'creates a timestamped backup of the current config file' do
+        setup_old_cfg
+
         setup.backup_config
-        expect(Dir[tmp_path + '/*_bak.yml'].size).to be 1
+        expect(Dir[app_data_path + '/*_bak.yml'].size).to be 1
       end
     end # context #backup_config
 
     context '#upgrade_config' do
 
       before(:each) do
-        mkpath tmp_path
-        targets = Dir[File.join(tmp_path, '*.yml')]
-        targets.each do |target|
-          rm target if File.exists?(target)
-        end
-
-        old_config_yml = File.join(tmp_path, 'config.yml')
-        rm old_config_yml if File.exists?(old_config_yml)
-        cp File.join(data_dir, 'old_config.yml'), File.join(tmp_path, 'config.yml')
+        delete_all_configs
       end
 
       it 'replaces old config file with new (upgraded) config file' do
-        setup.upgrade_config(tmp_path)
-        TorrentProcessor.load_configuration File.join(tmp_path, 'config.yml')
-        new_config = TorrentProcessor.configuration
+        setup_old_cfg
 
-        expect(new_config.utorrent.port).to eq '8082'
+        setup.upgrade_config(app_data_path)
+        TorrentProcessor.load_configuration cfg_path
+
+        expect(setup.config_needs_upgrade?).to eq false
       end
     end # context #backup_config
   end

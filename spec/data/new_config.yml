@@ -1,0 +1,22 @@
+--- !ruby/object:TorrentProcessor::Configuration
+utorrent: !ruby/object:TorrentProcessor::Configuration::UTorrentConfiguration
+  ip: 192.168.1.103
+  port: '8082'
+  user: admin
+  pass: abc
+  dir_completed_download: tmp/spec/console/torrents/completed
+  seed_ratio: 0
+tmdb: !ruby/object:TorrentProcessor::Configuration::TMdbConfiguration
+  language: en
+  api_key: ***REMOVED***
+  target_movies_path: tmp/spec/console/movies_final
+  can_copy_start_time: '00:00'
+  can_copy_stop_time: '23:59'
+app_path: tmp/spec/console
+logging: false
+max_log_size: 0
+log_dir: tmp/spec/console
+tv_processing: tmp/spec/console/media/tv
+movie_processing: tmp/spec/console/media/movies
+other_processing: tmp/spec/console/media/other
+filters: {}

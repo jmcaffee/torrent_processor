@@ -1,20 +1,20 @@
 ---
-:appPath: tmp/spec
-:version: 0.0.1
+:appPath: tmp/spec/tpsetup
+:version: 0.3.2
 :logging: true
 :ip: 127.0.0.1
-:port: '8082'
-:user: admin
-:pass: abc
-:logdir: tmp/spec
+:port: '8081'
+:user: testuser
+:pass: testpass
+:logdir: tmp/spec/tpsetup
 :maxlogsize: 10000
-:tvprocessing: C:\Media\Unsorted Media
-:movieprocessing: C:\Media\UnsortedMovies
-:otherprocessing: C:\Media\Unsorted Media
+:tvprocessing: tmp/spec/tpsetup/unsorted_media
+:movieprocessing: tmp/spec/tpsetup/unsorted_movies
+:otherprocessing: tmp/spec/tpsetup/unsorted_media
 :filters:
   thepiratebay: '0'
   announce.torrentday.com: '2500'
 :tmdb_api_key: ***REMOVED***
-:target_movies_path: M:\
+:target_movies_path: tmp/spec/tpsetup/movies_final
 :can_copy_start_time: '03:00'
 :can_copy_stop_time: '22:00'
