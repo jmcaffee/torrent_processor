@@ -10,24 +10,52 @@ end
 
 describe Database do
 
+  let(:tmp_path) do
+    pth = 'tmp/spec/database'
+    mkpath pth
+    pth
+  end
+
   let(:db) do
-    obj = Database.new(controller_stub)
+    obj = Database.new(init_args)
     obj.filename = db_file
     obj
   end
 
-  let(:controller_stub) do
-    obj = double("controller")
-    obj.stub(:cfg) do
-      {
-        :appPath => app_data_path
-      }
-    end
-    obj
+  let(:init_args) do
+    {
+      :cfg => cfg_stub
+    }
   end
 
-  let(:app_data_path) { FileUtils.mkdir_p('tmp/spec/database'); 'tmp/spec/database' }
-  let(:db_path)       { File.join(app_data_path, db_file) }
+  let(:cfg_stub) do
+    cfg = TorrentProcessor.configuration
+
+    cfg.app_path          = tmp_path
+    cfg.logging           = false
+    cfg.max_log_size      = 0
+    cfg.log_dir           = tmp_path
+    cfg.tv_processing     = File.join(tmp_path, 'media/tv')
+    cfg.movie_processing  = File.join(tmp_path, 'media/movies')
+    cfg.other_processing  = File.join(tmp_path, 'media/other')
+    cfg.filters           = {}
+
+    cfg.utorrent.ip                     = '192.168.1.103'
+    cfg.utorrent.port                   = '8082'
+    cfg.utorrent.user                   = 'admin'
+    cfg.utorrent.pass                   = 'abc'
+    cfg.utorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
+    cfg.utorrent.seed_ratio             = 0
+
+    cfg.tmdb.api_key              = '***REMOVED***'
+    cfg.tmdb.language             = 'en'
+    cfg.tmdb.target_movies_path   = File.join(tmp_path, 'movies_final')
+    cfg.tmdb.can_copy_start_time  = "00:00"
+    cfg.tmdb.can_copy_stop_time   = "23:59"
+    cfg
+  end
+
+  let(:db_path)       { File.join(tmp_path, db_file) }
   let(:db_file)       { 'test.db' }
 
   it "database file name can be overridden" do
@@ -36,7 +64,7 @@ describe Database do
   end
 
   it "defaults to 'tp.db'" do
-    test_db = Database.new(controller_stub)
+    test_db = Database.new(init_args)
     expect(test_db.filename).to eq 'tp.db'
   end
 

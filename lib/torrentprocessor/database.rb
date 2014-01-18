@@ -20,19 +20,29 @@ module TorrentProcessor
 #   include KtCmdLine
 
     attr_reader :verbose
+    attr_reader :cfg
 
     ###
     # Database constructor
     #
     # controller:: controller object
     #
-    def initialize(controller)
-      $LOG.debug "Database::initialize"
+    def initialize(args)
+      parse_args args
 
-      @controller = controller
-      @cfg        = @controller.cfg
       @verbose    = false
       @database   = nil
+    end
+
+    def parse_args args
+      args = defaults.merge(args)
+      @cfg = args[:cfg] if args[:cfg]
+    end
+
+    def defaults
+      {
+        :logger => NullLogger,
+      }
     end
 
     def filename= fname
@@ -44,7 +54,7 @@ module TorrentProcessor
     end
 
     def filepath
-      File.join( @cfg[:appPath], filename )
+      File.join( cfg.app_path, filename )
     end
 
     def database
@@ -60,7 +70,6 @@ module TorrentProcessor
     # arg:: verbose mode if true
     #
     def verbose=(arg)
-      $LOG.debug "Database::verbose=( #{arg} )"
       @verbose = arg
     end
 
@@ -69,7 +78,6 @@ module TorrentProcessor
     # Connect to TP Database
     #
     def connect()
-      $LOG.debug "Database::connect"
       dbname = filepath
       db = SQLite3::Database.new( dbname )
 
@@ -86,7 +94,6 @@ module TorrentProcessor
     # Close the Database connection
     #
     def close()
-      $LOG.debug "Database::close"
       return if @database.nil? || @database.closed?
       @database.close
       @database = nil
@@ -112,8 +119,6 @@ module TorrentProcessor
     # Execute a query against the DB
     #
     def execute(query)
-      $LOG.debug "Database::execute( #{query} )"
-
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
       rows = database.execute( query )
@@ -124,8 +129,6 @@ module TorrentProcessor
     # Execute a batch query against the DB
     #
     def execute_batch(query)
-      $LOG.debug "Database::execute_batch( query )"
-
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
       rows = database.execute_batch( query )
@@ -138,7 +141,6 @@ module TorrentProcessor
     # torrent:: Torrent Data to update
     #
     def create(tdata)
-      $LOG.debug "Database::create( tdata )"
       query = buildCreateQuery( tdata )
       return execute( query )
     end
@@ -150,7 +152,6 @@ module TorrentProcessor
     # torrent:: Torrent Data to update
     #
     def update(tdata)
-      $LOG.debug "Database::update( tdata )"
       query = buildUpdateQuery( tdata )
       return execute( query )
     end
@@ -162,7 +163,6 @@ module TorrentProcessor
     # hash:: Torrent hash to be removed
     #
     def delete_torrent(hash)
-      $LOG.debug "Database::delete_torrent( hash )"
       query = "DELETE FROM torrents WHERE hash = \"#{hash}\";"
       return execute( query )
     end
@@ -174,8 +174,6 @@ module TorrentProcessor
     # torrents:: Hash of Torrent Data to update
     #
     def update_torrents(torrents)
-      $LOG.debug "Database::update_torrents( torrents )"
-
       # I need to determine which torrents are updates and which are inserts.
       updates = Hash.new
       inserts = Hash.new
@@ -210,7 +208,6 @@ module TorrentProcessor
     # returns:: true/false
     #
     def exists_in_db?(hash)
-      $LOG.debug "Database::exists_in_db?(hash)"
       result = execute( "SELECT count() FROM torrents WHERE hash = \"#{hash}\";" )
       return false if Integer(result[0][0]) < 1
       return true
@@ -223,7 +220,6 @@ module TorrentProcessor
     # returns:: state
     #
     def read_torrent_state(hash)
-      $LOG.debug "Database::read_torrent_state(hash)"
       result = execute( "SELECT tp_state FROM torrents WHERE hash = \"#{hash}\";" )
       result[0]
     end
@@ -236,7 +232,6 @@ module TorrentProcessor
     # state:: state of Torrent
     #
     def update_torrent_state(hash, state)
-      $LOG.debug "Database::update_torrent_state( hash, state )"
       query = "UPDATE torrents SET tp_state = \"#{state}\" WHERE hash = \"#{hash}\";"
       return execute( query )
     end
@@ -248,7 +243,6 @@ module TorrentProcessor
     # cache_id
     #
     def create_cache(cache_id)
-      $LOG.debug "Database::create_cache( #{cache_id} )"
       # Clear out the table if we're creating a new cache value.
       delete_cache()
       execute( "INSERT INTO torrents_info (cache_id) values (\"#{cache_id}\");" )
@@ -261,7 +255,6 @@ module TorrentProcessor
     # returns:: cache_id
     #
     def read_cache()
-      $LOG.debug "Database::read_cache()"
       result = execute( "SELECT cache_id FROM torrents_info WHERE id = 1;" )
       result[0][0]
     end
@@ -273,7 +266,6 @@ module TorrentProcessor
     # cache_id
     #
     def update_cache(cache_id)
-      $LOG.debug "Database::update_cache( #{cache_id} )"
       execute( "UPDATE torrents_info SET cache_id = \"#{cache_id}\" WHERE id = 1;" )
     end
 
@@ -282,7 +274,6 @@ module TorrentProcessor
     # Delete the cache id
     #
     def delete_cache()
-      $LOG.debug "Database::delete_cache()"
       execute( "DELETE FROM torrents_info;" )
     end
 
@@ -293,7 +284,6 @@ module TorrentProcessor
     # tdata:: TorrentData object
     #
     def buildUpdateQuery( tdata )
-      $LOG.debug "Database::buildUpdateQuery( tdata )"
 
       query = <<EOQ
 UPDATE torrents SET
@@ -316,8 +306,6 @@ EOQ
     # torrents:: Hash of TorrentData objects
     #
     def buildBatchUpdateQuery( torrents )
-      $LOG.debug "Database::buildBatchUpdateQuery( torrents )"
-
       query = "BEGIN;\n"
       torrents.each do |k,v|
         query += buildUpdateQuery( v )
@@ -333,8 +321,6 @@ EOQ
     # torrents:: Hash of TorrentData objects
     #
     def buildBatchInsertQuery( torrents )
-      $LOG.debug "Database::buildBatchInsertQuery( torrents )"
-
       query = "BEGIN;\n"
       torrents.each do |k,v|
         query += buildCreateQuery( v )
@@ -350,8 +336,6 @@ EOQ
     # tdata:: TorrentData object
     #
     def buildCreateQuery( tdata )
-      $LOG.debug "Database::buildCreateQuery( tdata )"
-
       query = <<EOQ
 INSERT INTO torrents (
   hash,
@@ -375,8 +359,6 @@ EOQ
     # tdata:: TorrentData object
     #
     def buildInsertOrReplaceQuery( tdata )
-      $LOG.debug "Database::buildInsertOrReplaceQuery( tdata )"
-
       query = <<EOQ
 INSERT OR REPLACE INTO torrents (
   hash,
