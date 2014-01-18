@@ -26,6 +26,17 @@ module TorrentProcessor
     # Constructor
     #
     def initialize()
+      tmp_setup = TPSetup.new({})
+      if tmp_setup.config_needs_upgrade?
+        tmp_setup.backup_config
+        tmp_setup.upgrade_config(tmp_setup.app_data_path)
+      end
+      
+      cfg_file_path = tmp_setup.cfg_path
+      #File.join(TorrentProcessor.configuration.app_path, 'config.yml')
+      TorrentProcessor.load_configuration(cfg_file_path)
+require 'pry'; binding.pry
+
       @cfg            = TorrentProcessor.configuration
       @model          = Processor.new(self)
       @model.verbose  = false
@@ -49,8 +60,6 @@ module TorrentProcessor
     # arg:: True = verbose on
     #
     def verbose(arg)
-      # FIXME: Replace 'puts' with 'log'
-      puts "Verbose mode: #{arg.to_s}" if @verbose
       @model.verbose = arg
       @setup.verbose = arg
     end
@@ -61,15 +70,6 @@ module TorrentProcessor
     #
     def verbose=(arg)
       return verbose(arg)
-    end
-
-    ###
-    # Write the default config file to disk
-    #
-    #
-    #
-    def writeCfg()
-      Config.new.save
     end
 
     ###
@@ -97,13 +97,13 @@ module TorrentProcessor
 
 
     ###
-    # TODO: write process() description
+    # Tell user if setup needs to be completed, then process torrents.
     #
     def process()
       if !@setup.check_setup_completed()
         # Force the user to configure the application if it has not yet been configured.
-        puts "Torrent Processor has not yet been configured."
-        puts "Run Torrent Processor with the -init option to configure it."
+        log "Torrent Processor has not yet been configured."
+        log "Run Torrent Processor with the -init option to configure it."
         exit
       end
 
@@ -143,7 +143,7 @@ module TorrentProcessor
       if ! @setup.config_needs_upgrade?
         puts 'Configuration file is up to date. Skipping config upgrade.'
       else
-        @setup.upgrade_config @cfg[:appData]
+        @setup.upgrade_config cfg.app_data
       end
 
       puts 'Attempting database upgrade'
@@ -157,7 +157,7 @@ module TorrentProcessor
     # Write message to torrentprocessor log
     #
     def log(msg)
-      FileLogger.log msg
+      Runtime.service.logger.log msg
     end
   end # class Controller
 

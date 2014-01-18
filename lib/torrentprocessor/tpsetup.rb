@@ -117,12 +117,6 @@ module TorrentProcessor
       false
     end
 
-  private
-
-    def cfg
-      TorrentProcessor.configuration
-    end
-
     def cfg_path
       File.join(app_data_path, 'config.yml')
     end
@@ -130,6 +124,12 @@ module TorrentProcessor
     def app_data_path
       appdata = ENV['APPDATA'].gsub('\\','/')
       File.join(appdata, 'torrentprocessor')
+    end
+
+  private
+
+    def cfg
+      TorrentProcessor.configuration
     end
 
     def database
