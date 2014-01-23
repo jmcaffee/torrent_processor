@@ -2,15 +2,24 @@ GEM
   remote: http://rubygems.org/
   specs:
     builder (3.2.2)
+    docile (1.1.0)
     hoe (3.7.3)
       rake (>= 0.8, < 11.0)
     hpricot (0.8.6)
     json (1.8.1)
     ktcommon (0.0.1)
+    lockfile (2.1.0)
+    multi_json (1.8.2)
     ocra (1.3.1)
     rake (10.1.0)
     s4t-utils (1.0.4)
       hoe (>= 1.3.0)
+    simplecov (0.8.1)
+      docile (~> 1.1.0)
+      lockfile (>= 2.1.0)
+      multi_json
+      simplecov-html (~> 0.8.0)
+    simplecov-html (0.8.0)
     sqlite3 (1.3.8-x86-mingw32)
     torrentprocessor (0.3.1)
     user-choices (1.1.6.1)
@@ -29,6 +38,7 @@ DEPENDENCIES
   ktcommon
   ocra
   s4t-utils
+  simplecov
   sqlite3
   torrentprocessor
   user-choices

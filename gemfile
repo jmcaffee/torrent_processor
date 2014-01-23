@@ -9,3 +9,5 @@ gem "sqlite3"
 gem "torrentprocessor"
 gem "user-choices"
 gem "xml-simple"
+
+gem 'simplecov', :require => false, :group => :test
