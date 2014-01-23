@@ -26,9 +26,9 @@ describe TorrentCopier do
         cp(src, completed_downloads) if !File.exists?(File.join(completed_downloads, test_torrent))
       end
 
-      TorrentProcessor.configure do |config|
-        config.utorrent.dir_completed_download = completed_downloads
-      end
+      #TorrentProcessor.configure do |config|
+      #  config.utorrent.dir_completed_download = completed_downloads
+      #end
       blocking_file_delete(File.join(completed_downloads, 'robocopy.log'))
       blocking_file_delete(File.join(target_dir, test_torrent))
     end
@@ -39,17 +39,14 @@ describe TorrentCopier do
     let(:data_dir)            { 'spec/data/rar_source' }
     let(:test_torrent)        { 'test_250kb.avi' }
 
-    let(:controller_stub) do
-      obj = double("controller")
-      obj.stub(:logger) { SimpleLogger }
-      obj.stub(:cfg) do
-        {
-          :otherprocessing  => target_dir,
-          :tvprocessing     => target_dir,
-          :movieprocessing  => target_dir
-        }
-      end
-      obj
+    let(:args) do
+      {
+        :logger           => SimpleLogger,
+        :completed_dir    => completed_downloads,
+        :other_processing => target_dir,
+        :tv_processing    => target_dir,
+        :movie_processing => target_dir,
+      }
     end
 
     let(:torrent_data) do
@@ -63,7 +60,7 @@ describe TorrentCopier do
     context 'given a single media file' do
 
       it "copies a file to the configured destination directory" do
-        TorrentCopier.new.execute(controller_stub, torrent_data)
+        TorrentCopier.new.execute(args, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
       end
     end
@@ -81,7 +78,7 @@ describe TorrentCopier do
       end
 
       it "copies a directory to the configured destination directory" do
-        TorrentCopier.new.execute(controller_stub, torrent_data)
+        TorrentCopier.new.execute(args, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         expect(File.exists?(File.join(target_dir, test_torrent, 'test_250kb.part06.rar'))).to be true
       end

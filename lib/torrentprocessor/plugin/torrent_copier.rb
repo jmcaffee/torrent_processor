@@ -13,9 +13,17 @@ module TorrentProcessor::Plugin
   class TorrentCopier
     require_relative '../service/robocopy'
 
-    def execute ctx, args
-      @context = ctx
-      set_torrent_data args
+    attr_reader :logger
+    attr_reader :other_processing
+    attr_reader :tv_processing
+    attr_reader :movie_processing
+    attr_reader :torrent
+    attr_reader :completed_dir
+
+
+    def execute args, torrent_data
+      parse_args args
+      set_torrent_data torrent_data
 
       # Throw exception if torrent hasn't completed the download.
 
@@ -44,45 +52,41 @@ module TorrentProcessor::Plugin
 
   private
 
-    def context
-      @context
+    def defaults
+      { :logger           => ::NullLogger,
+        :completed_dir    => TorrentProcessor.configuration.utorrent.dir_completed_download,
+        :other_processing => TorrentProcessor.configuration.other_processing,
+        :tv_processing    => TorrentProcessor.configuration.tv_processing,
+        :movie_processing => TorrentProcessor.configuration.movie_processing,
+      }
+    end
+
+    def parse_args args
+      args = defaults.merge(args)
+      @logger           = args[:logger]             if args[:logger]
+      @completed_dir    = args[:completed_dir]      if args[:completed_dir]
+      @other_processing = args[:other_processing]   if args[:other_processing]
+      @tv_processing    = args[:tv_processing]      if args[:tv_processing]
+      @movie_processing = args[:movie_processing]   if args[:movie_processing]
     end
 
     def log msg = ''
-      if context.respond_to? :log
-        context.log msg
-      elsif context.respond_to? :logger
-        context.logger.log msg
-      else
-        puts msg
-      end
+      @logger.log msg
     end
 
-    def cfg
-      context.cfg
-    end
-
-    def default_args
+    def default_torrent_args
       {hash: nil, filename: nil, filedir: '', label: ''}
     end
 
     def set_torrent_data args
-      @torrent = default_args.merge(args)
-    end
-
-    def torrent
-      @torrent
+      @torrent = default_torrent_args.merge(args)
     end
 
     def final_directory
-      dest_path = cfg[:otherprocessing]
-      dest_path = cfg[:tvprocessing]     if (torrent[:label].include?("TV"))
-      dest_path = cfg[:movieprocessing]  if (torrent[:label].include?("Movie"))
+      dest_path = other_processing
+      dest_path = tv_processing     if (torrent[:label].include?("TV"))
+      dest_path = movie_processing  if (torrent[:label].include?("Movie"))
       dest_path
-    end
-
-    def completed_dir
-      TorrentProcessor.configuration.utorrent.dir_completed_download
     end
 
     def torrent_subdir
@@ -96,9 +100,9 @@ module TorrentProcessor::Plugin
 
     def copy_torrent dest_path, is_dir
       if is_dir
-        TorrentProcessor::Service::Robocopy.copy_dir(torrent[:filedir], dest_path, true, context.logger)
+        TorrentProcessor::Service::Robocopy.copy_dir(torrent[:filedir], dest_path, true, @logger)
       else
-        TorrentProcessor::Service::Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], context.logger)
+        TorrentProcessor::Service::Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], @logger)
       end # if
     end
 
