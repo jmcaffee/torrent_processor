@@ -42,11 +42,6 @@ class TorrentProcessorApp < UserChoices::Command
       command_line.uses_switch("--version", "Show application version.")
     }
 
-    builder.add_choice(:verbose, :type=>:boolean, :default=>false) { |command_line|
-      command_line.uses_switch("-v", "--verbose",
-                              "Verbose output.")
-    }
-
     builder.add_choice(:init, :type=>:boolean, :default=>false) { |command_line|
       command_line.uses_switch("--init",
                               "Configure Torrent Processor application.")
@@ -96,10 +91,6 @@ class TorrentProcessorApp < UserChoices::Command
       puts TorrentProcessor::logo()
       @controller.setup_app()
       return
-    end
-
-    if(@user_choices[:verbose])
-      @controller.verbose(@user_choices[:verbose])
     end
 
     if(@user_choices[:interactive])
