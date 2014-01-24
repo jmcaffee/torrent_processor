@@ -17,8 +17,6 @@ module TorrentProcessor
   # Controller class
   class Controller
 
-  attr_accessor   :model
-  attr_reader     :verbose
   attr_reader     :cfg
   attr_reader     :setup
 
@@ -31,21 +29,14 @@ module TorrentProcessor
         tmp_setup.backup_config
         tmp_setup.upgrade_config(tmp_setup.app_data_path)
       end
-      
+
       cfg_file_path = tmp_setup.cfg_path
       #File.join(TorrentProcessor.configuration.app_path, 'config.yml')
       TorrentProcessor.load_configuration(cfg_file_path)
-require 'pry'; binding.pry
 
-      @cfg            = TorrentProcessor.configuration
-      @model          = Processor.new(self)
-      @model.verbose  = false
+      @cfg = TorrentProcessor.configuration
 
-      FileLogger.logdir   = @cfg.log_dir
-      FileLogger.logfile  = 'tp-processing.log'
-
-      Runtime.service.logger    = FileLogger
-      Runtime.service.database  = Database.new( :cfg => @cfg )
+      init_services
 
       @setup = TPSetup.new(
         {
@@ -53,23 +44,6 @@ require 'pry'; binding.pry
           :database => Runtime.service.database
         }
       )
-    end
-
-    ###
-    # Set the verbose flag. The flag is actually maintained/stored in the model.
-    # arg:: True = verbose on
-    #
-    def verbose(arg)
-      @model.verbose = arg
-      @setup.verbose = arg
-    end
-
-    ###
-    # Assignment operator for setting the verbose flag.
-    # arg:: True = verbose on
-    #
-    def verbose=(arg)
-      return verbose(arg)
     end
 
     ###
@@ -107,7 +81,45 @@ require 'pry'; binding.pry
         exit
       end
 
-      @model.process()
+      Runtime.service.processor.process()
+    end
+
+    def init_services
+      # Configure the default logger.
+      FileLogger.logdir   = cfg.log_dir
+      FileLogger.logfile  = 'tp-processing.log'
+      Runtime.service.logger = FileLogger
+
+      # Configure the database.
+      Runtime.service.database = Database.new( :cfg => cfg )
+
+      # Configure the uTorrent interface.
+      Runtime.service.utorrent = Service::UTorrent::UTorrentWebUI.new(
+                                                              cfg.utorrent.ip,
+                                                              cfg.utorrent.port,
+                                                              cfg.utorrent.user,
+                                                              cfg.utorrent.pass )
+
+      # Configure the MovieDB service.
+      api_key = cfg.tmdb.api_key
+      if api_key.nil? || api_key.empty?
+        log "!!! No TMdb API key configured !!!"
+        Runtime.service.moviedb = nil
+      else
+        Runtime.service.moviedb = Plugin::MovieDB.new( :api_key => cfg.tmdb.api_key,
+                                                      :language => cfg.tmdb.language )
+      end
+
+      # Configure the processor (main object).
+      Runtime.service.processor = Processor.new( :logger => Runtime.service.logger,
+                                                 :utorrent => Runtime.service.utorrent,
+                                                 :database => Runtime.service.database,
+                                                 :moviedb => Runtime.service.moviedb )
+
+      # Configure the console object.
+      Runtime.service.console = Console.new( :utorrent => Runtime.service.utorrent,
+                                             :database => Runtime.service.database,
+                                             :processor => Runtime.service.processor )
     end
 
     ###
@@ -124,7 +136,8 @@ require 'pry'; binding.pry
         puts "*"*10
         puts
       end
-      @model.interactive_mode()
+
+      Runtime.service.console.execute
     end
 
     ###
