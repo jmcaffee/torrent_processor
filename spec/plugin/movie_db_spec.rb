@@ -4,7 +4,14 @@ include TorrentProcessor::Plugin
 describe MovieDB do
 
   context "with a valid API key" do
-      subject(:mdb) {MovieDB.new('***REMOVED***')}
+      subject(:mdb) {MovieDB.new(args)}
+
+      let(:args) do
+        {
+          api_key: '***REMOVED***',
+          logger: SimpleLogger
+        }
+      end
 
     context "when testing the connection" do
 
@@ -47,12 +54,6 @@ describe MovieDB do
 
     context "console commands" do
 
-      let(:ctrl) do
-        obj = double('controller')
-        obj.stub(:moviedb) { mdb }
-        obj
-      end
-
       it "provides console commands" do
         cmds = MovieDB.register_cmds
         cmds.size.should eq 2
@@ -61,7 +62,8 @@ describe MovieDB do
       context "when testing the connection" do
 
         it ".test_connection connects to TMDB.org" do
-          expect(mdb.cmd_test_connection([nil,ctrl])).to be true
+          args[:cmd] = '.tmdbtestcon'
+          expect(mdb.cmd_test_connection(args)).to be true
         end
       end
 
@@ -77,23 +79,28 @@ describe MovieDB do
             let(:a_team_title)              {'The A-Team'}
 
         it "searches for a movie title" do
-          expect(mdb.cmd_search_movie([total_recall_file, ctrl])[0].title).to eq total_recall_title
+          args[:cmd] = '.tmdbmoviesearch ' + total_recall_file
+          expect(mdb.cmd_search_movie(args)[0].title).to eq total_recall_title
         end
 
         it "searches for a movie title with year" do
-          expect(mdb.cmd_search_movie([bridesmaids_file, ctrl])[0].title).to eq bridesmaids_title
+          args[:cmd] = '.tmdbmoviesearch ' + bridesmaids_file
+          expect(mdb.cmd_search_movie(args)[0].title).to eq bridesmaids_title
         end
 
         it "strips spaces and re-searches for a movie title" do
-          expect(mdb.cmd_search_movie([bridesmaids_file, ctrl])[0].title).to eq bridesmaids_title
+          args[:cmd] = '.tmdbmoviesearch ' + bridesmaids_file
+          expect(mdb.cmd_search_movie(args)[0].title).to eq bridesmaids_title
         end
 
         it "finds titles with missing special characters" do
-          expect(mdb.cmd_search_movie([cowboys_and_aliens_file, ctrl])[0].title).to eq cowboys_and_aliens_title
+          args[:cmd] = '.tmdbmoviesearch ' + cowboys_and_aliens_file
+          expect(mdb.cmd_search_movie(args)[0].title).to eq cowboys_and_aliens_title
         end
 
         it "searches for a movie title with dash" do
-          expect(mdb.cmd_search_movie([a_team_file, ctrl])[0].title).to eq a_team_title
+          args[:cmd] = '.tmdbmoviesearch ' + a_team_file
+          expect(mdb.cmd_search_movie(args)[0].title).to eq a_team_title
         end
       end # context search command
     end # context "console commands"
