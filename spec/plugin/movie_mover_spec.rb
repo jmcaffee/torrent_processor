@@ -4,15 +4,22 @@ include TorrentProcessor::Plugin
 describe MovieMover do
 
   context "when movies need to be processed" do
-      let(:mdb)           { MovieDB.new('***REMOVED***') }
-      let(:logger)        do
-                            class TmpLogger
-                              def log msg
-                                puts msg
-                              end
-                            end
-                            TmpLogger.new
-                          end
+
+      let(:args) do
+        {
+          logger:   SimpleLogger,
+          movie_db: mdb
+        }
+      end
+
+      let(:mdb)           { MovieDB.new(mdb_args) }
+
+      let(:mdb_args) do
+        {
+          api_key: '***REMOVED***',
+          logger:   SimpleLogger,
+        }
+      end
 
       let(:root_src_dir)  { 'tmp/spec/movie_mover/movies_src' }
       let(:root_dest_dir) { 'tmp/spec/movie_mover/movies_final' }
@@ -55,7 +62,7 @@ describe MovieMover do
       let(:cowboys_final_file_path)       { File.join(root_dest_dir, cowboys_title,      cowboys_final_file )     }
       let(:ateam_final_file_path)         { File.join(root_dest_dir, ateam_title,        ateam_final_file )       }
 
-      subject(:mover)   { MovieMover.new(mdb, logger) }
+      subject(:mover)   { MovieMover.new(args) }
 
       before(:each) do
         blocking_dir_delete root_src_dir
@@ -96,7 +103,13 @@ describe MovieMover do
 
 
     context "when logger is nil" do
-      subject(:mover)   { MovieMover.new(mdb, nil) }
+      let(:args) do
+        {
+          movie_db: mdb
+        }
+      end
+
+      subject(:mover)   { MovieMover.new(args) }
 
       it "MovieMover does not blow up" do
         expect(mover.process(root_src_dir, root_dest_dir, -1, -1))

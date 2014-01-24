@@ -43,12 +43,6 @@ module TorrentProcessor::Plugin
 
 
 
-  class NullLogger
-    def log msg
-    end
-  end
-
-
   class MovieMover
     require_relative 'movie_db'
 
@@ -57,11 +51,38 @@ module TorrentProcessor::Plugin
     COMPLETE_FILE = 'mover.completed'
 
 
-    def initialize(movie_db, logger)
+    def initialize(args)
       @tag = 'MovieMover'
+      parse_args args
+    end
+
+    def defaults
+      {
+        :logger     => NullLogger,
+        :movie_db   => Runtime.service.moviedb
+      }
+    end
+
+    def parse_args args
+      args = defaults.merge(args)
+      self.logger = args[:logger]   if args[:logger]
+      self.db     = args[:movie_db] if args[:movie_db]
+    end
+
+    def db=(movie_db)
       @db = movie_db
-      @logger = logger
-      @logger ||= NullLogger.new
+    end
+
+    def db
+      @db
+    end
+
+    def logger=(logger_obj)
+      @logger = logger_obj
+    end
+
+    def log msg = ''
+      @logger.log msg
     end
 
     def within_time_frame start_time, stop_time
@@ -105,9 +126,9 @@ module TorrentProcessor::Plugin
       file = path.basename
       #puts "  video file: #{file}"
 
-      movies = @db.search_movie(file.to_s)
+      movies = db.search_movie(file.to_s)
       title = movies[0].title
-      year = @db.get_year(movies[0].release_date)
+      year = db.get_year(movies[0].release_date)
       target_filename = to_filename(title, year, path.extname)
       dest_path = File.join(dest_dir, to_filename(title, year, ''))
 
@@ -130,18 +151,18 @@ module TorrentProcessor::Plugin
     def process_dir dir
       #puts "process_dir [#{dir}]"
 
-      @logger.log "#{@tag}: Processing directory: #{dir}"
+      log "#{@tag}: Processing directory: #{dir}"
 
       # Can't process the dir if there's no details file.
       if !details_file_exists? dir
-        @logger.log "    'details' file does not exist! Aborting processing of directory"
+        log "    'details' file does not exist! Aborting processing of directory"
         return
       end
 
       # No need to process this dir if the lock file exists.
       # It's already been processed.
       if lock_file_exists? dir
-        @logger.log "    lock file exists! Aborting processing of directory"
+        log "    lock file exists! Aborting processing of directory"
         return
       end
 
@@ -172,23 +193,23 @@ module TorrentProcessor::Plugin
 
     def clean_dir dir
       #puts "clean_dir [#{dir}]"
-      @logger.log "#{@tag}: Cleaning directory: #{dir}"
+      log "#{@tag}: Cleaning directory: #{dir}"
 
       pc_file = File.join(dir, COMPLETE_FILE)
 
       # Can't clean the dir if there's no 'completed' file.
       if !File.exist?(pc_file)
-        @logger.log "    'completed' file does not exist! Aborting cleaning of directory"
+        log "    'completed' file does not exist! Aborting cleaning of directory"
         return
       end
 
       if dir.nil? || dir.empty? || dir == '..' || dir == '..' || dir == '/'
-        @logger.log "    invalid directory! Aborting cleaning of directory"
+        log "    invalid directory! Aborting cleaning of directory"
         return
       end
 
       if !File.exists?(dir) && File.directory?(dir)
-        @logger.log "    directory does not exist! Aborting cleaning of directory"
+        log "    directory does not exist! Aborting cleaning of directory"
         return
       end
 
