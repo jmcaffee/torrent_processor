@@ -91,11 +91,14 @@ module TorrentProcessor::Service
       app_cmd = "#{app_path} #{cmd_line}"
       logger.log "Executing: #{app_cmd}" unless logger.nil?
 
-      result = Kernel.system("#{app_cmd}")
-      unless result
-          logger.log ("    ERROR: #{app_path} failed. Command line it was called with: ".concat(app_cmd) ) unless logger.nil?
-          return false
+      #result = Kernel.system("#{app_cmd}")
+      # Using backticks so we can capture all stdout output
+      result = `#{app_cmd}`
+      unless result.include? 'Everything is Ok'
+        logger.log ("    ERROR: #{app_path} failed. Command line it was called with: ".concat(app_cmd) ) unless logger.nil?
+        return false
       end
+
       true
     end
 
