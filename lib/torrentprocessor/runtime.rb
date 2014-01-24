@@ -18,10 +18,12 @@ module Runtime
   end
 
   class Service
+    attr_accessor :logger
+    attr_accessor :database
     attr_accessor :utorrent
     attr_accessor :moviedb
-    attr_accessor :database
-    attr_accessor :logger
+    attr_accessor :processor
+    attr_accessor :console
   end
 end
 
