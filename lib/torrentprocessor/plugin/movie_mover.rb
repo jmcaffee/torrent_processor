@@ -50,6 +50,8 @@ module TorrentProcessor::Plugin
     LOCK_FILE     = 'mover.lock'
     COMPLETE_FILE = 'mover.completed'
 
+    attr_reader :logger
+    attr_reader :db
 
     def initialize(args)
       @tag = 'MovieMover'
@@ -65,20 +67,9 @@ module TorrentProcessor::Plugin
 
     def parse_args args
       args = defaults.merge(args)
-      self.logger = args[:logger]   if args[:logger]
-      self.db     = args[:movie_db] if args[:movie_db]
-    end
 
-    def db=(movie_db)
-      @db = movie_db
-    end
-
-    def db
-      @db
-    end
-
-    def logger=(logger_obj)
-      @logger = logger_obj
+      @logger = args[:logger]   if args[:logger]
+      @db     = args[:movie_db] if args[:movie_db]
     end
 
     def log msg = ''

@@ -46,6 +46,9 @@ module TorrentProcessor::Plugin
     TEST_CONNECTION_CMD = '.tmdbtestcon'
     MOVIE_SEARCH_CMD    = '.tmdbmoviesearch'
 
+    attr_reader :logger
+    attr_reader :api_key
+    attr_reader :language
 
     def MovieDB.register_cmds
       { TEST_CONNECTION_CMD => Command.new(MovieDB, :cmd_test_connection,    "Test the TMdb connection",
@@ -73,10 +76,6 @@ module TorrentProcessor::Plugin
 
     def language=(lang)
       Tmdb::Api.language(lang)
-    end
-
-    def logger=(logger_obj)
-      @logger = logger_obj
     end
 
     def log msg = ''
@@ -111,11 +110,10 @@ module TorrentProcessor::Plugin
 
     def parse_args args
       args = defaults.merge(args)
-      self.logger    = args[:logger]   if args[:logger]
-      self.api_key   = args[:api_key]  if args[:api_key]
-      self.language  = args[:language] if args[:language]
 
-      #raise ArgumentError, 'Missing api_key' if args[:api_key].nil?
+      @logger       = args[:logger]   if args[:logger]
+      self.api_key  = args[:api_key]  if args[:api_key]
+      self.language = args[:language] if args[:language]
     end
 
     def cmd_search_movie(args)
