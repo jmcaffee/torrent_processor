@@ -19,11 +19,12 @@ describe Controller do
     obj
   end
 
-  let(:logger) { SimpleLogger }
+  #let(:logger) { SimpleLogger }
+  let(:logger) { NullLogger }
 
   let(:setup_args) do
     {
-      :logger => logger,
+      #:logger => logger,
       :database => db_stub
     }
   end

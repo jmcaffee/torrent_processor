@@ -86,12 +86,9 @@ describe UTPlugin do
   let(:args) do
     {
       :cmd      => cmd,
-      :logger   => SimpleLogger,
+      #:logger   => SimpleLogger,
       :utorrent => ut_stub,
       :database => db_stub,
-      #:logger   => Runtime.service.logger,
-      #:utorrent => Runtime.service.utorrent,
-      #:database => Runtime.service.database,
     }
   end
 

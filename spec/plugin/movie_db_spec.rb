@@ -9,7 +9,7 @@ describe MovieDB do
       let(:args) do
         {
           api_key: '***REMOVED***',
-          logger: SimpleLogger
+          #logger: SimpleLogger,
         }
       end
 

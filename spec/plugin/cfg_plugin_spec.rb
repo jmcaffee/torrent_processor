@@ -91,7 +91,7 @@ describe CfgPlugin do
   let(:args) do
     {
       :cmd      => cmd,
-      :logger   => SimpleLogger,
+      #:logger   => SimpleLogger,
       :utorrent => ut_stub,
       :database => db_stub,
     }

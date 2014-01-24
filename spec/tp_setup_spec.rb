@@ -56,7 +56,7 @@ describe TPSetup do
   # Common set of args passed to plugins by the console object.
   let(:args) do
     {
-      :logger   => SimpleLogger,
+      #:logger   => SimpleLogger,
       :database => db_stub,
     }
   end

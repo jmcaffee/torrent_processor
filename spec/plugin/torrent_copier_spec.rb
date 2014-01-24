@@ -41,7 +41,7 @@ describe TorrentCopier do
 
     let(:args) do
       {
-        :logger           => SimpleLogger,
+        #:logger           => SimpleLogger,
         :completed_dir    => completed_downloads,
         :other_processing => target_dir,
         :tv_processing    => target_dir,

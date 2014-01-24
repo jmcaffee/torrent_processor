@@ -36,7 +36,7 @@ describe Unrar do
 
     let(:controller_stub) do
       obj = double("controller")
-      obj.stub(:logger) { SimpleLogger }
+      obj.stub(:logger) { NullLogger }
       obj.stub(:cfg) do
         {
           :otherprocessing  => target_root_dir,
@@ -124,7 +124,8 @@ describe Unrar do
 
     let(:console_stub) do
       obj = double("console")
-      obj.stub(:logger) { SimpleLogger }
+      #obj.stub(:logger) { SimpleLogger }
+      obj.stub(:logger) { NullLogger }
       obj.stub(:cfg)    do
         { :otherprocessing  => torrent_dir,
           :tvprocessing     => torrent_dir,

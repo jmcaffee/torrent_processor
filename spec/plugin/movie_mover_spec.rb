@@ -7,7 +7,7 @@ describe MovieMover do
 
       let(:args) do
         {
-          logger:   SimpleLogger,
+          #logger:   SimpleLogger,
           movie_db: mdb
         }
       end
@@ -17,7 +17,8 @@ describe MovieMover do
       let(:mdb_args) do
         {
           api_key: '***REMOVED***',
-          logger:   SimpleLogger,
+          language: 'en',
+          #logger:   SimpleLogger,
         }
       end
 
@@ -102,13 +103,12 @@ describe MovieMover do
     end
 
 
-    context "when logger is nil" do
+    context "when logger is not provided" do
       let(:args) do
         {
           movie_db: mdb
         }
       end
-
       subject(:mover)   { MovieMover.new(args) }
 
       it "MovieMover does not blow up" do

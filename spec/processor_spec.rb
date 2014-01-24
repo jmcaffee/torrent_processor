@@ -25,7 +25,6 @@ describe Processor do
 
   let(:args) do
     {
-      :logger   => NullLogger,
       #:logger   => SimpleLogger,
       :cfg      => cfg_stub,
       :moviedb  => moviedb_stub,
@@ -101,7 +100,7 @@ describe Processor do
 
     it 'instantiates a processor object' do
       Processor.new(
-        :logger   => SimpleLogger,
+        #:logger   => SimpleLogger,
         :cfg      => cfg_stub,
         :moviedb  => moviedb_stub,
         :utorrent => utorrent_stub,

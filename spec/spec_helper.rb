@@ -17,6 +17,7 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+  config.order = 59885
 end
 
 include FileUtils
@@ -101,6 +102,9 @@ def blocking_file_delete(path)
       FileUtils.rm path
     rescue Errno::EACCES => e
       trys += 1
+    rescue Errno::ENOENT => e
+      # File doesn't exist? WTF?
+      return
     end
   end
 end
@@ -121,8 +125,13 @@ def create_downloaded_torrent(src, destdir)
 end
 
 class SimpleLogger
-  def SimpleLogger.log msg
+  def SimpleLogger.log msg = ''
     puts msg
+  end
+end
+
+class NullLogger
+  def NullLogger.log msg = ''
   end
 end
 
