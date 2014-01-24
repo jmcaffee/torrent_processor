@@ -10,3 +10,6 @@ install.cmd
 tmp/
 TorrentProcessor.iss
 install
+
+# SimpleCov reports
+coverage/
