@@ -56,7 +56,7 @@ describe Console do
     obj
   end
 
-  context '#new' do
+  describe '#new' do
 
     it 'instantiates a console object' do
       Console.new(
@@ -66,62 +66,63 @@ describe Console do
     end
   end
 
-  context '#execute' do
+  describe '#execute' do
 
     it 'starts the console' do
+      TorrentProcessor::Console.any_instance.stub(:getInput).and_return('.exit')
       console.execute
     end
   end
 
-  context '#process_cmd' do
+  describe '#process_cmd' do
 
     context 'uTorrent commands' do
 
-      context 'cmd: .testcon' do
+      describe 'cmd: .testcon' do
 
-        it "'.testcon' tests the uTorrent connection" do
+        it "tests the uTorrent connection" do
           console.process_cmd '.testcon'
         end
       end
 
-      context 'cmd: .utsettings' do
+      describe 'cmd: .utsettings' do
 
-        it "'.utsettings' returns current uTorrent settings" do
+        it "returns current uTorrent settings" do
           console.process_cmd '.utsettings'
         end
       end
 
-      context 'cmd: .jobprops' do
+      describe 'cmd: .jobprops' do
 
-        it "'.jobprops' returns current uTorrent job properties" do
+        it "returns current uTorrent job properties" do
           console.process_cmd '.jobprops'
         end
       end
 
-      context 'cmd: .tlist' do
+      describe 'cmd: .tlist' do
 
-        it "'.tlist' returns a list of torrents uTorrent is monitoring" do
+        it "returns a list of torrents uTorrent is monitoring" do
           console.process_cmd '.tlist'
         end
       end
 
-      context 'cmd: .tnames' do
+      describe 'cmd: .tnames' do
 
-        it "'.tnames' display names of torrents in uTorrent" do
+        it "display names of torrents in uTorrent" do
           console.process_cmd '.tnames'
         end
       end
 
-      context 'cmd: .tdetails' do
+      describe 'cmd: .tdetails' do
 
-        it "'.tdetails' display torrent details" do
+        it "display torrent details" do
           console.process_cmd '.tdetails'
         end
       end
 
-      context 'cmd: .listquery' do
+      describe 'cmd: .listquery' do
 
-        it "'.listquery' return response output of list query" do
+        it "return response output of list query" do
           console.process_cmd '.listquery'
         end
       end
@@ -133,16 +134,16 @@ describe Console do
         config.tmdb.api_key = '***REMOVED***'
       end
 
-      context 'cmd: .tmdbtestcon' do
+      describe 'cmd: .tmdbtestcon' do
 
-        it "'.tmdbtestcon' tests the TMdb connection" do
+        it "tests the TMdb connection" do
           console.process_cmd '.tmdbtestcon'
         end
       end
 
-      context 'cmd: .tmdbmoviesearch' do
+      describe 'cmd: .tmdbmoviesearch' do
 
-        it "'.tmdbmoviesearch' searches for a movie" do
+        it "searches for a movie" do
           console.process_cmd '.tmdbmoviesearch fight club'
           #console.process_cmd '.tmdbmoviesearch'
         end
