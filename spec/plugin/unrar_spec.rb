@@ -24,6 +24,10 @@ describe Unrar do
       mv(File.join(target_root_dir, test_torrent_dir), File.join(target_root_dir, test_torrent_name))
 
       TorrentProcessor.configure do |config|
+        config.tv_processing    = target_root_dir
+        config.movie_processing = target_root_dir
+        config.other_processing = target_root_dir
+
         config.utorrent.dir_completed_download = completed_downloads
       end
 
@@ -33,19 +37,9 @@ describe Unrar do
     let(:completed_downloads) { File.join(test_root_dir, 'completed_downloads') }
     let(:target_root_dir)     { File.join(test_root_dir, 'target') }
     let(:test_root_dir)       { 'tmp/spec/unrar_plugin' }
+    let(:logger)              { NullLogger }
 
-    let(:controller_stub) do
-      obj = double("controller")
-      obj.stub(:logger) { NullLogger }
-      obj.stub(:cfg) do
-        {
-          :otherprocessing  => target_root_dir,
-          :tvprocessing     => target_root_dir,
-          :movieprocessing  => target_root_dir
-        }
-      end
-      obj
-    end
+    let(:context_args) { { :logger => logger } }
 
     context 'given a .rar archive' do
 
@@ -66,7 +60,7 @@ describe Unrar do
         end
 
         it "extracts a file from a rar archive in the destination directory" do
-          Unrar.new.execute(controller_stub, torrent_data)
+          Unrar.new.execute(context_args, torrent_data)
           expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         end
       end
@@ -91,28 +85,7 @@ describe Unrar do
         end
 
         it "skips (does not fail) directories with no .rar archives" do
-          Unrar.new.execute(controller_stub, torrent_data)
-        end
-      end
-
-      context 'given media file(s) NOT in nested dir' do
-
-        let(:data_dir)          { 'spec/data' }
-        let(:test_torrent_dir)  { 'rar_source' }
-        let(:test_torrent_name) { 'test_250kb' }
-        let(:test_torrent)      { test_torrent_name + '.avi' }
-        let(:target_dir)        { File.join(target_root_dir, test_torrent_name) }
-
-        let(:torrent_data) do
-          {
-            :filename => test_torrent,
-            :filedir  => completed_downloads,
-            :label    => 'TV'
-          }
-        end
-
-        it "skips (does not fail) torrents that are not in a subdirectory" do
-          Unrar.new.execute(controller_stub, torrent_data)
+          Unrar.new.execute(context_args, torrent_data)
         end
       end
     end
@@ -121,20 +94,17 @@ describe Unrar do
   context "console commands" do
 
     let(:unrar_plug)  { Unrar.new }
-
-    let(:console_stub) do
-      obj = double("console")
-      #obj.stub(:logger) { SimpleLogger }
-      obj.stub(:logger) { NullLogger }
-      obj.stub(:cfg)    do
-        { :otherprocessing  => torrent_dir,
-          :tvprocessing     => torrent_dir,
-          :movieprocessing  => torrent_dir
+    let(:cmd_args) do
+        {
+          :cmd      => cmd,
+          :logger   => logger,
+          :utorrent => utorrent_stub,
+          :database => db_stub,
         }
-      end
-      obj.stub(:database) { db_stub }
-      obj
     end
+
+    let(:logger) { NullLogger }
+    #let(:logger)  { SimpleLogger }
 
     let(:db_stub) do
       obj = double("database")
@@ -142,40 +112,63 @@ describe Unrar do
       obj
     end
 
+    let(:utorrent_stub) do
+      obj = double("utorrent")
+      obj
+    end
+
     let(:torrent) do
       {
         :filename => 'multi_rar',
-        :filedir  => 'tmp/spec/unrar_plugin_console/completed/multi-rar',
+        :filedir  => 'tmp/spec/unrar_plugin_console/completed/multi_rar',
         :label    => 'TV'
       }
     end
 
   context '#cmd_unrar' do
 
+      let(:target_root_dir)     { File.join(test_root_dir, 'target') }
+      let(:test_root_dir)       { 'tmp/spec/unrar_plugin_console' }
       let(:torrent_dir)  { 'tmp/spec/unrar_plugin_console/target' }
-      let(:torrent_file) { File.join( torrent_dir, 'test_250kb.avi' ) }
+      let(:torrent_file) { File.join( torrent_dir, torrent[:filename], 'test_250kb.avi' ) }
+      let(:cmd) { '.unrar' }
 
       before(:each) do
         blocking_dir_delete(torrent_dir)
         create_downloaded_torrent('spec/data/multi_rar', torrent_dir)
+
+        TorrentProcessor.configure do |config|
+          config.tv_processing    = target_root_dir
+          config.movie_processing = target_root_dir
+          config.other_processing = target_root_dir
+
+          config.utorrent.dir_completed_download = File.join(test_root_dir, 'completed')
+        end
       end
 
     it 'raises an exception if caller is not provided' do
-      expect { unrar_plug.cmd_unrar [] }.to raise_exception
+      expect { unrar_plug.cmd_unrar {} }.to raise_exception
     end
 
     context 'given a path' do
 
+      let(:cmd) { ".unrar #{File.join(torrent_dir, torrent[:filename])}" }
+
       it 'unrars an archive' do
-        unrar_plug.cmd_unrar([torrent_dir, console_stub])
+        unrar_plug.cmd_unrar(cmd_args)
+
         expect(File.exists?(torrent_file)).to be true
       end
     end
 
     context 'given a torrent ID' do
 
+      let(:cmd) { ".unrar 1" }
+
       it 'unrars an archive' do
-        unrar_plug.cmd_unrar(['1', console_stub])
+        unrar_plug.cmd_unrar(cmd_args)
+
+        expect(File.exists?(torrent_file)).to be true
       end
     end
   end
