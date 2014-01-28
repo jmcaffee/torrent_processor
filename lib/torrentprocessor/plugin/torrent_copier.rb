@@ -31,22 +31,25 @@ module TorrentProcessor::Plugin
 
       # Setup the destination processing folder path.
 
-      dest_path = final_directory
+      dir_helper = TorrentProcessor::Utility::DirHelper.new(
+        {
+          :download_dir     => completed_dir,
+          :tv_processing    => tv_processing,
+          :movie_processing => movie_processing,
+          :other_processing => other_processing,
+          :logger           => logger
+        })
 
-      # Modify destination path if torrent is in subdirectory.
-
-      path_tail = torrent_subdir
-      is_subdir = (path_tail.nil? ? false : true)
-      dest_path += path_tail if is_subdir
+      dest_path = dir_helper.destination torrent[:filedir], torrent[:filename], torrent[:label]
 
       # Copy the torrent.
 
-      copy_torrent dest_path, is_subdir
+      copy_torrent dest_path, dir_helper.subdirectory?
 
       # Verify copy was successful.
 
       target_path = "#{dest_path}\\#{torrent[:filename]}"
-      target_path = "#{dest_path}" if is_subdir
+      target_path = "#{dest_path}" if dir_helper.subdirectory?
       verify_successful_copy target_path
     end
 
@@ -80,22 +83,6 @@ module TorrentProcessor::Plugin
 
     def set_torrent_data args
       @torrent = default_torrent_args.merge(args)
-    end
-
-    def final_directory
-      dest_path = other_processing
-      dest_path = tv_processing     if (torrent[:label].include?("TV"))
-      dest_path = movie_processing  if (torrent[:label].include?("Movie"))
-      dest_path
-    end
-
-    def torrent_subdir
-      if (torrent[:filedir] != completed_dir)
-        is_subdir = true
-        path_tail = torrent[:filedir].split(completed_dir)[1]
-        path_tail = path_tail.prepend('/') unless path_tail.start_with?('/')
-        return path_tail
-      end
     end
 
     def copy_torrent dest_path, is_dir
