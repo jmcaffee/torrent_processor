@@ -130,6 +130,7 @@ $LOGGING = false
 class_files = File.join( File.dirname(__FILE__), 'torrentprocessor', '*.rb')
 $: << File.join( File.dirname(__FILE__), 'torrentprocessor')  # Add directory to the include file array.
 Dir.glob(class_files) do | class_file |
+  #puts 'require ' + class_file[/\w+\.rb$/]
   require class_file[/\w+\.rb$/]
 end
 
