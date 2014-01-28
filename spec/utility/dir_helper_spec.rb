@@ -9,6 +9,62 @@ describe TorrentProcessor::Utility::DirHelper do
     end
   end
 
+  describe '#subdirectory?' do
+
+    context "given a torrent's current directory and name" do
+
+      let(:torrent_name)  { 'torrent_name' }
+      let(:current_dir)   { 'current_dir' }
+      let(:download_dir)  { 'current_dir' }
+      let(:tv_dir)        { 'tv_dir' }
+      let(:movie_dir)     { 'movie_dir' }
+      let(:other_dir)     { 'other_dir' }
+
+      before(:each) do
+        TorrentProcessor.configure do |config|
+          config.tv_processing    = tv_dir
+          config.movie_processing = movie_dir
+          config.other_processing = other_dir
+
+          config.utorrent.dir_completed_download = download_dir
+        end
+      end
+
+      context 'torrent is in subdirectory' do
+
+        let(:label) { 'Movie' }
+        let(:current_dir) { File.join(download_dir, 'sub_dir') }
+
+        it 'returns true' do
+          subject.destination(current_dir, torrent_name, label)
+          expect(subject.subdirectory?).to be true
+        end
+
+        context 'torrent name IS the subdirectory name' do
+
+          let(:current_dir) { File.join(download_dir, torrent_name) }
+          let(:torrent_name) { 'sub_dir' }
+
+          it 'returns true' do
+            subject.destination(current_dir, torrent_name, label)
+            expect(subject.subdirectory?).to be true
+          end
+        end # context torrent name is subdirectory name
+      end # context torrent in subdirectory
+
+      context 'torrent is NOT in subdirectory' do
+
+        let(:label) { 'Movie' }
+        let(:current_dir) { download_dir }
+
+        it 'returns false' do
+          subject.destination(current_dir, torrent_name, label)
+          expect(subject.subdirectory?).to be false
+        end
+      end # context torrent NOT in subdirectory
+    end # context "given a torrent's current directory and name" do
+  end
+
   describe '#destination' do
 
     context "given a torrent's current directory and name" do

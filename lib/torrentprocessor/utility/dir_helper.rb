@@ -31,12 +31,19 @@ module TorrentProcessor::Utility
       @download_dir     = args[:download_dir]     if args[:download_dir]
     end
 
+    def subdirectory?
+      @is_subdir
+    end
+
     def destination(current_dir, torrent_name, label)
       target_dir = final_directory(label)
 
       subdir = subdirectory_of(@download_dir, current_dir)
-      unless subdir.nil? || subdir.empty?
+      if ! subdir.nil? && ! subdir.empty?
         target_dir = File.join(target_dir, subdir)
+        @is_subdir = true
+      else
+        @is_subdir = false
       end
 
       if subdir == '/'+torrent_name
