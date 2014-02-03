@@ -61,7 +61,7 @@ class TorrentProcessorApp < UserChoices::Command
     #builder.add_choice(:option, :type=>:string) { |command_line|
     #  command_line.uses_option("-o", "--option ARG",
     #                          "Option description.")
-    }
+    #}
 
   end # def add_choices
 
