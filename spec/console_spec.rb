@@ -24,9 +24,10 @@ describe Console do
 
   let(:args) do
     {
-      :utorrent => utorrent_stub,
-      :database => db_stub,
-      :processor => processor_stub
+      :logger     => CaptureLogger,
+      :utorrent   => utorrent_stub,
+      :database   => db_stub,
+      :processor  => processor_stub
     }
   end
 
@@ -60,6 +61,7 @@ describe Console do
 
     it 'instantiates a console object' do
       Console.new(
+        :logger   => CaptureLogger,
         :utorrent => utorrent_stub,
         :database => db_stub,
         :processor => processor_stub)
@@ -149,5 +151,33 @@ describe Console do
         end
       end
     end
+
+    context 'Unrar commands' do
+
+      describe 'cmd .unrar' do
+
+        before(:each) do
+          CaptureLogger.reset
+        end
+
+        context 'no path or ID provided' do
+
+          it 'displays an error message when path or id not provided' do
+            console.process_cmd '.unrar'
+
+            expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_true
+          end
+        end # no path or ID
+
+        context 'path provided' do
+
+          it 'unrars archive' do
+            console.process_cmd '.unrar blah'
+
+            expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_false
+          end
+        end # path provided
+      end # cmd .unrar
+    end # Unrar commands
   end
 end
