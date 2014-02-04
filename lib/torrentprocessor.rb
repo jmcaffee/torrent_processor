@@ -134,4 +134,13 @@ Dir.glob(class_files) do | class_file |
   require class_file[/\w+\.rb$/]
 end
 
+# If compiling with OCRA we want these gems available to us so we need
+# to require them.
+if defined? Ocra
+  require 'pry'
+  require 'rb-readline'
+  require 'pry-nav'
+  require 'pry-rescue'
+  require 'pry-stack_explorer'
+end
 
