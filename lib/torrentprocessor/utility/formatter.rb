@@ -33,7 +33,7 @@ module TorrentProcessor::Utility
     ###
     # Toggle the output mode
     #
-    def Formatter.toggleOutputMode
+    def Formatter.toggle_output_mode
       @omode = (@omode == :raw ? :pretty : :raw )
     end
 

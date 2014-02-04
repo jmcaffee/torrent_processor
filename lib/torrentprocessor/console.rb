@@ -315,7 +315,7 @@ module TorrentProcessor
       end
 
       if cmd == ".omode"
-        Formatter.toggleOutputMode
+        Formatter.toggle_output_mode
         log "Output Mode: #{Formatter.output_mode.to_s}"
         return true
       end
