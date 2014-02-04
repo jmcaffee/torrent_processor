@@ -63,6 +63,14 @@ describe Unrar do
           Unrar.new.execute(context_args, torrent_data)
           expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         end
+
+        it 'deletes rar files on successful extraction' do
+          Unrar.new.execute(context_args, torrent_data)
+
+          expect(File.exists?(File.join(target_dir, test_torrent))).to be true
+          rars = Dir[File.join(target_dir,'**/*.rar')]
+          expect(rars.count).to be 0
+        end
       end
     end
 
@@ -159,7 +167,60 @@ describe Unrar do
 
         expect(File.exists?(torrent_file)).to be true
       end
-    end
+
+      context 'new style archive' do
+
+        it 'deletes rar files on successful extraction' do
+          unrar_plug.cmd_unrar(cmd_args)
+
+          expect(File.exists?(torrent_file)).to be true
+          rars = Dir[File.join(torrent_dir,'**/*.rar')]
+          expect(rars.count).to be 0
+        end
+      end # new style
+
+      context 'old style archive' do
+
+        before(:each) do
+          blocking_dir_delete(torrent_dir)
+          create_downloaded_torrent('spec/data/old_style_rar', torrent_dir)
+        end
+
+        let(:torrent) do
+          {
+            :filename => 'old_style_rar',
+            :filedir  => 'tmp/spec/unrar_plugin_console/completed/old_style_rar',
+            :label    => 'TV'
+          }
+        end
+
+        it 'deletes rar files on successful extraction' do
+          unrar_plug.cmd_unrar(cmd_args)
+
+          expect(File.exists?(torrent_file)).to be true
+          rars = Dir[File.join(torrent_dir,'**/*.r??')]
+          expect(rars.count).to be 0
+        end
+      end # old style
+
+      context 'handles windows file separators' do
+
+        before(:each) do
+          blocking_dir_delete(torrent_dir)
+          create_downloaded_torrent('spec/data/multi_rar', torrent_dir)
+        end
+
+        let(:torrent_dir)  { 'tmp\\spec\\unrar_plugin_console\\target' }
+
+        it 'deletes rar files on successful extraction' do
+          unrar_plug.cmd_unrar(cmd_args)
+
+          expect(File.exists?(torrent_file)).to be true
+          rars = Dir[File.join(torrent_dir.gsub('\\','/'),'**/*.r??')]
+          expect(rars.count).to be 0
+        end
+      end # old style
+    end # given a path
 
     context 'given a torrent ID' do
 
@@ -170,7 +231,64 @@ describe Unrar do
 
         expect(File.exists?(torrent_file)).to be true
       end
+
+      context 'new style archive' do
+
+        it 'deletes rar files on successful extraction' do
+          unrar_plug.cmd_unrar(cmd_args)
+
+          expect(File.exists?(torrent_file)).to be true
+          rars = Dir[File.join(torrent_dir,'**/*.rar')]
+          expect(rars.count).to be 0
+        end
+      end # new style
+
+      context 'old style archive' do
+
+        before(:each) do
+          blocking_dir_delete(torrent_dir)
+          create_downloaded_torrent('spec/data/old_style_rar', torrent_dir)
+        end
+
+        let(:torrent) do
+          {
+            :filename => 'old_style_rar',
+            :filedir  => 'tmp/spec/unrar_plugin_console/completed/old_style_rar',
+            :label    => 'TV'
+          }
+        end
+
+        it 'deletes rar files on successful extraction' do
+          unrar_plug.cmd_unrar(cmd_args)
+
+          expect(File.exists?(torrent_file)).to be true
+          rars = Dir[File.join(torrent_dir,'**/*.r??')]
+          expect(rars.count).to be 0
+        end
+      end # old style
     end
+
+    context 'no argument provided' do
+
+      let(:cmd) { '.unrar' }
+      let(:logger) { CaptureLogger }
+
+      it 'returns true indicating the command was handled' do
+        expect(unrar_plug.cmd_unrar(cmd_args)).to be_true
+      end
+
+      it 'logs an error message' do
+        unrar_plug.cmd_unrar(cmd_args)
+
+        expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_true
+      end
+
+      it 'displays help message' do
+        unrar_plug.cmd_unrar(cmd_args)
+
+        expect(CaptureLogger.messages.include?('.unrar [FILE_PATH or TORRENT_ID]')).to be_true
+      end
+    end # no arg provided
   end
 
   # Private methods

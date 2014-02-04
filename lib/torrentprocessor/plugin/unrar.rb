@@ -29,18 +29,27 @@ module TorrentProcessor::Plugin
       parse_args args
       cmdtxt = cmd_arguments('.unrar', args[:cmd])
 
-      if cmdtxt.nil?
+      if cmdtxt.nil? || cmdtxt.empty?
         log 'Error: path to directory or torrent ID expected'
         cmd_help
-        return
+        # Return true to indicate we 'handled' the command.
+        return true
       end
 
       id = text_to_id cmdtxt
       if id >= 0
-        unrar_torrent id
+        if unrar_torrent id
+          delete_archive_files_from_id id
+        end
       else
-        extract_archive cmdtxt, @logger
+        if extract_archive cmdtxt, @logger
+          delete_archive_files(cmdtxt)
+        end
       end
+
+
+      # Return true to indicate we 'handled' the command.
+      true
     end
 
     def cmd_help
@@ -116,6 +125,8 @@ module TorrentProcessor::Plugin
       unless extract_archive(dest_path, @logger) == true
         raise PluginError, 'Unrar failed'
       end
+
+      delete_archive_files dest_path
     end
 
     def unrar_torrent id
@@ -126,6 +137,25 @@ module TorrentProcessor::Plugin
 
     def extract_archive path, logger
       TorrentProcessor::Service::SevenZip.extract_rar(path, path, logger)
+    end
+
+    def delete_archive_files_from_id id
+      # Calculate the destination path
+      set_torrent_data database.find_torrent_by_id(id)
+      path = destination_location
+
+      delete_archive_files path
+    end
+
+    def delete_archive_files path
+      # Dir won't work with windows separators, so force unix separators.
+      rars = Dir[File.join(path.gsub('\\','/'), '*.r??')]
+      log "Deleting rar files from #{path}"
+
+      rars.each do |rar|
+        log "  rm #{rar}"
+        FileUtils.rm rar
+      end
     end
   end # class
 end # module
