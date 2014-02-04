@@ -9,7 +9,7 @@
 
 ##########################################################################
 # TorrentProcessor module
-module TorrentProcessor
+module TorrentProcessor::Utility
 
 
 
