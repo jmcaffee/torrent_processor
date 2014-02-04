@@ -26,7 +26,7 @@ module TorrentProcessor::Utility
     ###
     # Return current output mode
     #
-    def Formatter.outputMode
+    def Formatter.output_mode
       @omode
     end
 
