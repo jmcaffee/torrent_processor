@@ -6,8 +6,12 @@ gem "ktcommon"
 gem "ocra"
 gem "s4t-utils"
 gem "sqlite3"
-gem "torrentprocessor"
 gem "user-choices"
 gem "xml-simple"
 
-gem 'simplecov', :require => false, :group => :test
+gem 'pry',                :require => false
+gem 'pry-nav',            :require => false
+gem 'pry-rescue',         :require => false
+gem 'pry-stack_explorer', :require => false
+gem 'rb-readline',        :require => false
+gem 'simplecov',          :require => false, :group => :test
