@@ -16,6 +16,7 @@ require 'rake/clean'
 require 'rdoc/task'
 require 'ostruct'
 require 'rakeUtils'
+require 'rspec/core/rake_task'
 
 # Setup common directory structure
 
@@ -56,6 +57,30 @@ imports.each do |imp|
 end
 
 
+
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = '-fp'
+  #require 'pry'; binding.pry
+end
+
+RSpec::Core::RakeTask.new(:spec_pretty) do |t|
+  t.rspec_opts = '-fd'
+  #require 'pry'; binding.pry
+end
+
+task :default => [:spec]
+
+
+desc "Install gem and build installer"
+task :dist => [:clean, :gem, :purge_gem_versions, :install_gem, :exe_installer]
+
+task :purge_gem_versions do
+  sh("gem uninstall #{PROJNAME.downcase} --all --executables")
+end
+
+task :install_gem do
+  sh("gem install pkg/torrentprocessor-#{PKG_VERSION}.gem -l --no-document")
+end
 
 #############################################################################
 #task :init => [BUILDDIR] do
