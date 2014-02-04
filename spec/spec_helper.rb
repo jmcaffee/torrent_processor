@@ -24,7 +24,8 @@ include FileUtils
 
 def create_file_of_size(file_path, file_size, random = false)
   # Create the directory path if it doesn't exist.
-  pn = Pathname.new(file_path)
+  tmp = '-tmp'
+  pn = Pathname.new(file_path + tmp)
   dir = pn.dirname
   if !dir.exist?
     dir.mkpath
@@ -37,7 +38,7 @@ def create_file_of_size(file_path, file_size, random = false)
   end
 
   # Write a file to disk.
-  File.open(file_path, 'w') do |f|
+  File.open(file_path + tmp, 'w') do |f|
     if random
       file_size.times do
         f.write Random.rand(10)
@@ -45,7 +46,10 @@ def create_file_of_size(file_path, file_size, random = false)
     else
       f.write '1'*file_size
     end
+    f.flush
   end
+
+  mv(file_path + tmp, file_path)
 end
 
 def generate_movie_set(root_dir, movie_name, movie_ext)
@@ -132,6 +136,22 @@ end
 
 class NullLogger
   def NullLogger.log msg = ''
+  end
+end
+
+class CaptureLogger
+
+  def CaptureLogger.log msg = ''
+    @messages ||= []
+    @messages << msg if !msg.nil? && !msg.empty?
+  end
+
+  def CaptureLogger.messages
+    @messages
+  end
+
+  def CaptureLogger.reset
+    @messages = []
   end
 end
 
