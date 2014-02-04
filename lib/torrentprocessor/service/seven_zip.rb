@@ -63,7 +63,9 @@ module TorrentProcessor::Service
       return @@app_path unless (!defined?(@@app_path) || @@app_path.nil?)
 
       possible_locations = ['C:/Program Files/7Zip/7z.exe',
+                            'C:/Program Files/7-Zip/7z.exe',
                             'C:/Program Files (x86)/7Zip/7z.exe',
+                            'C:/Program Files (x86)/7-Zip/7z.exe',
                             'C:/opt/bin/7Zip/7z.exe']
 
       possible_locations.each do |path|
@@ -85,10 +87,10 @@ module TorrentProcessor::Service
 
     def SevenZip.extract_rar(src_dir, out_dir, logger = nil)
       switches = SevenZip.default_switches
-      switches << " -o#{out_dir}"
+      switches << " -o#{SevenZip.quote(out_dir)}"
 
       cmd_line = "#{SevenZip.default_commands} #{switches} #{SevenZip.quote(src_dir)}"
-      app_cmd = "#{app_path} #{cmd_line}"
+      app_cmd = "#{SevenZip.quote(app_path)} #{cmd_line}"
       logger.log "Executing: #{app_cmd}" unless logger.nil?
 
       #result = Kernel.system("#{app_cmd}")
