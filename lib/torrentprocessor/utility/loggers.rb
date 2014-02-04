@@ -62,12 +62,17 @@ class FileLogger
   def self.rotate_log
     return if max_log_size == 0
 
-    if File.new(logpath).size > max_log_size
-      rm(logpath + '.3') if File.exists?(logpath + '.3')
+    if FileTest.size(logpath) > max_log_size
 
-      mv(logpath + '.2', logpath + '.3') if File.exists?(logpath + '.2')
-      mv(logpath + '.1', logpath + '.2') if File.exists?(logpath + '.1')
-      mv(logpath, logpath + '.1') if File.exists?(logpath)
+      # Used to determine if a file was still open when receiving EACCESS errors.
+      #puts "#"*20
+      #ObjectSpace.each_object(File) { |f| p f if f.path.include?(logpath) && !f.closed? }
+      #puts "#"*20
+
+      FileUtils.rm(logpath + '.3') if File.exists?(logpath + '.3')
+      FileUtils.mv(logpath + '.2', logpath + '.3') if File.exists?(logpath + '.2')
+      FileUtils.mv(logpath + '.1', logpath + '.2') if File.exists?(logpath + '.1')
+      FileUtils.mv(logpath, logpath + '.1') if File.exists?(logpath)
     end # if
   end
 end
