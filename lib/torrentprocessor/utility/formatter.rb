@@ -37,6 +37,14 @@ module TorrentProcessor::Utility
       @omode = (@omode == :raw ? :pretty : :raw )
     end
 
+    def Formatter.logger=(logger_class)
+      @logger = logger_class
+    end
+
+    def Formatter.logger
+      @logger ||= NullLogger
+    end
+
     ###
     # Output a simple horizonal rule
     #

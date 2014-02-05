@@ -4,12 +4,18 @@ include TorrentProcessor::Utility
 
 describe Formatter do
 
-  subject(:formatter) { Formatter.set_output_mode(:pretty); Formatter }
+  subject(:formatter) do
+    Formatter.set_output_mode(:pretty)
+    Formatter.logger = nil
+    Formatter
+  end
 
   its(:toggle_output_mode) { should be :raw }
 
   context 'by default' do
     its(:output_mode) { should be :pretty }
+
+    its(:logger) { should be NullLogger }
   end
 
   describe '.set_output_mode' do
@@ -36,4 +42,29 @@ describe Formatter do
       end
     end # only accepts :pretty and :raw
   end # .set_output_mode
+
+  describe '.logger=' do
+
+    it 'sets a logger class' do
+      formatter.logger = CaptureLogger
+
+      expect(formatter.logger).to be CaptureLogger
+    end
+  end # .logger=
+
+  context 'has formatting helper methods' do
+
+    before(:each) do
+      formatter.logger = CaptureLogger
+      CaptureLogger.reset
+    end
+
+    describe '.print_rule' do
+
+      it 'prints a row of dashes' do
+        formatter.print_rule
+        expect(CaptureLogger.messages.include?('-'*40)).to be_true
+      end
+    end # .print_rule
+  end # has formatting helper methods
 end

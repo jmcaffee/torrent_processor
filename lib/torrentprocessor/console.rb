@@ -91,9 +91,9 @@ module TorrentProcessor
           end # qmode is webui
 
           if @qmode == :db
-            Formatter.pHr
+            Formatter.print_rule
             log "Query returned #{result.length} rows."
-            Formatter.pHr
+            Formatter.print_rule
             Formatter.pQueryResults(result)
             #result.each do |r|
             # p r
