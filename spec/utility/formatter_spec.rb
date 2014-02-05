@@ -89,28 +89,108 @@ describe Formatter do
 
       context ':raw mode' do
 
-        before(:each) { Formatter.set_output_mode(:raw) }
+        before(:each) do
+          Formatter.set_output_mode(:raw)
+          CaptureLogger.reset
+        end
 
-        it 'prints values without modification' do
+        it 'prints values without formatting' do
           msg = ['Foo Bar']
           formatter.print_query_results msg
-          expect(CaptureLogger.messages.include?(msg)).to be_true
+          expect(CaptureLogger.messages[0]).to eq 'Foo Bar'
 
           msg = [
             ['Foo', 'Bar', 'Baz']
           ]
+          CaptureLogger.reset
           formatter.print_query_results msg
-          expect(CaptureLogger.messages.include?(msg)).to be_true
+          expect(CaptureLogger.messages[0]).to eq [ 'Foo', 'Bar', 'Baz' ]
         end
       end # :raw mode
 
-      it 'prints row of "=" matching length of message' do
-        msg = 'Foo Bar'
-        hdr = '=' * msg.size
-        formatter.print_header msg
+      context ':pretty mode' do
 
-        expect(CaptureLogger.messages.include?(hdr)).to be_true
-      end
+        before(:each) do
+          Formatter.set_output_mode(:pretty)
+          CaptureLogger.reset
+        end
+
+        it 'prints nicely formatted values' do
+          msg = ['Foo Bar']
+          formatter.print_query_results msg
+          expect(CaptureLogger.messages[0]).to eq 'Foo Bar'
+
+          msg = [
+            ['Foo', 'Bar', 'Baz']
+          ]
+          CaptureLogger.reset
+          formatter.print_query_results msg
+          expect(CaptureLogger.messages[0]).to eq 'Foo | Bar | Baz'
+        end
+      end # :pretty mode
     end # .print_query_results
+
+    describe '.print' do
+
+      let(:hsh) do
+        { :a => 1, :b => 2, :c => 3 }
+      end
+
+      let(:ary) do
+        [ 'a', 'b', 'c' ]
+      end
+
+      context ':raw mode' do
+
+        before(:each) do
+          Formatter.set_output_mode(:raw)
+          CaptureLogger.reset
+        end
+
+        context 'prints a hash' do
+
+          it 'outputs "inspect" results' do
+            formatter.print hsh
+            expect(CaptureLogger.messages[0]).to eq '{:a=>1, :b=>2, :c=>3}'
+          end
+        end # prints a hash
+
+        context 'prints an array' do
+
+          it 'outputs "inspect" results' do
+            formatter.print ary
+            expect(CaptureLogger.messages[0]).to eq '["a", "b", "c"]'
+          end
+        end # prints a hash
+      end # :raw mode
+
+      context ':pretty mode' do
+
+        before(:each) do
+          Formatter.set_output_mode(:pretty)
+          CaptureLogger.reset
+        end
+
+        context 'prints a hash' do
+
+          it 'prints' do
+            formatter.print hsh
+            expect(CaptureLogger.messages[0]).to eq ' :a: 1'
+            expect(CaptureLogger.messages[1]).to eq ' :b: 2'
+            expect(CaptureLogger.messages[2]).to eq ' :c: 3'
+          end
+        end # prints a hash
+
+        context 'prints an array' do
+
+          it 'prints' do
+            formatter.print ary
+            expect(CaptureLogger.messages[0]).to eq '     a'
+            expect(CaptureLogger.messages[1]).to eq '     b'
+            expect(CaptureLogger.messages[2]).to eq '     c'
+          end
+        end # prints a hash
+      end # :pretty mode
+    end # .print
   end # has formatting helper methods
 end

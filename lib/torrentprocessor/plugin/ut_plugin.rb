@@ -135,7 +135,7 @@ module TorrentProcessor::Plugin
       hashes.each do |torr|
         log Formatter.print_rule
         hsh = torr[0]
-        Formatter.pHash(utorrent.torrents[hsh].to_hsh)
+        Formatter.print(utorrent.torrents[hsh].to_hsh)
       end # each torr
 
       log Formatter.print_rule

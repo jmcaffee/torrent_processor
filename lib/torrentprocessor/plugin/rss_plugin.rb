@@ -82,7 +82,7 @@ module TorrentProcessor
         hashes.each do |feed|
           puts Formatter.print_rule
           hsh = feed[0]
-          Formatter.pHash(ut.rssfeeds[hsh].to_hsh)
+          Formatter.print(ut.rssfeeds[hsh].to_hsh)
         end # each torr
         
         puts Formatter.print_rule
@@ -117,7 +117,7 @@ module TorrentProcessor
         hashes.each do |filter|
           puts Formatter.print_rule
           hsh = filter[0]
-          Formatter.pHash(ut.rssfilters[hsh].to_hsh)
+          Formatter.print(ut.rssfilters[hsh].to_hsh)
         end # each torr
         
         puts Formatter.print_rule

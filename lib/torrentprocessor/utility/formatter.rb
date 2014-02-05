@@ -45,12 +45,17 @@ module TorrentProcessor::Utility
       @logger ||= NullLogger
     end
 
+    def Formatter.log msg = ''
+      return if msg.nil?
+      self.logger.log msg
+    end
+
     ###
     # Output a simple horizonal rule
     #
     def Formatter.print_rule
       hr = "-"*40
-      self.logger.log hr
+      log hr
     end
 
     ###
@@ -59,10 +64,10 @@ module TorrentProcessor::Utility
     # hdr:: Header text
     #
     def Formatter.print_header(hdr)
-      self.logger.log
-      self.logger.log hdr
-      self.logger.log "=" * hdr.size
-      self.logger.log
+      log
+      log hdr
+      log "=" * hdr.size
+      log
     end
 
     ###
@@ -71,21 +76,35 @@ module TorrentProcessor::Utility
     # results:: DB query results
     def Formatter.print_query_results(results)
 
-      case @omode
+      case output_mode
         when :raw
           results.each do |r|
-            p r
+            log r
           end
           #puts results
 
         when :pretty
           results.each do |i|
             if( i.kind_of?(Array) )
-              puts i.join( " | " )
+              log i.join( " | " )
             else
-              puts i
+              log i
             end
           end
+      end
+    end
+
+    def Formatter.print obj
+      type = obj.class.to_s
+      case type
+      when 'Hash'
+        print_hash(obj)
+      when 'Array'
+        print_array(obj)
+      else
+        log obj
+        raise 'ERROR'
+        #puts 'ERROR'
       end
     end
 
@@ -100,9 +119,9 @@ module TorrentProcessor::Utility
     #
     # nothing
     #
-    def Formatter.pHash(hsh)
+    def Formatter.print_hash(hsh)
       if @omode == :raw
-        puts hsh.inspect
+        log hsh.inspect
         return
       end # if @omode == :raw
 
@@ -117,19 +136,27 @@ module TorrentProcessor::Utility
 
       hsh.each do |k,v|
         if ( v.class != Array && v.class != Hash && !v.respond_to?(:to_hsh))
-          puts " #{k.ljust(maxlen)}: #{v}"
+          log " #{key_to_string(k).ljust(maxlen)}: #{v}"
         elsif ( v.class == Hash )
-          puts " #{k.ljust(maxlen)}:"
-          Formatter.pHash( v )
+          log " #{key_to_string(k).ljust(maxlen)}:"
+          Formatter.print_hash( v )
         elsif ( v.respond_to?(:to_hsh) )
-          puts " #{k.ljust(maxlen)}:"
-          Formatter.pHash( v.to_hsh )
-          puts " --- "
+          log " #{key_to_string(k).ljust(maxlen)}:"
+          Formatter.print_hash( v.to_hsh )
+          log " --- "
         else
-          puts " #{k.ljust(maxlen)}:"
-          Formatter.pArray ( v )
+          log " #{key_to_string(k).ljust(maxlen)}:"
+          Formatter.print_array ( v )
         end
       end # each k,v
+    end
+
+    def Formatter.key_to_string key
+      if Symbol.all_symbols.include? key
+        ":#{key}"
+      else
+        key
+      end
     end
 
     ###
@@ -143,22 +170,22 @@ module TorrentProcessor::Utility
     #
     # nothing
     #
-    def Formatter.pArray(ary)
+    def Formatter.print_array(ary)
       if @omode == :raw
-        puts ary.inspect
+        log ary.inspect
         return
       end # if @omode == :raw
 
       ary.each do |v|
         if ( v.class != Array && v.class != Hash && !v.respond_to?(:to_hsh) )
-          puts "     #{v}"
+          log "     #{v}"
         elsif ( v.class == Hash )
-          Formatter.pHash( v )
+          Formatter.print_hash( v )
         elsif ( v.respond_to?(:to_hsh) )
-          Formatter.pHash( v.to_hsh )
-          puts " --- "
+          Formatter.print_hash( v.to_hsh )
+          log " --- "
         else
-          Formatter.pArray ( v )
+          Formatter.print_array ( v )
         end
       end # each v
     end
