@@ -72,6 +72,16 @@ describe Formatter do
       it 'prints a header message' do
         msg = 'Foo Bar'
         formatter.print_header msg
+
+        expect(CaptureLogger.messages.include?(msg)).to be_true
+      end
+
+      it 'prints row of "=" matching length of message' do
+        msg = 'Foo Bar'
+        hdr = '=' * msg.size
+        formatter.print_header msg
+
+        expect(CaptureLogger.messages.include?(hdr)).to be_true
       end
     end
   end # has formatting helper methods

@@ -59,10 +59,10 @@ module TorrentProcessor::Utility
     # hdr:: Header text
     #
     def Formatter.print_header(hdr)
-      puts
-      puts hdr
-      puts "=" * hdr.size
-      puts
+      self.logger.log
+      self.logger.log hdr
+      self.logger.log "=" * hdr.size
+      self.logger.log
     end
 
     ###
