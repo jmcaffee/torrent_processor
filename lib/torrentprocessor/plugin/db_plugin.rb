@@ -166,7 +166,7 @@ module TorrentProcessor
 
         Formatter.print_header "ID | Ratio | Name"
         q = "SELECT id,ratio,name from torrents;"
-        Formatter.pQueryResults( db.execute( q ) )
+        Formatter.print_query_results( db.execute( q ) )
         return true
       end
 
@@ -184,7 +184,7 @@ module TorrentProcessor
         return true
         Formatter.print_header "ID | Ratio | Name"
         q = "SELECT id,ratio,name from torrents;"
-        Formatter.pQueryResults( db.execute( q ) )
+        Formatter.print_query_results( db.execute( q ) )
         return true
       end
 
@@ -208,7 +208,7 @@ module TorrentProcessor
         end
 
         Formatter.print_header "Table description(s)"
-        Formatter.pQueryResults( db.execute( q ) )
+        Formatter.print_query_results( db.execute( q ) )
         return true;
       end
 
@@ -224,7 +224,7 @@ module TorrentProcessor
 
         Formatter.print_header "ID | TP State | Name"
         q = "SELECT id,tp_state,name from torrents;"
-        Formatter.pQueryResults( db.execute( q ) )
+        Formatter.print_query_results( db.execute( q ) )
         return true
       end
 
@@ -240,7 +240,7 @@ module TorrentProcessor
 
         Formatter.print_header "Tables in DB"
         q = "SELECT name from sqlite_master WHERE type = 'table' ORDER BY name;"
-        Formatter.pQueryResults( db.execute( q ) )
+        Formatter.print_query_results( db.execute( q ) )
         return true
       end
 

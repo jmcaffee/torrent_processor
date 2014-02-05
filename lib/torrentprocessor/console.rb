@@ -94,7 +94,7 @@ module TorrentProcessor
             Formatter.print_rule
             log "Query returned #{result.length} rows."
             Formatter.print_rule
-            Formatter.pQueryResults(result)
+            Formatter.print_query_results(result)
             #result.each do |r|
             # p r
             #end

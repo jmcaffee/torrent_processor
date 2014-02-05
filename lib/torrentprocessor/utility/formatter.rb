@@ -69,7 +69,7 @@ module TorrentProcessor::Utility
     # Output a DB query
     #
     # results:: DB query results
-    def Formatter.pQueryResults(results)
+    def Formatter.print_query_results(results)
 
       case @omode
         when :raw

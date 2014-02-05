@@ -83,6 +83,32 @@ describe Formatter do
 
         expect(CaptureLogger.messages.include?(hdr)).to be_true
       end
-    end
+    end # .print_header
+
+    describe '.print_query_results' do
+
+      context ':raw mode' do
+
+        before(:each) { Formatter.set_output_mode(:raw) }
+
+        it 'prints values without modification' do
+          msg = 'Foo Bar'
+          formatter.print_query_results msg
+          expect(CaptureLogger.messages.include?(msg)).to be_true
+
+          msg = ['Foo', 'Bar', 'Baz']
+          formatter.print_query_results msg
+          expect(CaptureLogger.messages.include?(msg)).to be_true
+        end
+      end # :raw mode
+
+      it 'prints row of "=" matching length of message' do
+        msg = 'Foo Bar'
+        hdr = '=' * msg.size
+        formatter.print_header msg
+
+        expect(CaptureLogger.messages.include?(hdr)).to be_true
+      end
+    end # .print_query_results
   end # has formatting helper methods
 end
