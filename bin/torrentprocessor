@@ -80,8 +80,6 @@ class TorrentProcessorApp < UserChoices::Command
   # Execute the TorrentProcessor application.
   # This method is called automatically when 'torrentprocessor(.rb)' is executed from the command line.
   def execute
-    $LOG.debug "TorrentProcessorApp::execute"
-
     if(@user_choices[:version])
       puts TorrentProcessor::logo()
       return
@@ -129,12 +127,15 @@ end # class TorrentProcessorApp
   rescue SystemExit
 
   rescue Exception => e
-    puts "!!! ERROR:"
+    puts "An error has occurred.\nPlease send the following information to support@ktechSystems.com:"
     puts "\t" + e.message
     puts
-    exit if !$LOGGING
-    puts "Exception type: #{e.class.to_s}"
-    puts e.backtrace
-    puts
+    if TorrentProcessor::VERSION.include?('alpha') ||
+       TorrentProcessor::VERSION.include?('beta') ||
+       TorrentProcessor::VERSION.include?('pre')
+      puts "Exception type: #{e.class.to_s}"
+      puts e.backtrace
+      puts
+    end
   end
 #end
