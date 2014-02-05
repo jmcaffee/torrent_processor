@@ -92,11 +92,13 @@ describe Formatter do
         before(:each) { Formatter.set_output_mode(:raw) }
 
         it 'prints values without modification' do
-          msg = 'Foo Bar'
+          msg = ['Foo Bar']
           formatter.print_query_results msg
           expect(CaptureLogger.messages.include?(msg)).to be_true
 
-          msg = ['Foo', 'Bar', 'Baz']
+          msg = [
+            ['Foo', 'Bar', 'Baz']
+          ]
           formatter.print_query_results msg
           expect(CaptureLogger.messages.include?(msg)).to be_true
         end
