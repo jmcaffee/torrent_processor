@@ -58,7 +58,7 @@ module TorrentProcessor::Utility
     #
     # hdr:: Header text
     #
-    def Formatter.pHeader(hdr)
+    def Formatter.print_header(hdr)
       puts
       puts hdr
       puts "=" * hdr.size

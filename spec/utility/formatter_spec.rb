@@ -66,5 +66,13 @@ describe Formatter do
         expect(CaptureLogger.messages.include?('-'*40)).to be_true
       end
     end # .print_rule
+
+    describe '.print_header' do
+
+      it 'prints a header message' do
+        msg = 'Foo Bar'
+        formatter.print_header msg
+      end
+    end
   end # has formatting helper methods
 end

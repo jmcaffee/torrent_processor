@@ -164,7 +164,7 @@ module TorrentProcessor
         kaller = args[1]
         db = kaller.database
 
-        Formatter.pHeader "ID | Ratio | Name"
+        Formatter.print_header "ID | Ratio | Name"
         q = "SELECT id,ratio,name from torrents;"
         Formatter.pQueryResults( db.execute( q ) )
         return true
@@ -182,7 +182,7 @@ module TorrentProcessor
 
         puts "Not implemented yet."
         return true
-        Formatter.pHeader "ID | Ratio | Name"
+        Formatter.print_header "ID | Ratio | Name"
         q = "SELECT id,ratio,name from torrents;"
         Formatter.pQueryResults( db.execute( q ) )
         return true
@@ -207,7 +207,7 @@ module TorrentProcessor
           q = "SELECT sql FROM sqlite_master;"
         end
 
-        Formatter.pHeader "Table description(s)"
+        Formatter.print_header "Table description(s)"
         Formatter.pQueryResults( db.execute( q ) )
         return true;
       end
@@ -222,7 +222,7 @@ module TorrentProcessor
         kaller = args[1]
         db = kaller.database
 
-        Formatter.pHeader "ID | TP State | Name"
+        Formatter.print_header "ID | TP State | Name"
         q = "SELECT id,tp_state,name from torrents;"
         Formatter.pQueryResults( db.execute( q ) )
         return true
@@ -238,7 +238,7 @@ module TorrentProcessor
         kaller = args[1]
         db = kaller.database
 
-        Formatter.pHeader "Tables in DB"
+        Formatter.print_header "Tables in DB"
         q = "SELECT name from sqlite_master WHERE type = 'table' ORDER BY name;"
         Formatter.pQueryResults( db.execute( q ) )
         return true
@@ -253,7 +253,7 @@ module TorrentProcessor
         kaller = args[1]
         db = kaller.database
 
-        Formatter.pHeader "Run all DB migrations"
+        Formatter.print_header "Run all DB migrations"
         db.upgrade
         return true
       end
