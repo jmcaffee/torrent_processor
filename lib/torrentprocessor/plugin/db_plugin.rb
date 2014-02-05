@@ -44,7 +44,6 @@ module TorrentProcessor
       # Open a connection to the DB
       #
       def db_connect(args)
-        $LOG.debug "DBPlugin::db_connect"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -58,7 +57,6 @@ module TorrentProcessor
       # Close the DB connection
       #
       def db_close(args)
-        $LOG.debug "DBPlugin::db_close"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -72,7 +70,6 @@ module TorrentProcessor
       # Clear all torrent data from the DB and refresh with new data from uTorrent.
       #
       def db_update(args)
-        $LOG.debug "DBPlugin::db_update"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -103,7 +100,6 @@ module TorrentProcessor
       # Update a torrent's state
       #
       def db_changestate(args)
-        $LOG.debug "DBPlugin::db_changestate"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -159,7 +155,6 @@ module TorrentProcessor
       # Display the current torrent ratios within the DB
       #
       def db_torrent_ratios(args)
-        $LOG.debug "DBPlugin::db_torrent_ratios"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -175,7 +170,6 @@ module TorrentProcessor
       # Reconcile the DB with uTorrent current state
       #
       def db_reconcile(args)
-        $LOG.debug "DBPlugin::db_reconcile"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -193,7 +187,6 @@ module TorrentProcessor
       # Display the DB schema
       #
       def db_schema(args)
-        $LOG.debug "DBPlugin::db_schema"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -217,7 +210,6 @@ module TorrentProcessor
       # Display the current state of torrents in the DB
       #
       def db_torrent_states(args)
-        $LOG.debug "DBPlugin::db_torrent_states"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -233,7 +225,6 @@ module TorrentProcessor
       # Display a list of tables within the DB
       #
       def db_list_tables(args)
-        $LOG.debug "DBPlugin::db_list_tables"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database
@@ -248,7 +239,6 @@ module TorrentProcessor
       # Run DB upgrade migrations
       #
       def db_upgrade_db(args)
-        $LOG.debug "DBPlugin::db_upgrade_db"
         cmdtxt = args[0]
         kaller = args[1]
         db = kaller.database

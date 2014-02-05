@@ -50,8 +50,6 @@ module TorrentProcessor::Service::UTorrent
     # torrent:: Array of torrent data
     #
     def initialize(torrent)
-      $LOG.debug "TorrentData::initialize"
-
       @hash                 = torrent[0]
       @status               = torrent[1]
       @name                 = torrent[2]
@@ -89,7 +87,6 @@ module TorrentProcessor::Service::UTorrent
     # arg:: verbose mode if true
     #
     def verbose=(arg)
-      $LOG.debug "TorrentData::verbose=( #{arg} )"
       @verbose = arg
     end
 

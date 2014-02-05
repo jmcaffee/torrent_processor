@@ -25,7 +25,6 @@ module TorrentProcessor
     # Config class constructor
     #
     def initialize(rootDir=nil)
-      $LOG.debug "Config::initialize"
       super
       @cfg = {}
 
@@ -37,8 +36,6 @@ module TorrentProcessor
     # Set default config values
     #
     def setDefaults
-      $LOG.debug "Config::setDefaults"
-
       # Notes about APPDATA paths:
       # Local app data should be used when an app's data is too
       # big to move around. Or is specific to the machine running
@@ -89,7 +86,6 @@ module TorrentProcessor
     # Load the YAML configuration file.
     # returns:: a hash containing configuration info.
     def load
-      $LOG.debug "Config::load"
       tmpCfg = read(@cfgFile)
       @cfg = tmpCfg if !tmpCfg.nil? && tmpCfg != false && !tmpCfg.empty?
       @cfg
@@ -98,7 +94,6 @@ module TorrentProcessor
 
     # Save the @cfg hash to a YAML file.
     def save
-      $LOG.debug "Config::save"
       write(@cfgFile, @cfg)
     end
 

@@ -81,8 +81,8 @@ module TorrentProcessor
       dbname = filepath
       db = SQLite3::Database.new( dbname )
 
-      $LOG.debug "  Connected to db: #{dbname}" if !db.nil?
-      $LOG.error "  Unable to connect to db: #{dbname}" if db.nil?
+      #$LOG.debug "  Connected to db: #{dbname}" if !db.nil?
+      #$LOG.error "  Unable to connect to db: #{dbname}" if db.nil?
 
       raise "ERROR: Unable to connect to database: #{dbname}" if db.nil?
 
@@ -188,7 +188,7 @@ module TorrentProcessor
 
       if updates.length > 0
         query = buildBatchUpdateQuery( updates )
-        $LOG.info query
+        #$LOG.info query
         execute_batch( query )
       end
 
@@ -196,7 +196,7 @@ module TorrentProcessor
         query = buildBatchInsertQuery( inserts )
         #File.open("r:/tools/ruby/torrentprocessor/trunk/query.sql", 'w') {|f| f.write( query ); f.flush; }
         #puts query
-        $LOG.info query
+        #$LOG.info query
         execute_batch( query )
       end
     end
@@ -489,7 +489,7 @@ EOQ
       def self.migrate_to_v1(db)
         ver = db.schema_version
         return if ver >= 1
-        $LOG.debug "Migrating DB to v1..."
+        #$LOG.debug "Migrating DB to v1..."
 
         result = db.execute('DROP TABLE IF EXISTS app_lock;')
 
@@ -503,7 +503,7 @@ EOQ
         result = db.execute q
 
         db.execute('PRAGMA user_version = 1;')
-        $LOG.debug "v1 migration complete."
+        #$LOG.debug "v1 migration complete."
       end
     end # class
   end # class Database

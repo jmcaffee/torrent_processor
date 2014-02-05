@@ -33,8 +33,6 @@ module TorrentProcessor::Service::UTorrent
     # Processor constructor
     #
     def initialize(ip, port, user, pass)
-      $LOG.debug "UTorrentWebUI::initialize( ip:#{ip}, port:#{port} user:#{user} pass:#{pass}"
-
       @ip         = ip
       @port       = port
       @user       = user
@@ -60,8 +58,6 @@ module TorrentProcessor::Service::UTorrent
     # query:: Query to send
     #
     def send_get_query(query)
-      $LOG.debug "UTorrentWebUI::send_get_query( #{query} )"
-
       data = nil
       start_session()
       get_token()
@@ -75,8 +71,6 @@ module TorrentProcessor::Service::UTorrent
     # Get uTorrent settings
     #
     def get_utorrent_settings()
-      $LOG.debug "UTorrentWebUI::get_utorrent_settings()"
-
       @url = "/gui/?action=getsettings"
 
       send_get_query(@url)
@@ -89,8 +83,6 @@ module TorrentProcessor::Service::UTorrent
     # Get a torrent's job properties
     #
     def get_torrent_job_properties(hash)
-      $LOG.debug "UTorrentWebUI::get_torrent_job_properties()"
-
       @url = "/gui/?action=getprops&hash=#{hash}"
 
       send_get_query(@url)
@@ -105,8 +97,6 @@ module TorrentProcessor::Service::UTorrent
     #     {hash1 => {'prop1' => 'value1', 'prop2' => 'value2'},
     #      hash2 => {'prp1' => 'val1', 'prp2' => 'val2'}}
     def set_job_properties(props)
-      $LOG.debug "UTorrentWebUI::set_job_properties( props )"
-
       urlRoot = "/gui/?action=setprops"
       jobprops = ""
 
@@ -127,8 +117,6 @@ module TorrentProcessor::Service::UTorrent
     # Send uTorrent request to remove torrent
     #
     def remove_torrent(hash)
-      $LOG.debug "UTorrentWebUI::remove_torrent( hash )"
-
       @url = "/gui/?action=removedata&hash=#{hash}"
 
       send_get_query(@url)
@@ -139,8 +127,6 @@ module TorrentProcessor::Service::UTorrent
     # Get a list of Torrents
     #
     def get_torrent_list(cache_id = nil)
-      $LOG.debug "UTorrentWebUI::get_torrent_list( #{cache_id} )"
-
       @url = "/gui/?list=1"
       @url = "/gui/?list=1&cache=#{cache_id}" if !cache_id.nil?
 
@@ -154,7 +140,6 @@ module TorrentProcessor::Service::UTorrent
     # Get a list of Torrents using a cache value
     #
     def get_torrent_list_using_cache(cache_id)
-      $LOG.debug "UTorrentWebUI::get_torrent_list_using_cache( #{cache_id} )"
       # TODO: Remove this method
       @url = "/gui/?list=1&cache=#{cache_id}"
 
@@ -170,7 +155,6 @@ module TorrentProcessor::Service::UTorrent
     # arg:: verbose mode if true
     #
     def verbose=(arg)
-      $LOG.debug "UTorrentWebUI::verbose=( #{arg} )"
       @verbose = arg
     end
 
@@ -180,7 +164,6 @@ module TorrentProcessor::Service::UTorrent
     # returns:: none
     #
     def torrents_removed?()
-      $LOG.debug "UTorrentWebUI::torrents_removed?()"
       return false if (@removed_torrents.nil? || @removed_torrents.length == 0)
       return true
     end
@@ -189,8 +172,6 @@ module TorrentProcessor::Service::UTorrent
     # Return the cache token
     #
     def cache()
-      $LOG.debug "UTorrentWebUI::cache()"
-
       return @torrentc
     end
 
@@ -202,7 +183,6 @@ module TorrentProcessor::Service::UTorrent
     # returns:: HTTP object
     #
     def start_session()
-      $LOG.debug "UTorrentWebUI::start_session()"
       @http = Net::HTTP.start(@ip, @port)
     end
 
@@ -210,7 +190,6 @@ module TorrentProcessor::Service::UTorrent
     # Stop a HTTP session
     #
     def stop_session()
-      $LOG.debug "UTorrentWebUI::stop_session()"
       @http.finish
     end
 
@@ -220,7 +199,6 @@ module TorrentProcessor::Service::UTorrent
     # returns:: response body
     #
     def get_query(query)
-      $LOG.debug "UTorrentWebUI::get_query( #{query} )"
       req = Net::HTTP::Get.new(query)
       req.basic_auth @user, @pass
       req["cookie"] = @cookie if @cookie
@@ -247,7 +225,6 @@ module TorrentProcessor::Service::UTorrent
       data = @response.body
       raise "Invalid response. Check the address, login and password of the server." if data.nil? || data.empty?
 
-      $LOG.debug "  Response Body: #{data}"
       data
     end
 
@@ -256,11 +233,9 @@ module TorrentProcessor::Service::UTorrent
     #
     # returns:: token
     def get_token()
-      $LOG.debug "UTorrentWebUI::get_token()"
       get_query("/gui/token.html")
       data = Hpricot(@response.body)
       @token = data.at("div[#token]").inner_html
-      $LOG.debug "  Token: #{@token}"
 
       store_cookie()
       @token
@@ -272,7 +247,6 @@ module TorrentProcessor::Service::UTorrent
     def store_cookie()
       tmpcookie = @response["set-cookie"]
       @cookie = tmpcookie.split(";")[0] if !tmpcookie.nil?
-      $LOG.debug "  Cookie set: #{@cookie}" if !tmpcookie.nil?
     end
 
     ###
@@ -281,8 +255,6 @@ module TorrentProcessor::Service::UTorrent
     # response:: the JSON parsed reponse
     #
     def parse_list_request_response(response)
-      $LOG.debug "UTorrentWebUI::parse_list_request_response(response)"
-
       # Clear out the torrents hash
       @torrents.clear unless @torrents.nil?
 
@@ -297,17 +269,16 @@ module TorrentProcessor::Service::UTorrent
 
       # Stash the cache
       @torrentc = response["torrentc"]
-      $LOG.info "    Cache value stored: #{@torrentc}"
 
       parse_torrent_list_reponse( response )      if response.include?("torrents")
       parse_torrent_list_cache_response( response ) if response.include?("torrentsp")
-      $LOG.error("  List Request Response does not contain either 'torrents' or 'torrentsp'") if (!response.include?("torrents") && !response.include?("torrentsp"))
+      #$LOG.error("  List Request Response does not contain either 'torrents' or 'torrentsp'") if (!response.include?("torrents") && !response.include?("torrentsp"))
 
       parse_rss_feeds_list_response( response )     if response.include?("rssfeeds")
-      $LOG.info("  List Request Response does not contain RSS Feed data") if (!response.include?("rssfeeds"))
+      #$LOG.info("  List Request Response does not contain RSS Feed data") if (!response.include?("rssfeeds"))
 
       parse_rss_filters_list_response( response )   if response.include?("rssfilters")
-      $LOG.info("  List Request Response does not contain RSS Filter data") if (!response.include?("rssfilters"))
+      #$LOG.info("  List Request Response does not contain RSS Filter data") if (!response.include?("rssfilters"))
 
       return response
     end
@@ -318,7 +289,6 @@ module TorrentProcessor::Service::UTorrent
     # response:: the JSON parsed reponse
     #
     def parse_torrent_list_reponse(response)
-      $LOG.debug "UTorrentWebUI::parse_torrent_list_reponse(response)"
       torrents = response["torrents"]
 
       # torrents is an array of arrays
@@ -334,7 +304,6 @@ module TorrentProcessor::Service::UTorrent
     # response:: the JSON parsed reponse
     #
     def parse_torrent_list_cache_response(response)
-      $LOG.debug "UTorrentWebUI::parse_torrent_list_cache_response(response)"
       torrents = response["torrentsp"]
 
       # torrents is an array of arrays
@@ -357,7 +326,6 @@ module TorrentProcessor::Service::UTorrent
     # response:: the JSON parsed reponse
     #
     def parse_rss_feeds_list_response(response)
-      $LOG.debug "UTorrentWebUI::parse_rss_feeds_list_response(response)"
       feeds = response["rssfeeds"]
 
       # feeds is an array of arrays
@@ -373,7 +341,6 @@ module TorrentProcessor::Service::UTorrent
     # response:: the JSON parsed reponse
     #
     def parse_rss_filters_list_response(response)
-      $LOG.debug "UTorrentWebUI::parse_rss_filters_list_response(response)"
       filters = response["rssfilters"]
 
       # filters is an array of arrays
@@ -387,9 +354,8 @@ module TorrentProcessor::Service::UTorrent
     # Parse the response data (using JSON)
     #
     def parse_response
-      $LOG.debug "UTorrentWebUI::parse_response()"
       if @response.nil? || !@response
-        $LOG.debug "Response is NIL or empty."
+        #$LOG.debug "Response is NIL or empty."
         return
       end
 
