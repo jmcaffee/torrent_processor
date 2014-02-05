@@ -2,7 +2,11 @@ require 'spec_helper'
 
 describe FileLogger do
 
-  subject(:file_logger) { FileLogger }
+  subject(:file_logger) do
+    FileLogger.logfile = nil
+    FileLogger.logdir = nil
+    FileLogger
+  end
 
   let(:tmp_path) do
     pth = 'tmp/spec/loggers'

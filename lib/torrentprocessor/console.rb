@@ -10,8 +10,8 @@
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
 require_relative 'service/utorrent'
-require 'utility/formatter'
-require 'plugin'
+require_relative 'utility/formatter'
+require_relative 'plugin'
 require_relative 'utility/loggers'
 
 
