@@ -37,7 +37,7 @@ module TorrentProcessor
 
       @cmds       = Array.new
       @prompt     = "db>"
-      Formatter.setOutputMode :pretty
+      Formatter.set_output_mode :pretty
       @qmode      = :db
       @rmode      = :body
 

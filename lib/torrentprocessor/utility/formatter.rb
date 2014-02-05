@@ -17,7 +17,7 @@ module TorrentProcessor::Utility
     ###
     # Set output mode
     #
-    def Formatter.setOutputMode(mode)
+    def Formatter.set_output_mode(mode)
       if [:pretty, :raw].include? mode
         @omode = mode
       end
