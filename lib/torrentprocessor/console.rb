@@ -23,6 +23,7 @@ module TorrentProcessor
 
     include KtCmdLine
     include Plugin
+    include Utility
 
   attr_reader :logger
   attr_reader :utorrent
@@ -310,7 +311,7 @@ module TorrentProcessor
       end
 
       if cmd == ".process"
-        @controller.process
+        processor.process
         return true
       end
 

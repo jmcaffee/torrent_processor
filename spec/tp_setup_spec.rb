@@ -103,21 +103,5 @@ describe TPSetup do
         expect(Dir[app_data_path + '/*_bak.yml'].size).to be 1
       end
     end # context #backup_config
-
-    context '#upgrade_config' do
-
-      before(:each) do
-        delete_all_configs
-      end
-
-      it 'replaces old config file with new (upgraded) config file' do
-        setup_old_cfg
-
-        setup.upgrade_config(app_data_path)
-        TorrentProcessor.load_configuration cfg_path
-
-        expect(setup.config_needs_upgrade?).to eq false
-      end
-    end # context #backup_config
   end
 end

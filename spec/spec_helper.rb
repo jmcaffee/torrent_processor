@@ -128,18 +128,21 @@ def create_downloaded_torrent(src, destdir)
   cp src, destdir
 end
 
-class SimpleLogger
+class NullLogger
+  def NullLogger.log msg = ''
+  end
+
+  def NullLogger.log_dir dir
+  end
+end
+
+class SimpleLogger < NullLogger
   def SimpleLogger.log msg = ''
     puts msg
   end
 end
 
-class NullLogger
-  def NullLogger.log msg = ''
-  end
-end
-
-class CaptureLogger
+class CaptureLogger < NullLogger
 
   def CaptureLogger.log msg = ''
     @messages ||= []
@@ -152,6 +155,35 @@ class CaptureLogger
 
   def CaptureLogger.reset
     @messages = []
+  end
+end
+
+def generate_configuration dir_name, &block
+  cfg_file = File.join(dir_name, 'config.yml')
+
+  rm cfg_file if File.exists? cfg_file
+  cp 'spec/data/new_config.yml', cfg_file
+  TorrentProcessor.load_configuration cfg_file
+
+  if block_given?
+    TorrentProcessor.configure &block
+  else
+    TorrentProcessor.configure do |config|
+      config.app_path                 = dir_name
+      config.log_dir                  = dir_name
+      config.tv_processing            = File.join(dir_name, 'tv')
+      config.movie_processing         = File.join(dir_name, 'movie')
+      config.other_processing         = File.join(dir_name, 'other')
+      config.utorrent.dir_completed_download  = File.join(dir_name, 'completed')
+      config.tmdb.target_movies_path            = File.join(dir_name, 'final_movies')
+
+      mkpath config.tv_processing
+      mkpath config.movie_processing
+      mkpath config.other_processing
+      mkpath config.utorrent.dir_completed_download
+      mkpath config.tmdb.target_movies_path
+    end
+    TorrentProcessor.save_configuration
   end
 end
 

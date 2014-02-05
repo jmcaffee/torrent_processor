@@ -73,38 +73,38 @@ module TorrentProcessor
     end
 
     def upgrade_config path
-      old_config = Config.new(path).load
-      TorrentProcessor.configure do |config|
-        config.app_path         = old_config[:appPath]
-        config.logging          = old_config[:logging]
-        config.log_dir          = old_config[:logdir]
-        config.max_log_size     = old_config[:maxlogsize]
-        config.tv_processing    = old_config[:tvprocessing]
-        config.movie_processing = old_config[:movieprocessing]
-        config.other_processing = old_config[:otherprocessing]
-        config.other_processing = old_config[:otherprocessing]
+      #old_config = Config.new(path).load
+      #TorrentProcessor.configure do |config|
+      #  config.app_path         = old_config[:appPath]
+      #  config.logging          = old_config[:logging]
+      #  config.log_dir          = old_config[:logdir]
+      #  config.max_log_size     = old_config[:maxlogsize]
+      #  config.tv_processing    = old_config[:tvprocessing]
+      #  config.movie_processing = old_config[:movieprocessing]
+      #  config.other_processing = old_config[:otherprocessing]
+      #  config.other_processing = old_config[:otherprocessing]
 
-        # Create an empty hash if needed.
-        config.filters = {} if config.filters.nil?
+      #  # Create an empty hash if needed.
+      #  config.filters = {} if config.filters.nil?
 
-        # Copy filters hash.
-        old_config[:filters].each do |k,v|
-          config.filters[k] = v
-        end
+      #  # Copy filters hash.
+      #  old_config[:filters].each do |k,v|
+      #    config.filters[k] = v
+      #  end
 
-        config.utorrent.ip    = old_config[:ip]
-        config.utorrent.port  = old_config[:port]
-        config.utorrent.user  = old_config[:user]
-        config.utorrent.pass  = old_config[:pass]
-        config.utorrent.pass  = old_config[:pass]
+      #  config.utorrent.ip    = old_config[:ip]
+      #  config.utorrent.port  = old_config[:port]
+      #  config.utorrent.user  = old_config[:user]
+      #  config.utorrent.pass  = old_config[:pass]
+      #  config.utorrent.pass  = old_config[:pass]
 
-        config.tmdb.api_key             = old_config[:tmdb_api_key]
-        config.tmdb.target_movies_path  = old_config[:target_movies_path]
-        config.tmdb.can_copy_start_time = old_config[:can_copy_start_time]
-        config.tmdb.can_copy_stop_time  = old_config[:can_copy_stop_time]
-      end
+      #  config.tmdb.api_key             = old_config[:tmdb_api_key]
+      #  config.tmdb.target_movies_path  = old_config[:target_movies_path]
+      #  config.tmdb.can_copy_start_time = old_config[:can_copy_start_time]
+      #  config.tmdb.can_copy_stop_time  = old_config[:can_copy_stop_time]
+      #end
 
-      TorrentProcessor.save_configuration(File.join(path, 'config.yml'))
+      #TorrentProcessor.save_configuration(File.join(path, 'config.yml'))
     end
 
     ###

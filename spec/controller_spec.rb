@@ -12,7 +12,17 @@ include TorrentProcessor
 
 describe Controller do
 
-  subject(:controller) { Controller.new }
+  subject(:controller) do
+    TPSetup.any_instance.stub(:app_data_path).and_return(work_dir)
+    generate_configuration(work_dir)
+    Controller.new
+  end
+
+  let(:work_dir) do
+    dir = 'tmp/spec/controller'
+    mkpath dir
+    dir
+  end
 
   let(:db_stub) do
     obj = double('database')
