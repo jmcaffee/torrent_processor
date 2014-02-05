@@ -147,7 +147,7 @@ module TorrentProcessor::Plugin
       parse_args args
 
       log "Current Filters:"
-      Formatter.pHr
+      Formatter.print_rule
       filters = cfg.filters
       if (filters.nil? || filters.length < 1)
         log " None"

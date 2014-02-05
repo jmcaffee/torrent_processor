@@ -80,12 +80,12 @@ module TorrentProcessor
         return true if hashes.nil?
         
         hashes.each do |feed|
-          puts Formatter.pHr
+          puts Formatter.print_rule
           hsh = feed[0]
           Formatter.pHash(ut.rssfeeds[hsh].to_hsh)
         end # each torr
         
-        puts Formatter.pHr
+        puts Formatter.print_rule
 
         return true
       end
@@ -115,12 +115,12 @@ module TorrentProcessor
         return true if hashes.nil?
         
         hashes.each do |filter|
-          puts Formatter.pHr
+          puts Formatter.print_rule
           hsh = filter[0]
           Formatter.pHash(ut.rssfilters[hsh].to_hsh)
         end # each torr
         
-        puts Formatter.pHr
+        puts Formatter.print_rule
 
         return true
       end
@@ -138,9 +138,9 @@ module TorrentProcessor
           return nil
         end
         
-        Formatter.pHr
+        Formatter.print_rule
         puts " #  | Name"
-        Formatter.pHr
+        Formatter.print_rule
         puts
         
         # Have to build an accompanying hash because we can't fetch a value 
@@ -157,7 +157,7 @@ module TorrentProcessor
         end
         
         puts
-        Formatter.pHr
+        Formatter.print_rule
         puts
 
         return indexed_hsh

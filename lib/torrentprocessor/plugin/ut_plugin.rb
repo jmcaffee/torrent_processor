@@ -59,9 +59,9 @@ module TorrentProcessor::Plugin
 
       utorrent.get_utorrent_settings()
 
-      Formatter.pHr
+      Formatter.print_rule
       log "  uTorrent Settings"
-      Formatter.pHr
+      Formatter.print_rule
       log
       #log utorrent.settings.class
       utorrent.settings.each do |i|
@@ -105,10 +105,10 @@ module TorrentProcessor::Plugin
         return true
       end
 
-      Formatter.pHr
+      Formatter.print_rule
       log " Hash  | Name"
       #log "Torrent Names"
-      Formatter.pHr
+      Formatter.print_rule
       log
 
       utorrent.torrents.each do |k,v|
@@ -116,7 +116,7 @@ module TorrentProcessor::Plugin
       end
 
       log
-      Formatter.pHr
+      Formatter.print_rule
       log
 
       return true
@@ -133,12 +133,12 @@ module TorrentProcessor::Plugin
       return true if hashes.nil?
 
       hashes.each do |torr|
-        log Formatter.pHr
+        log Formatter.print_rule
         hsh = torr[0]
         Formatter.pHash(utorrent.torrents[hsh].to_hsh)
       end # each torr
 
-      log Formatter.pHr
+      log Formatter.print_rule
 
       return true
     end
@@ -158,9 +158,9 @@ module TorrentProcessor::Plugin
       parse_args args
 
       response = utorrent.get_torrent_list()
-      Formatter.pHr
+      Formatter.print_rule
       log response.inspect
-      Formatter.pHr
+      Formatter.print_rule
 
       return true
     end
@@ -262,9 +262,9 @@ module TorrentProcessor::Plugin
         return nil
       end
 
-      Formatter.pHr
+      Formatter.print_rule
       log " #  | Name"
-      Formatter.pHr
+      Formatter.print_rule
       log
 
       # Have to build an accompanying hash because we can't fetch a value
@@ -280,7 +280,7 @@ module TorrentProcessor::Plugin
       end
 
       log
-      Formatter.pHr
+      Formatter.print_rule
       log
 
       return indexed_hsh

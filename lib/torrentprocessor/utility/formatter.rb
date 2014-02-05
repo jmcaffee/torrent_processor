@@ -48,9 +48,9 @@ module TorrentProcessor::Utility
     ###
     # Output a simple horizonal rule
     #
-    def Formatter.pHr
+    def Formatter.print_rule
       hr = "-"*40
-      puts hr
+      self.logger.log hr
     end
 
     ###
