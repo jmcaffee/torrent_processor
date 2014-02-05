@@ -11,8 +11,10 @@ module TorrentProcessor::Plugin
 
   class UTPlugin
     require_relative '../service/utorrent'
+    require_relative '../utility/formatter'
     include TorrentProcessor
     include KtCmdLine
+    include Utility
 
     def UTPlugin.register_cmds
       { ".testcon" =>     Command.new(UTPlugin, :ut_test_connection,  "Test the uTorrent WebUI connection"),

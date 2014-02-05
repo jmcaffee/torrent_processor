@@ -8,12 +8,14 @@
 ##############################################################################
 
 require 'ktcommon/ktcmdline'
+require_relative '../utility/formatter'
 
 module TorrentProcessor::Plugin
 
   class CfgPlugin
     include ::KtCmdLine
     include TorrentProcessor
+    include TorrentProcessor::Utility
 
     def CfgPlugin.register_cmds
       { ".user" =>        Command.new(CfgPlugin, :cfg_user,       "Configure uTorrent user"),
