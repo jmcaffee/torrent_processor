@@ -1,8 +1,11 @@
 require 'spec_helper'
+require 'database_helper'
 
 include TorrentProcessor
 
 describe Database do
+
+  include DatabaseHelper
 
   subject(:console) { Console.new(init_args) }
 
@@ -15,10 +18,6 @@ describe Database do
   end
 
   let(:utorrent_stub) { double('utorrent') }
-
-  let(:database_stub) do
-    obj = double('database')
-  end
 
   describe '#process_cmd' do
 
