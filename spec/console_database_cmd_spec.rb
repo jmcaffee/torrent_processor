@@ -4,7 +4,7 @@ require 'utorrent_helper'
 
 include TorrentProcessor
 
-describe Database do
+describe Console do
 
   include DatabaseHelper
   include UTorrentHelper
