@@ -1,12 +1,13 @@
 require 'spec_helper'
-require 'torrent_spec_helper'
 require 'database_helper'
+require 'utorrent_helper'
 
 include TorrentProcessor::Plugin
 
 describe DBPlugin do
 
   include DatabaseHelper
+  include UTorrentHelper
 
   subject(:plugin) { DBPlugin.new }
 
@@ -14,18 +15,9 @@ describe DBPlugin do
     {
       :cmd      => cmd,
       :logger   => CaptureLogger,
-      :database => database_stub,
-      :utorrent => utorrent_stub,
+      :database => database_stub(),
+      :utorrent => utorrent_stub(),
     }
-  end
-
-  let(:utorrent_stub) do
-    obj = double('utorrent')
-    obj.stub(:cache)                      { 'cache' }
-    obj.stub(:get_torrent_list)           { TorrentSpecHelper.utorrent_torrent_list_data() }
-    obj.stub(:torrents)                   { TorrentSpecHelper.utorrent_torrents_data() }
-
-    obj
   end
 
   before(:each) do
