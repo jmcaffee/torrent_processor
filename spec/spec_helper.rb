@@ -168,6 +168,13 @@ class CaptureLogger < NullLogger
     messages.each { |m| msgs << m + "\n" }
     raise "'#{text}' not found in:\n#{msgs}"
   end
+
+  def CaptureLogger.does_not_contain text
+    messages.each do |m|
+      raise "'#{text}' found in:\n#{m}" if m.include?(text)
+    end
+    true
+  end
 end
 
 def generate_configuration dir_name, &block
