@@ -7,55 +7,41 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-
 require 'spec_helper'
+require 'torrent_spec_helper'
 
 include TorrentProcessor::Plugin
 
 describe UTPlugin do
 
+  before(:each) { CaptureLogger.reset }
+
   subject(:plugin) { UTPlugin.new }
 
-  let(:tmp_path) { 'tmp/spec/ut_plugin' }
+  let(:args) do
+    {
+      :cmd      => cmd,
+      :logger   => CaptureLogger,
+      :utorrent => utorrent_stub,
+      :database => database_stub,
+    }
+  end
 
-  let(:db_stub) do
+  let(:database_stub) do
     obj = double('database')
     obj.stub(:close) { true }
     obj
   end
 
-  let(:ut_stub) do
+  let(:utorrent_stub) do
     obj = double('utorrent')
-    obj.stub(:get_torrent_list) do
-      {}
-    end
-
-    obj.stub(:torrents) do
-      {}
-    end
-
-    obj.stub(:get_utorrent_settings) do
-      {}
-    end
-
-    obj.stub(:settings) do
-      {}
-    end
-
-    obj.stub(:sendGetQuery) do
-      {}
-    end
-
+    obj.stub(:get_utorrent_settings)
+    obj.stub(:send_get_query)
+    obj.stub(:settings)                   { TorrentSpecHelper.utorrent_settings_data() }
+    obj.stub(:get_torrent_job_properties) { TorrentSpecHelper.utorrent_job_properties_data() }
+    obj.stub(:get_torrent_list)           { TorrentSpecHelper.utorrent_torrent_list_data() }
+    obj.stub(:torrents)                   { TorrentSpecHelper.utorrent_torrents_data() }
     obj
-  end
-
-  let(:args) do
-    {
-      :cmd      => cmd,
-      #:logger   => SimpleLogger,
-      :utorrent => ut_stub,
-      :database => db_stub,
-    }
   end
 
   context '#ut_test_connection' do
@@ -81,7 +67,9 @@ describe UTPlugin do
     let(:cmd) { '.jobprops' }
 
     it "returns current uTorrent job properties" do
+      TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
       plugin.ut_jobprops args
+      expect { CaptureLogger.contains 'Horizon.S52E16' }
     end
   end
 
@@ -91,6 +79,7 @@ describe UTPlugin do
 
     it "returns a list of torrents uTorrent is monitoring" do
       plugin.ut_list args
+      expect { CaptureLogger.contains 'Horizon.S52E16' }
     end
   end
 
@@ -100,6 +89,7 @@ describe UTPlugin do
 
     it "display names of torrents in uTorrent" do
       plugin.ut_names args
+      expect { CaptureLogger.contains 'Horizon.S52E16' }
     end
   end
 
@@ -108,7 +98,9 @@ describe UTPlugin do
     let(:cmd) { '.tdetails' }
 
     it "display torrent details" do
+      TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
       plugin.ut_torrent_details args
+      expect { CaptureLogger.contains 'Horizon.S52E16' }
     end
   end
 
@@ -118,6 +110,7 @@ describe UTPlugin do
 
     it "return response output of list query" do
       plugin.ut_list_query args
+      expect { CaptureLogger.contains '520023045, 0, 0, 0, 0, 0, "TV",' }
     end
   end
 end
