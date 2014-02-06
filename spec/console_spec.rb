@@ -78,58 +78,6 @@ describe Console do
 
   describe '#process_cmd' do
 
-    context 'uTorrent commands' do
-
-      describe 'cmd: .testcon' do
-
-        it "tests the uTorrent connection" do
-          console.process_cmd '.testcon'
-        end
-      end
-
-      describe 'cmd: .utsettings' do
-
-        it "returns current uTorrent settings" do
-          console.process_cmd '.utsettings'
-        end
-      end
-
-      describe 'cmd: .jobprops' do
-
-        it "returns current uTorrent job properties" do
-          console.process_cmd '.jobprops'
-        end
-      end
-
-      describe 'cmd: .tlist' do
-
-        it "returns a list of torrents uTorrent is monitoring" do
-          console.process_cmd '.tlist'
-        end
-      end
-
-      describe 'cmd: .tnames' do
-
-        it "display names of torrents in uTorrent" do
-          console.process_cmd '.tnames'
-        end
-      end
-
-      describe 'cmd: .tdetails' do
-
-        it "display torrent details" do
-          console.process_cmd '.tdetails'
-        end
-      end
-
-      describe 'cmd: .listquery' do
-
-        it "return response output of list query" do
-          console.process_cmd '.listquery'
-        end
-      end
-    end # context uTorrent commands
-
     context 'TMdb comands' do
 
       TorrentProcessor.configure do |config|
