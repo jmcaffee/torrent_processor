@@ -145,16 +145,28 @@ end
 class CaptureLogger < NullLogger
 
   def CaptureLogger.log msg = ''
-    @messages ||= []
-    @messages << msg if !msg.nil? && !msg.empty?
+    messages << msg if !msg.nil? && !msg.empty?
   end
 
   def CaptureLogger.messages
-    @messages
+    @messages ||= []
   end
 
   def CaptureLogger.reset
     @messages = []
+  end
+
+  def CaptureLogger.dump_messages
+    messages.each { |m| puts m }
+  end
+
+  def CaptureLogger.contains text
+    messages.each do |m|
+      return true if m.include?(text)
+    end
+    msgs = ''
+    messages.each { |m| msgs << m + "\n" }
+    raise "'#{text}' not found in:\n#{msgs}"
   end
 end
 
