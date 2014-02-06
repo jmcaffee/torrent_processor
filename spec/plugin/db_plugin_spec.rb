@@ -27,7 +27,7 @@ describe DBPlugin do
         ]
       elsif q.include? 'SELECT hash, name FROM torrents WHERE (tp_state IS NULL AND id = 2)'
         [
-          [ 'abc' ]
+          [ 'abc', 'TestTorrent1' ]
         ]
       elsif q.include? 'SELECT id,ratio,name from torrents'
         [
