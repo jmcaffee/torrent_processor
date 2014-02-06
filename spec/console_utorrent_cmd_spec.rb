@@ -80,7 +80,7 @@ describe Console do
       it 'display details of a torrent in utorrent' do
         TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
         expect(console.process_cmd('.tdetails')).to be_true
-        expect { CaptureLogger.contains 'Horizon.S52E16' }
+        expect { CaptureLogger.contains 'availability       : 65536' }
       end
     end # cmd: .tdetails
 

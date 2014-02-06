@@ -171,7 +171,11 @@ module TorrentProcessor::Plugin
 
     def parse_args args
       args = defaults.merge(args)
-      self.logger    = args[:logger]   if args[:logger]
+      if args[:logger]
+        self.logger = args[:logger]
+        Formatter.logger = args[:logger]
+      end
+      #self.logger    = args[:logger]   if args[:logger]
       self.utorrent  = args[:utorrent] if args[:utorrent]
       self.database  = args[:database] if args[:database]
     end

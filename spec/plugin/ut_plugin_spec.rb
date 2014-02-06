@@ -98,9 +98,9 @@ describe UTPlugin do
     let(:cmd) { '.tdetails' }
 
     it "display torrent details" do
-      TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
+      TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('1')
       plugin.ut_torrent_details args
-      expect { CaptureLogger.contains 'Horizon.S52E16' }
+      expect { CaptureLogger.contains 'availability       : 65536' }
     end
   end
 
