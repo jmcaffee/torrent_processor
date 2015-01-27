@@ -15,6 +15,9 @@ module TorrentProcessor::Plugin
     include KtCmdLine
     include TorrentProcessor::Utility
 
+    attr_reader :database, :utorrent
+
+
     def RSSPlugin.register_cmds
       { ".rssfeeds" =>      Command.new(RSSPlugin, :rss_feeds,          "Display current RSS feeds"),
         ".rssfilters" =>    Command.new(RSSPlugin, :rss_filters,        "Display current RSS filters"),
@@ -24,32 +27,47 @@ module TorrentProcessor::Plugin
       }
     end
 
+    def defaults
+      {
+        :logger => NullLogger
+      }
+    end
+
+    def parse_args args
+      args = defaults.merge args
+      @logger   = args.fetch(:logger)
+      Formatter.logger = @logger
+      @database = args.fetch(:database)
+      @utorrent = args.fetch(:utorrent)
+    end
+
+    def log msg = ''
+      @logger.log msg
+    end
 
     def rss_feeds(args)
-      cmdtxt = args[0]
-      kaller = args[1]
-      ut = kaller.utorrent
+      cmd = args.fetch(:cmd)
+      parse_args args
 
-      data = ut.get_torrent_list()
-      display_current_feed_list( ut.rssfeeds )
+      data = utorrent.get_torrent_list()
+      display_current_feed_list( utorrent.rssfeeds )
       #puts data
-      puts " #{ut.rssfeeds.length} Feed(s) found."
-      puts
+      log " #{utorrent.rssfeeds.length} Feed(s) found."
+      log
 
       return true
     end
 
 
     def rss_filters(args)
-      cmdtxt = args[0]
-      kaller = args[1]
-      ut = kaller.utorrent
+      cmd = args.fetch(:cmd)
+      parse_args args
 
-      data = ut.get_torrent_list()
-      display_current_feed_list( ut.rssfilters )
+      data = utorrent.get_torrent_list()
+      display_current_feed_list( utorrent.rssfilters )
       #puts data
-      puts " #{ut.rssfilters.length} Filter(s) found."
-      puts
+      log " #{utorrent.rssfilters.length} Filter(s) found."
+      log
 
       return true
     end
@@ -59,21 +77,20 @@ module TorrentProcessor::Plugin
     # Display RSS feed details
     #
     def rss_feed_details(args)
-      cmdtxt = args[0]
-      kaller = args[1]
-      ut = kaller.utorrent
+      cmd = args.fetch(:cmd)
+      parse_args args
 
-      ut.get_torrent_list()
-      hashes = select_rss_hashes( ut.rssfeeds )
+      utorrent.get_torrent_list()
+      hashes = select_rss_hashes( utorrent.rssfeeds )
       return true if hashes.nil?
 
       hashes.each do |feed|
-        puts Formatter.print_rule
+        Formatter.print_rule
         hsh = feed[0]
-        Formatter.print(ut.rssfeeds[hsh].to_hsh)
+        Formatter.print(utorrent.rssfeeds[hsh].to_hsh)
       end # each torr
 
-      puts Formatter.print_rule
+      Formatter.print_rule
 
       return true
     end
@@ -83,31 +100,30 @@ module TorrentProcessor::Plugin
     # Display RSS filter details
     #
     def rss_filter_details(args)
-      cmdtxt = args[0]
-      kaller = args[1]
-      ut = kaller.utorrent
+      cmd = args.fetch(:cmd)
+      parse_args args
 
-      cmd_parts = cmdtxt.split
+      cmd_parts = cmd.split
       hashes = []
-      ut.get_torrent_list()
+      utorrent.get_torrent_list()
       if (cmd_parts.length > 1)
         fid = Integer(cmd_parts[1])
-        hashes = display_current_feed_list( ut.rssfilters )
+        hashes = display_current_feed_list( utorrent.rssfilters )
         newhashes = []
         newhashes << hashes[fid].clone
         hashes = newhashes.clone
       else
-        hashes = select_rss_hashes( ut.rssfilters )
+        hashes = select_rss_hashes( utorrent.rssfilters )
       end
       return true if hashes.nil?
 
       hashes.each do |filter|
-        puts Formatter.print_rule
+        Formatter.print_rule
         hsh = filter[0]
-        Formatter.print(ut.rssfilters[hsh].to_hsh)
+        Formatter.print(utorrent.rssfilters[hsh].to_hsh)
       end # each torr
 
-      puts Formatter.print_rule
+      Formatter.print_rule
 
       return true
     end
@@ -121,14 +137,14 @@ module TorrentProcessor::Plugin
     def display_current_feed_list( fdata )
       len = fdata.length
       if len == 0
-        puts "No feeds to display"
+        log "No feeds to display"
         return nil
       end
 
       Formatter.print_rule
-      puts " #  | Name"
+      log " #  | Name"
       Formatter.print_rule
-      puts
+      log
 
       # Have to build an accompanying hash because we can't fetch a value
       # from a hash using an index.
@@ -138,14 +154,14 @@ module TorrentProcessor::Plugin
       #puts "-*"*30
       fdata.each_with_index do |(k,v),i|
         i += 1
-        puts "#{i}\t#{v.feed_name}"
+        log "#{i}\t#{v.feed_name}"
         # FIXME: don't need to send a tuple here.
         indexed_hsh[i] = [v.feed_name, v.feed_name]
       end
 
-      puts
+      log
       Formatter.print_rule
-      puts
+      log
 
       return indexed_hsh
     end
@@ -161,7 +177,7 @@ module TorrentProcessor::Plugin
       # Return all feed/filter hashes in an array of arrays containing the hash and the name
       hashes = []
       if index == "0"
-        tdata.each do |k,v|
+        fdata.each do |k,v|
           hashes << [v.feed_name, v.feed_name]
         end
         return hashes
@@ -178,15 +194,14 @@ module TorrentProcessor::Plugin
       end
 
       if !indexed_hsh.has_key?(index)
-        puts " Invalid entry!"
-        puts
+        log " Invalid entry!"
+        log
         # Re-display the list
         return select_rss_hashes(fdata)
       end
 
       # Return the selected hash in an array
       return ([] << indexed_hsh[index])
-
     end
   end # class RSSPlugin
 end # module TorrentProcessor::Plugin

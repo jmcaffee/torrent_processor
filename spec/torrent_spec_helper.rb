@@ -113,5 +113,143 @@ module TorrentSpecHelper
     end
     the_torrents
   end
+
+  def self.utorrent_rss_feeds_data
+    the_feeds = {}
+
+    [
+      [
+        'unk0',
+        'unk1',
+        'unk2',
+        'unk3',
+        'unk4',
+        'unk5',
+        'TestTorrent1Feed|http://testtorrent1feed.url',
+        'unk7',
+        [
+          [
+            'Feed1',
+            'Test Torrent 1',
+            'http://testtorrent1feed.url/tt1',
+            'unk1',
+            'unk2',
+            'unk3',
+            'unk4',
+            'unk5',
+            'unk6',
+            'unk7',
+            'unk8',
+            '1'
+          ],
+          [
+            'Feed2',
+            'Test Torrent 2',
+            'http://testtorrent1feed.url/tt2',
+            'unk1',
+            'unk2',
+            'unk3',
+            'unk4',
+            'unk5',
+            'unk6',
+            'unk7',
+            'unk8',
+            '1'
+          ]
+        ]
+      ],
+      [
+        'unk0',
+        'unk1',
+        'unk2',
+        'unk3',
+        'unk4',
+        'unk5',
+        'TestTorrent2Feed|http://testtorrent2feed.url',
+        'unk7',
+        [
+          [
+            'Feed3',
+            'Test Torrent 1',
+            'http://testtorrent2feed.url/tt1',
+            'unk1',
+            'unk2',
+            'unk3',
+            'unk4',
+            'unk5',
+            'unk6',
+            'unk7',
+            'unk8',
+            '1'
+          ],
+          [
+            'Feed4',
+            'Test Torrent 2',
+            'http://testtorrent2feed.url/tt2',
+            'unk1',
+            'unk2',
+            'unk3',
+            'unk4',
+            'unk5',
+            'unk6',
+            'unk7',
+            'unk8',
+            '1'
+          ]
+        ]
+      ]
+    ].each do |f|
+      feed = TorrentProcessor::Service::UTorrent::RSSFeed.new f
+      the_feeds[feed.feed_name] = feed
+    end
+    the_feeds
+  end
+
+  def self.utorrent_rss_filters_data
+    the_filters = {}
+
+    [
+      [
+        'unk1',
+        0,
+        'TestTorrent1',
+        'include_filter',
+        'exclude_filter',
+        'dest_dir',
+        'unk2',#'TestTorrent1Feed|http://testtorrent1feed.url',
+        0,
+        'TV',
+        'minimum interval',
+        'unk3',
+        'unk4',
+        'unk5',
+        '02x14-',
+        'use episode filter',
+        'unk6',
+      ],
+      [
+        'unk1',
+        0,
+        'TestTorrent2',
+        'include_filter',
+        'exclude_filter',
+        'dest_dir',
+        'unk2',#'TestTorrent1Feed|http://testtorrent1feed.url',
+        0,
+        'TV',
+        'minimum interval',
+        'unk3',
+        'unk4',
+        'unk5',
+        '03x01-',
+        'use episode filter',
+        'unk6',
+      ]
+    ].each do |f|
+      filter = TorrentProcessor::Service::UTorrent::RSSFilter.new f
+      the_filters[filter.feed_name] = filter
+    end
+    the_filters
+  end
 end # module TorrentSpecHelper
 

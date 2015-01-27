@@ -40,13 +40,18 @@ module TorrentProcessor::Utility
 
       subdir = subdirectory_of(@download_dir, current_dir)
       if ! subdir.nil? && ! subdir.empty?
-        target_dir = File.join(target_dir, subdir)
+        #target_dir = File.join(target_dir, subdir)
         @is_subdir = true
       else
         @is_subdir = false
       end
 
-      if subdir == '/'+torrent_name
+      #if subdir == '/'+torrent_name
+      #  target_dir
+      #else
+      #  File.join(target_dir, torrent_name)
+      #end
+      if @is_subdir
         target_dir
       else
         File.join(target_dir, torrent_name)

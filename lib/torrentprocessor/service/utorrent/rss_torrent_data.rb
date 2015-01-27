@@ -152,7 +152,7 @@ module TorrentProcessor::Service::UTorrent
 
   class RSSFilter
 
-    attr_accessor :unk1
+    attr_accessor :id
     attr_accessor :filter_modifier    # Bitfield
     attr_accessor :feed_name
     attr_accessor :include_filter
@@ -228,7 +228,7 @@ module TorrentProcessor::Service::UTorrent
     def initialize(rssfilter)
       raise "Unexpected number of fields in rssfilter array. Expecting #{FIELD_COUNT}, received #{rssfilter.length}." unless rssfilter.length == FIELD_COUNT
 
-      @unk1               = rssfilter[0]
+      @id                 = rssfilter[0]
       @filter_modifier    = rssfilter[1]
       @feed_name          = rssfilter[2]
       @include_filter     = rssfilter[3]
@@ -256,22 +256,22 @@ module TorrentProcessor::Service::UTorrent
     #
     def to_hsh
       hsh = {}
-      hsh["unk1"] = @unk1
-      hsh["filter_modifier"] = filter_modifier_to_text()
-      hsh["feed_name"] = @feed_name
-      hsh["include_filter"] = @include_filter
-      hsh["exclude_filter"] = @exclude_filter
-      hsh["dest_dir"] = @dest_dir
-      hsh["unk2"] = @unk2
-      hsh["quality"] = quality_to_text()
-      hsh["label"] = @label
-      hsh["minimum_interval"] = minimum_interval_to_text()
-      hsh["unk3"] = @unk3
-      hsh["unk4"] = @unk4
-      hsh["unk5"] = @unk5
-      hsh["episode_filter"] = @episode_filter
+      hsh["id"]                 = @id
+      hsh["filter_modifier"]    = filter_modifier_to_text()
+      hsh["feed_name"]          = @feed_name
+      hsh["include_filter"]     = @include_filter
+      hsh["exclude_filter"]     = @exclude_filter
+      hsh["dest_dir"]           = @dest_dir
+      hsh["unk2"]               = @unk2
+      hsh["quality"]            = quality_to_text()
+      hsh["label"]              = @label
+      hsh["minimum_interval"]   = minimum_interval_to_text()
+      hsh["unk3"]               = @unk3
+      hsh["unk4"]               = @unk4
+      hsh["unk5"]               = @unk5
+      hsh["episode_filter"]     = @episode_filter
       hsh["use_episode_filter"] = @use_episode_filter
-      hsh["unk6"] = @unk6
+      hsh["unk6"]               = @unk6
 
       hsh
     end

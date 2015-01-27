@@ -44,6 +44,8 @@ module TorrentProcessor::Plugin
 
       # Copy the torrent.
 
+      require 'pry'; binding.pry
+      
       copy_torrent dest_path, dir_helper.subdirectory?
 
       # Verify copy was successful.
