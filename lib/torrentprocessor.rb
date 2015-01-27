@@ -7,8 +7,12 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
+require 'rubygems'
+require 'bundler/setup'
+
 require 'find'
 require 'logger'
+require 'ktutils/os'
 
 module TorrentProcessor
   class << self
@@ -21,7 +25,11 @@ module TorrentProcessor
   end
 
   def self.load_configuration cfg_file
-    @configuration = YAML.load_file(cfg_file)
+    if File.exist? cfg_file
+      @configuration = YAML.load_file(cfg_file)
+    #else
+    #  @configuration = Configuration.new
+    end
   end
 
   def self.save_configuration cfg_file = nil
@@ -79,7 +87,11 @@ end
 
 
 TorrentProcessor.configure do |config|
-  config.app_path       = File.join(ENV['APPDATA'].gsub('\\', '/'), 'torrentprocessor')
+  if Ktutils::OS.windows?
+    config.app_path       = File.join(ENV['APPDATA'].gsub('\\', '/'), 'torrentprocessor')
+  else
+    config.app_path       = File.join(ENV['HOME'], '.torrentprocessor')
+  end
   config.log_dir        = config.app_path
 
   config.tmdb.language  = 'en'

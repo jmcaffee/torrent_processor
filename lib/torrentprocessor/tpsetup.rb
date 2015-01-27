@@ -9,7 +9,8 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require 'sqlite3'
+require 'jdbc/sqlite3'
+require 'ktutils/os'
 
 
 module TorrentProcessor
@@ -56,12 +57,13 @@ module TorrentProcessor
 
     def config_needs_upgrade?
       needs_upgrade = false
-      File.read(cfg_path).each_line do |line|
-        if line.include?('appPath')
-          return true
+      if File.exist? cfg_path
+        File.read(cfg_path).each_line do |line|
+          if line.include?('appPath')
+            return true
+          end
         end
       end
-
       false
     end
 
@@ -122,8 +124,11 @@ module TorrentProcessor
     end
 
     def app_data_path
-      appdata = ENV['APPDATA'].gsub('\\','/')
-      File.join(appdata, 'torrentprocessor')
+      if Ktutils::OS.windows?
+        appdata = File.join(ENV['APPDATA'].gsub('\\', '/'), 'torrentprocessor')
+      else
+        appdata = File.join(ENV['HOME'], '.torrentprocessor')
+      end
     end
 
   private
