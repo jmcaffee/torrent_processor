@@ -13,3 +13,6 @@ install
 
 # SimpleCov reports
 coverage/
+
+# warbler generated files
+torrent_processor.jar
