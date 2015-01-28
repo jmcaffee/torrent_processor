@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require 'YAML'
+require 'yaml'
 
 module TorrentProcessor::Plugin
 
