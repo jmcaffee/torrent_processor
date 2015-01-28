@@ -15,8 +15,11 @@ require 'rake'
 require 'rake/clean'
 require 'rdoc/task'
 require 'ostruct'
-require 'rakeUtils'
+#require 'rakeUtils'
 require 'rspec/core/rake_task'
+require 'warbler'
+
+Warbler::Task.new
 
 # Setup common directory structure
 
