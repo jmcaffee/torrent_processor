@@ -9,9 +9,12 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-$LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-
-require 'torrentprocessor'
+begin
+  require 'torrentprocessor'
+rescue LoadError
+  $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
+  require 'torrentprocessor'
+end
 require 'user-choices'
 
 
