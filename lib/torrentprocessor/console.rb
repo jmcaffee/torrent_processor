@@ -167,6 +167,7 @@ module TorrentProcessor
                         [".help", "Display this cmd help info"],
                         [".exit", "Exit Interactive Mode"],
                         [".quit", "Exit Interactive Mode"],
+                        [".setup", "Configure application"],
                         [".process", "Run normal processing tasks"],
                         [".qmode", "Toggle query mode (webui <=> db)"],
                         [".rmode", "Toggle request mode (BODY <=> RAW)"],
@@ -331,6 +332,11 @@ module TorrentProcessor
       if cmd == ".rmode"
         @rmode = (@rmode == :body ? :raw : :body )
         log "Request Mode: #{@rmode.to_s}"
+        return true
+      end
+
+      if cmd == ".setup"
+        puts ".setup is not implemented yet. Restart app with --init option."
         return true
       end
 
