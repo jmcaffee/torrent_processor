@@ -15,8 +15,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     builder (3.2.2)
+    coderay (1.1.0)
+    dbd-jdbc (0.1.6-java)
+    dbi (0.4.5)
+      deprecated (= 2.0.1)
+    deprecated (2.0.1)
     diff-lcs (1.2.5)
     docile (1.1.0)
+    ffi (1.9.6-java)
     git_store (0.3.3)
     hashugar (1.0.0)
     hoe (3.7.3)
@@ -25,14 +31,27 @@ GEM
     httparty (0.13.3)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    interception (0.5)
     jdbc-sqlite3 (3.8.7)
     jruby-jars (1.7.18)
     jruby-rack (1.1.18)
     json (1.8.1-java)
     lockfile (2.1.0)
+    method_source (0.8.2)
     multi_json (1.8.2)
     multi_xml (0.5.5)
+    pry (0.10.1-java)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+      spoon (~> 0.0)
+    pry-nav (0.2.4)
+      pry (>= 0.9.10, < 0.11.0)
+    pry-rescue (1.4.1)
+      interception (>= 0.5)
+      pry
     rake (10.1.0)
+    rb-readline (0.5.2)
     rspec (3.1.0)
       rspec-core (~> 3.1.0)
       rspec-expectations (~> 3.1.0)
@@ -54,6 +73,9 @@ GEM
       multi_json
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
+    slop (3.6.0)
+    spoon (0.0.4)
+      ffi
     themoviedb (0.0.24)
       hashugar
       httparty
@@ -72,15 +94,23 @@ PLATFORMS
   java
 
 DEPENDENCIES
+  dbd-jdbc
+  dbi
   hoe (>= 1.3)
   hpricot
   jdbc-sqlite3
   json
   ktcommon!
   ktutils!
+  pry
+  pry-nav
+  pry-rescue
+  pry-stack_explorer
+  rb-readline
   rspec
   s4t-utils
   simplecov
+  sqlite3
   themoviedb
   user-choices
   warbler
