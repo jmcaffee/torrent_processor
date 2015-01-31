@@ -11,7 +11,7 @@ require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
 require 'json/pure'
 require 'net/http'
-require 'hpricot'
+require 'nokogiri'
 
 require_relative 'torrent_data'
 require_relative 'rss_torrent_data'
@@ -20,8 +20,9 @@ require_relative 'rss_torrent_data'
 module TorrentProcessor::Service::UTorrent
 
   class UTorrentWebUI
+    include TorrentProcessor::Utility::Loggable
+    include TorrentProcessor::Utility::Verbosable
 
-    attr_accessor :verbose
     attr_accessor :result
     attr_reader   :response
     attr_reader   :torrents
@@ -42,7 +43,6 @@ module TorrentProcessor::Service::UTorrent
       @result     = nil
       @http       = nil
       @token      = nil
-      @verbose    = false
       @settings   = Array.new
       @torrentc   = nil
 
@@ -150,15 +150,6 @@ module TorrentProcessor::Service::UTorrent
     end
 
     ###
-    # Set the verbose flag
-    #
-    # arg:: verbose mode if true
-    #
-    def verbose=(arg)
-      @verbose = arg
-    end
-
-    ###
     # Indicates if there are torrents that have been removed.
     #
     # returns:: none
@@ -184,6 +175,7 @@ module TorrentProcessor::Service::UTorrent
     #
     def start_session()
       @http = Net::HTTP.start(@ip, @port)
+      @http.read_timeout = 500 # seconds
     end
 
     ###
@@ -234,8 +226,9 @@ module TorrentProcessor::Service::UTorrent
     # returns:: token
     def get_token()
       get_query("/gui/token.html")
-      data = Hpricot(@response.body)
-      @token = data.at("div[#token]").inner_html
+      data = Nokogiri::HTML(@response.body)
+
+      @token = data.at("div#token").inner_html
 
       store_cookie()
       @token
@@ -272,13 +265,13 @@ module TorrentProcessor::Service::UTorrent
 
       parse_torrent_list_reponse( response )      if response.include?("torrents")
       parse_torrent_list_cache_response( response ) if response.include?("torrentsp")
-      #$LOG.error("  List Request Response does not contain either 'torrents' or 'torrentsp'") if (!response.include?("torrents") && !response.include?("torrentsp"))
+      log("  List Request Response does not contain either 'torrents' or 'torrentsp'") if (verbose && !response.include?("torrents") && !response.include?("torrentsp"))
 
       parse_rss_feeds_list_response( response )     if response.include?("rssfeeds")
-      #$LOG.info("  List Request Response does not contain RSS Feed data") if (!response.include?("rssfeeds"))
+      log("  List Request Response does not contain RSS Feed data") if (verbose && !response.include?("rssfeeds"))
 
       parse_rss_filters_list_response( response )   if response.include?("rssfilters")
-      #$LOG.info("  List Request Response does not contain RSS Filter data") if (!response.include?("rssfilters"))
+      log("  List Request Response does not contain RSS Filter data") if (verbose && !response.include?("rssfilters"))
 
       return response
     end
