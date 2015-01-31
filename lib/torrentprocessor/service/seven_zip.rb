@@ -50,6 +50,7 @@
 #
 ##############################################################################
 
+require 'ktutils/os'
 
 module TorrentProcessor::Service
 
@@ -62,14 +63,22 @@ module TorrentProcessor::Service
     def SevenZip.app_path
       return @@app_path unless (!defined?(@@app_path) || @@app_path.nil?)
 
-      possible_locations = ['C:/Program Files/7Zip/7z.exe',
-                            'C:/Program Files/7-Zip/7z.exe',
-                            'C:/Program Files (x86)/7Zip/7z.exe',
-                            'C:/Program Files (x86)/7-Zip/7z.exe',
-                            'C:/opt/bin/7Zip/7z.exe']
+      if Ktutils::OS.windows?
+        possible_locations = ['C:/Program Files/7Zip/7z.exe',
+                              'C:/Program Files/7-Zip/7z.exe',
+                              'C:/Program Files (x86)/7Zip/7z.exe',
+                              'C:/Program Files (x86)/7-Zip/7z.exe',
+                              'C:/opt/bin/7Zip/7z.exe']
 
-      possible_locations.each do |path|
-        if File.exists?(path)
+        possible_locations.each do |path|
+          if File.exists?(path)
+            @@app_path = path
+            return @@app_path
+          end
+        end
+      else
+        path = `which 7z`.chomp
+        if File.exists? path
           @@app_path = path
           return @@app_path
         end
