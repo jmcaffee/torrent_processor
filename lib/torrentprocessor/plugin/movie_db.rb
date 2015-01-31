@@ -10,6 +10,9 @@
 module TorrentProcessor::Plugin
 
   class MovieDB
+    include TorrentProcessor::Utility::Loggable
+    include TorrentProcessor::Utility::Verbosable
+
     require 'themoviedb'
 
     # Source types to strip from filenames before searching DB.
@@ -70,22 +73,26 @@ module TorrentProcessor::Plugin
       parse_args args
     end
 
+    def parse_args args
+      args = defaults.merge(args)
+
+      @logger       = args[:logger]   if args[:logger]
+      self.api_key  = args[:api_key]  if args[:api_key]
+      self.language = args[:language] if args[:language]
+    end
+
+    def defaults
+      {
+        #:logger     => NullLogger
+      }
+    end
+
     def api_key=(key)
       Tmdb::Api.key(key)
     end
 
     def language=(lang)
       Tmdb::Api.language(lang)
-    end
-
-    def log msg = ''
-      @logger.log msg
-    end
-
-    def defaults
-      {
-        :logger     => NullLogger
-      }
     end
 
     ###
@@ -106,14 +113,6 @@ module TorrentProcessor::Plugin
 
       log "Connection failed"
       return false
-    end
-
-    def parse_args args
-      args = defaults.merge(args)
-
-      @logger       = args[:logger]   if args[:logger]
-      self.api_key  = args[:api_key]  if args[:api_key]
-      self.language = args[:language] if args[:language]
     end
 
     def cmd_search_movie(args)

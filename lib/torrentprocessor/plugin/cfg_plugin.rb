@@ -8,7 +8,7 @@
 ##############################################################################
 
 require 'ktcommon/ktcmdline'
-require_relative '../utility/formatter'
+#require_relative '../utility/formatter'
 
 module TorrentProcessor::Plugin
 

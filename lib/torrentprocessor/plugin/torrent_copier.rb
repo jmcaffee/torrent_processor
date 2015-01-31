@@ -11,7 +11,7 @@
 module TorrentProcessor::Plugin
 
   class TorrentCopier
-    require_relative '../service/robocopy'
+    #require_relative '../service/robocopy'
 
     attr_reader :logger
     attr_reader :other_processing

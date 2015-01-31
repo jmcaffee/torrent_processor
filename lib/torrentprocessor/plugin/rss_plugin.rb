@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require_relative '../utility/formatter'
+#require_relative '../utility/formatter'
 
 module TorrentProcessor::Plugin
 

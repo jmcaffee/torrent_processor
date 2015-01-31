@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require_relative '../utility/formatter'
+#require_relative '../utility/formatter'
 
 module TorrentProcessor::Plugin
 
@@ -85,7 +85,7 @@ module TorrentProcessor::Plugin
 
       # Remove all torrents in DB.
       q = "SELECT hash FROM torrents;"
-      rows = database.execute(q)
+      rows = database.read(q)
 
       # For each torrent in list, remove it
       rows.each do |r|
@@ -228,7 +228,7 @@ module TorrentProcessor::Plugin
 
       Formatter.print_header "Tables in DB"
       q = "SELECT name from sqlite_master WHERE type = 'table' ORDER BY name;"
-      Formatter.print_query_results( database.execute( q ) )
+      Formatter.print_query_results( database.read( q ) )
       return true
     end
 
