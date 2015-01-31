@@ -26,6 +26,7 @@ module TorrentProcessor
     include Utility
 
   attr_reader :logger
+  attr_reader :verbose
   attr_reader :utorrent
   attr_reader :database
   attr_reader :processor
@@ -48,14 +49,18 @@ module TorrentProcessor
     def parse_args args
       args = defaults.merge(args)
       @logger    = args[:logger]    if args[:logger]
+      @verbose   = args[:verbose]   if args[:verbose]
       @utorrent  = args[:utorrent]  if args[:utorrent]
       @database  = args[:database]  if args[:database]
       @processor = args[:processor] if args[:processor]
+
+      Formatter.logger = @logger
     end
 
     def defaults
       {
-        :logger     => ::ScreenLogger
+        :logger     => ::ScreenLogger,
+        :verbose    => false
       }
     end
 
@@ -82,7 +87,10 @@ module TorrentProcessor
         end
 
         begin
-          result = (@qmode == :webui ? utorrent.send_get_query(q) : database.execute(q))
+          result = nil
+          elapsed = Benchmark.realtime do
+            result = (@qmode == :webui ? utorrent.send_get_query(q) : database.execute(q))
+          end
           if @qmode == :webui
             log result if @rmode == :body
             if @rmode == :raw
@@ -100,6 +108,8 @@ module TorrentProcessor
             # p r
             #end
           end # qmode is db
+
+          log "[#{elapsed} sec]\n"
 
         rescue Exception => e
           log e.message
@@ -121,13 +131,18 @@ module TorrentProcessor
     # cmd:: cmd to process
     # returns:: true if command processed
     def process_cmd(cmd)
-      result = CmdPluginManager.command(cmd,
-        {
-          :cmd      => cmd,
-          :logger   => logger,
-          :utorrent => utorrent,
-          :database => database,
-        })
+      result = nil
+      elapsed = Benchmark.realtime do
+        result = CmdPluginManager.command(cmd,
+          {
+            :cmd      => cmd,
+            :logger   => logger,
+            :verbose  => verbose,
+            :utorrent => utorrent,
+            :database => database,
+          })
+      end
+      log "[#{elapsed} sec]" unless result.nil?
       return result unless result.nil?
 
       cmd_parts = cmd.split
@@ -171,7 +186,8 @@ module TorrentProcessor
                         [".process", "Run normal processing tasks"],
                         [".qmode", "Toggle query mode (webui <=> db)"],
                         [".rmode", "Toggle request mode (BODY <=> RAW)"],
-                        [".omode", "Toggle DB output mode (raw <=> pretty)"]
+                        [".omode", "Toggle DB output mode (raw <=> pretty)"],
+                        [".verbose", "Verbose output"],
                       ]
 
       # Add the commands to a cmd array.
@@ -336,7 +352,14 @@ module TorrentProcessor
       end
 
       if cmd == ".setup"
-        puts ".setup is not implemented yet. Restart app with --init option."
+        log ".setup is not implemented yet. Restart app with --init option."
+        return true
+      end
+
+      if cmd == ".verbose"
+        @verbose = !verbose
+        update_plugins_verbose_mode verbose
+        log "Verbose Mode: #{verbose.to_s}"
         return true
       end
 
@@ -368,6 +391,17 @@ module TorrentProcessor
       torrents.each do |k,v|
         database.create(v)
       end
+    end
+
+    ###
+    # Set plugins verbose mode
+    #
+
+    def update_plugins_verbose_mode flag
+      @utorrent.verbose = flag
+      @database.verbose = flag
+      @database.logger = logger
+      @processor.verbose = flag
     end
   end # class Console
 end # module TorrentProcessor
