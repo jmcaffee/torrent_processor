@@ -18,6 +18,8 @@ module TorrentProcessor
   ##########################################################################
   # Processor class
   class Processor
+    include Utility::Loggable
+    include Utility::Verbosable
     include Plugin
 
     # Torrent state constants
@@ -48,6 +50,7 @@ module TorrentProcessor
     def parse_args args
       args = defaults.merge(args)
       @logger   = args[:logger]   if args[:logger]
+      @verbose  = args[:verbose]  if args[:verbose]
       @cfg      = args[:cfg]      if args[:cfg]
       @moviedb  = args[:moviedb]  if args[:moviedb]
       @utorrent = args[:utorrent] if args[:utorrent]
@@ -56,13 +59,20 @@ module TorrentProcessor
 
     def defaults
       {
-        :logger     => ::NullLogger,
-        :cfg        => TorrentProcessor.configuration
+        :cfg        => TorrentProcessor.configuration,
       }
     end
 
-    def log msg = ''
-      @logger.log msg
+
+    ###
+    # Override Verbosable verbose= to set flag on attached objects
+    #
+
+    def verbose= flag
+      @verbose = flag
+      @moviedb.verbose = flag if @moviedb
+      @utorrent.verbose = flag if @utorrent
+      @database.verbose = flag if @database
     end
 
     ###
