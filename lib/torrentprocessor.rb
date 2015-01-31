@@ -7,9 +7,6 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-require 'rubygems'
-require 'bundler/setup'
-
 require 'find'
 require 'logger'
 require 'ktutils/os'
@@ -100,12 +97,16 @@ end
 ##############################################################################
 # Require each lib file
 #
-class_files = File.join( File.dirname(__FILE__), 'torrentprocessor', '*.rb')
-$: << File.join( File.dirname(__FILE__), 'torrentprocessor')  # Add directory to the include file array.
-Dir.glob(class_files) do | class_file |
-  #puts 'require ' + class_file[/\w+\.rb$/]
-  require class_file[/\w+\.rb$/]
-end
+require 'torrentprocessor/version'
+require 'torrentprocessor/utility'
+require 'torrentprocessor/service'
+require 'torrentprocessor/controller'
+require 'torrentprocessor/processor'
+require 'torrentprocessor/runtime'
+require 'torrentprocessor/tpsetup'
+require 'torrentprocessor/database'
+require 'torrentprocessor/console'
+require 'torrentprocessor/plugin'
 
 # If compiling with OCRA we want these gems available to us so we need
 # to require them.
