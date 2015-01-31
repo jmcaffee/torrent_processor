@@ -24,7 +24,9 @@ describe Database do
 
   let(:init_args) do
     {
-      :cfg => cfg_stub
+      :cfg => cfg_stub,
+      #:verbose => true, # Default: false
+      :logger => ::ScreenLogger,
     }
   end
 
@@ -78,7 +80,7 @@ describe Database do
     it "connects to a database if not already connected" do
       database = db.database
       expect(database).to_not be nil
-      expect(database.closed?).to be false
+      expect(db.closed?).to be false
     end
   end
 
@@ -87,13 +89,13 @@ describe Database do
     it "closes a database" do
       database = db.database
       db.close
-      expect(database.closed?).to be true
+      expect(db.closed?).to be true
     end
 
     it "has no effect if database already closed" do
       database = db.database
       db.close
-      expect(database.closed?).to be true
+      expect(db.closed?).to be true
       db.close
     end
   end
@@ -103,8 +105,6 @@ describe Database do
     it "connects to a database and returns the instance" do
       database = db.connect
       expect(database).to_not be nil
-      expect(database.public_methods.include?(:execute)).to be true
-      expect(database.public_methods.include?(:execute_batch)).to be true
     end
   end
 

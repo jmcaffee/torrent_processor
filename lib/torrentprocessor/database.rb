@@ -9,7 +9,6 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require 'sqlite3'
 
 
 module TorrentProcessor
@@ -17,9 +16,9 @@ module TorrentProcessor
   ##########################################################################
   # Database class
   class Database
-#   include KtCmdLine
+   include Utility::Loggable
+   include Utility::Verbosable
 
-    attr_reader :verbose
     attr_reader :cfg
 
     ###
@@ -30,18 +29,21 @@ module TorrentProcessor
     def initialize(args)
       parse_args args
 
-      @verbose    = false
       @database   = nil
+      @adapter    = nil
     end
 
     def parse_args args
       args = defaults.merge(args)
       @cfg = args[:cfg] if args[:cfg]
+      @verbose = args[:verbose] if args[:verbose]
+      @logger = args[:logger] if args[:logger]
     end
 
     def defaults
       {
-        :logger => NullLogger,
+        #:logger => NullLogger,
+        #:verbose => false,
       }
     end
 
@@ -57,20 +59,24 @@ module TorrentProcessor
       File.join( cfg.app_path, filename )
     end
 
-    def database
-      if (@database.nil? || @database.closed?)
-        @database = connect
+    def adapter
+      return @adapter unless @adapter.nil?
+
+      if defined?(JRUBY_VERSION)
+        #require_relative 'db_adapters/jdbc_adapter'
+        #@adapter    = JdbcAdapter.new filepath
+        log 'DB: Initializing SequelJdbcAdapter' if verbose
+        require_relative 'db_adapters/sequel_jdbc_adapter'
+        @adapter    = SequelJdbcAdapter.new filepath
+      else
+        log 'DB: Initializing SqliteAdapter' if verbose
+        require_relative 'db_adapters/sqlite_adapter'
+        @adapter    = SqliteAdapter.new filepath
       end
-      @database
     end
 
-    ###
-    # Set the verbose flag
-    #
-    # arg:: verbose mode if true
-    #
-    def verbose=(arg)
-      @verbose = arg
+    def database
+      adapter.database
     end
 
 
@@ -78,15 +84,8 @@ module TorrentProcessor
     # Connect to TP Database
     #
     def connect()
-      dbname = filepath
-      db = SQLite3::Database.new( dbname )
-
-      #$LOG.debug "  Connected to db: #{dbname}" if !db.nil?
-      #$LOG.error "  Unable to connect to db: #{dbname}" if db.nil?
-
-      raise "ERROR: Unable to connect to database: #{dbname}" if db.nil?
-
-      db
+      log "DB: Connecting to #{filepath}" if verbose
+      adapter.connect
     end
 
 
@@ -94,24 +93,29 @@ module TorrentProcessor
     # Close the Database connection
     #
     def close()
-      return if @database.nil? || @database.closed?
-      @database.close
-      @database = nil
+      log 'DB: Closing database' if verbose
+      adapter.close
+    end
+
+    def closed?
+      adapter.closed?
     end
 
     def create_database
+      log 'DB: Creating database' if verbose
       Schema.create_base_schema self
     end
 
     def schema_version
       # Returns the first element of the first row of the result.
-      return (execute('PRAGMA user_version;')[0][0]).to_i
+      return (adapter.execute('PRAGMA user_version;')[0][0]).to_i
     end
 
     ###
     # Upgrade the DB schema if needed
     #
     def upgrade
+      log 'DB: Upgrading database' if verbose
       Schema.perform_migrations self
     end
 
@@ -121,7 +125,8 @@ module TorrentProcessor
     def execute(query)
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
-      rows = database.execute( query )
+      log('DB: Executing query: ' + query) if verbose
+      rows = adapter.execute( query )
     end
 
 
@@ -131,9 +136,15 @@ module TorrentProcessor
     def execute_batch(query)
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
-      rows = database.execute_batch( query )
+      log('DB: Executing batch query: ' + query) if verbose
+      rows = adapter.execute_batch( query )
     end
 
+
+    def read(query)
+      log('DB: Read: ' + query) if verbose
+      adapter.read(query)
+    end
 
     ###
     # Create a torrent in the database
@@ -142,7 +153,8 @@ module TorrentProcessor
     #
     def create(tdata)
       query = buildCreateQuery( tdata )
-      return execute( query )
+      log('DB: Create: ' + query) if verbose
+      return adapter.insert( query )
     end
 
 
@@ -153,7 +165,8 @@ module TorrentProcessor
     #
     def update(tdata)
       query = buildUpdateQuery( tdata )
-      return execute( query )
+      log('DB: Update: ' + query) if verbose
+      return adapter.update( query )
     end
 
 
@@ -164,7 +177,8 @@ module TorrentProcessor
     #
     def delete_torrent(hash)
       query = "DELETE FROM torrents WHERE hash = \"#{hash}\";"
-      return execute( query )
+      log('DB: Delete torrent: ' + query) if verbose
+      return adapter.delete( query )
     end
 
 
@@ -174,6 +188,7 @@ module TorrentProcessor
     # torrents:: Hash of Torrent Data to update
     #
     def update_torrents(torrents)
+      log 'DB: Update torrents' if verbose
       # I need to determine which torrents are updates and which are inserts.
       updates = Hash.new
       inserts = Hash.new
@@ -186,18 +201,22 @@ module TorrentProcessor
         end
       end
 
+      log "DB: #{updates.length} torrent(s) to update" if verbose
       if updates.length > 0
+        # FIXME
         query = buildBatchUpdateQuery( updates )
         #$LOG.info query
-        execute_batch( query )
+        adapter.execute_batch( query )
       end
 
+      log "DB: #{inserts.length} torrent(s) to insert" if verbose
       if inserts.length > 0
+        # FIXME
         query = buildBatchInsertQuery( inserts )
         #File.open("r:/tools/ruby/torrentprocessor/trunk/query.sql", 'w') {|f| f.write( query ); f.flush; }
         #puts query
         #$LOG.info query
-        execute_batch( query )
+        adapter.execute_batch( query )
       end
     end
 
@@ -208,7 +227,7 @@ module TorrentProcessor
     # returns:: true/false
     #
     def exists_in_db?(hash)
-      result = execute( "SELECT count() FROM torrents WHERE hash = \"#{hash}\";" )
+      result = adapter.execute( "SELECT count() FROM torrents WHERE hash = \"#{hash}\";" )
       return false if Integer(result[0][0]) < 1
       return true
     end
@@ -220,7 +239,8 @@ module TorrentProcessor
     # returns:: state
     #
     def read_torrent_state(hash)
-      result = execute( "SELECT tp_state FROM torrents WHERE hash = \"#{hash}\";" )
+      log "DB: Read torrent state: #{hash}" if verbose
+      result = adapter.read( "SELECT tp_state FROM torrents WHERE hash = \"#{hash}\";" )
       result[0]
     end
 
@@ -233,7 +253,8 @@ module TorrentProcessor
     #
     def update_torrent_state(hash, state)
       query = "UPDATE torrents SET tp_state = \"#{state}\" WHERE hash = \"#{hash}\";"
-      return execute( query )
+      log "DB: Update torrent state: #{query}" if verbose
+      return adapter.update( query )
     end
 
 
@@ -243,9 +264,10 @@ module TorrentProcessor
     # cache_id
     #
     def create_cache(cache_id)
+      log "DB: Create cache: #{cache_id}" if verbose
       # Clear out the table if we're creating a new cache value.
       delete_cache()
-      execute( "INSERT INTO torrents_info (cache_id) values (\"#{cache_id}\");" )
+      adapter.insert( "INSERT INTO torrents_info (cache_id) values (\"#{cache_id}\");" )
     end
 
 
@@ -255,7 +277,8 @@ module TorrentProcessor
     # returns:: cache_id
     #
     def read_cache()
-      result = execute( "SELECT cache_id FROM torrents_info WHERE id = 1;" )
+      result = adapter.read( "SELECT cache_id FROM torrents_info WHERE id = 1;" )
+      log "DB: Read cache: #{result}" if verbose
       result[0][0]
     end
 
@@ -266,7 +289,8 @@ module TorrentProcessor
     # cache_id
     #
     def update_cache(cache_id)
-      execute( "UPDATE torrents_info SET cache_id = \"#{cache_id}\" WHERE id = 1;" )
+      log "DB: Update cache: #{cache_id}" if verbose
+      adapter.update( "UPDATE torrents_info SET cache_id = \"#{cache_id}\" WHERE id = 1;" )
     end
 
 
@@ -274,7 +298,8 @@ module TorrentProcessor
     # Delete the cache id
     #
     def delete_cache()
-      execute( "DELETE FROM torrents_info;" )
+      log "DB: Delete cache" if verbose
+      adapter.delete( "DELETE FROM torrents_info;" )
     end
 
 
@@ -376,7 +401,7 @@ EOQ
 
     def find_torrent_by_id id
       q = "SELECT * FROM torrents WHERE id = #{id};"
-      row = execute(q).first
+      row = adapter.execute(q).first
       { :id               => row[0],
         :hash             => row[1],
         :created          => row[2],
@@ -402,8 +427,8 @@ EOQ
 CREATE TABLE IF NOT EXISTS torrents (
   id INTEGER PRIMARY KEY,
   hash TEXT UNIQUE,
-  created DATE,
-  modified DATE,
+  created TEXT,
+  modified TEXT,
   status NUMERIC,
   name TEXT,
   percent_progress NUMERIC,
@@ -413,8 +438,11 @@ CREATE TABLE IF NOT EXISTS torrents (
   folder TEXT,
   tp_state TEXT DEFAULT NULL
 );
+EOQ
+        db.execute( schema )
 
---  Create an update trigger
+#--  Create an update trigger
+        schema = <<EOQ
 CREATE TRIGGER IF NOT EXISTS update_torrents AFTER UPDATE  ON torrents
 BEGIN
 
@@ -422,9 +450,12 @@ UPDATE torrents SET modified = DATETIME('NOW')
          WHERE rowid = NEW.rowid;
 
 END;
+EOQ
+        db.execute( schema )
 
---  Also create an insert trigger
---    Note  AFTER keyword --------------------v
+#--  Also create an insert trigger
+#--    Note  AFTER keyword --------------------v
+        schema = <<EOQ
 CREATE TRIGGER IF NOT EXISTS insert_torrents AFTER INSERT ON torrents
 BEGIN
 
@@ -435,16 +466,22 @@ UPDATE torrents SET modified = DATETIME('NOW')
          WHERE rowid = NEW.rowid;
 
 END;
+EOQ
+        db.execute( schema )
 
--- Create the torrents_info table
+#-- Create the torrents_info table
+        schema = <<EOQ
 CREATE TABLE IF NOT EXISTS torrents_info (
   id INTEGER PRIMARY KEY,
   cache_id TEXT,
-  created DATE,
-  modified DATE
+  created TEXT,
+  modified TEXT
 );
+EOQ
+        db.execute( schema )
 
---  Create an update trigger
+#--  Create an update trigger
+        schema = <<EOQ
 CREATE TRIGGER IF NOT EXISTS update_torrents_info AFTER UPDATE  ON torrents_info
 BEGIN
 
@@ -452,9 +489,12 @@ UPDATE torrents_info SET modified = DATETIME('NOW')
          WHERE rowid = NEW.rowid;
 
 END;
+EOQ
+        db.execute( schema )
 
---  Also create an insert trigger
---    NOTE  AFTER keyword --------------------------v
+#--  Also create an insert trigger
+#--    NOTE  AFTER keyword --------------------------v
+        schema = <<EOQ
 CREATE TRIGGER IF NOT EXISTS insert_torrents_info AFTER INSERT ON torrents_info
 BEGIN
 
@@ -465,20 +505,29 @@ UPDATE torrents_info SET modified = DATETIME('NOW')
          WHERE rowid = NEW.rowid;
 
 END;
+EOQ
+        db.execute( schema )
 
--- Insert a cache record as part of initialization
+#-- Insert a cache record as part of initialization
+        schema = <<EOQ
 INSERT INTO torrents_info (cache_id) values (NULL);
+EOQ
+        db.execute( schema )
 
--- Create the app_lock table
+#-- Create the app_lock table
+        schema = <<EOQ
 CREATE TABLE IF NOT EXISTS app_lock (
   id INTEGER PRIMARY KEY,
   locked TEXT
 );
+EOQ
+        db.execute( schema )
 
--- Insert a lock record as part of initialization
+#-- Insert a lock record as part of initialization
+        schema = <<EOQ
 INSERT INTO app_lock (locked) values ("N");
 EOQ
-        db.execute_batch( schema )
+        db.execute( schema )
       end
 
       def self.perform_migrations(db)
