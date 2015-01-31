@@ -113,7 +113,7 @@ describe Console do
           it 'displays an error message when path or id not provided' do
             console.process_cmd '.unrar'
 
-            expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_true
+            expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_truthy
           end
         end # no path or ID
 
@@ -122,7 +122,7 @@ describe Console do
           it 'unrars archive' do
             console.process_cmd '.unrar blah'
 
-            expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_false
+            expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_falsey
           end
         end # path provided
       end # cmd .unrar

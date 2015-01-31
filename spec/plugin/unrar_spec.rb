@@ -274,19 +274,19 @@ describe Unrar do
       let(:logger) { CaptureLogger }
 
       it 'returns true indicating the command was handled' do
-        expect(unrar_plug.cmd_unrar(cmd_args)).to be_true
+        expect(unrar_plug.cmd_unrar(cmd_args)).to be_truthy
       end
 
       it 'logs an error message' do
         unrar_plug.cmd_unrar(cmd_args)
 
-        expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_true
+        expect(CaptureLogger.messages.include?('Error: path to directory or torrent ID expected')).to be_truthy
       end
 
       it 'displays help message' do
         unrar_plug.cmd_unrar(cmd_args)
 
-        expect(CaptureLogger.messages.include?('.unrar [FILE_PATH or TORRENT_ID]')).to be_true
+        expect(CaptureLogger.messages.include?('.unrar [FILE_PATH or TORRENT_ID]')).to be_truthy
       end
     end # no arg provided
   end

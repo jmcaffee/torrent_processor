@@ -37,15 +37,15 @@ describe Console do
     context 'cmd: .testcon' do
 
       it 'tests utorrent connection' do
-        expect(console.process_cmd('.testcon')).to be_true
-        expect(CaptureLogger.contains('Connected successfully')).to be_true
+        expect(console.process_cmd('.testcon')).to be_truthy
+        expect(CaptureLogger.contains('Connected successfully')).to be_truthy
       end
     end # cmd: .testcon
 
     context 'cmd: .utsettings' do
 
       it 'displays utorrent settings' do
-        expect(console.process_cmd('.utsettings')).to be_true
+        expect(console.process_cmd('.utsettings')).to be_truthy
         expect(CaptureLogger.contains('["webui.uconnect_toolbar_ever", 1, "true", {"access"=>"R"}]'))
       end
     end # cmd: .utsettings
@@ -54,7 +54,7 @@ describe Console do
 
       it 'display utorrent job properties' do
         TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
-        expect(console.process_cmd('.jobprops')).to be_true
+        expect(console.process_cmd('.jobprops')).to be_truthy
         expect { CaptureLogger.contains 'Horizon.S52E16' }
       end
     end # cmd: .jobprops
@@ -62,7 +62,7 @@ describe Console do
     context 'cmd: .tlist' do
 
       it 'display list of torrents utorrent is monitoring' do
-        expect(console.process_cmd('.tlist')).to be_true
+        expect(console.process_cmd('.tlist')).to be_truthy
         expect { CaptureLogger.contains 'Horizon.S52E16' }
       end
     end # cmd: .tlist
@@ -70,7 +70,7 @@ describe Console do
     context 'cmd: .tnames' do
 
       it 'display list of torrent names utorrent is monitoring' do
-        expect(console.process_cmd('.tnames')).to be_true
+        expect(console.process_cmd('.tnames')).to be_truthy
         expect { CaptureLogger.contains 'Horizon.S52E16' }
       end
     end # cmd: .tnames
@@ -79,7 +79,7 @@ describe Console do
 
       it 'display details of a torrent in utorrent' do
         TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
-        expect(console.process_cmd('.tdetails')).to be_true
+        expect(console.process_cmd('.tdetails')).to be_truthy
         expect { CaptureLogger.contains 'availability       : 65536' }
       end
     end # cmd: .tdetails
@@ -87,7 +87,7 @@ describe Console do
     context 'cmd: .listquery' do
 
       it 'run a list query against utorrent data' do
-        expect(console.process_cmd('.listquery')).to be_true
+        expect(console.process_cmd('.listquery')).to be_truthy
         expect { CaptureLogger.contains '520023045, 0, 0, 0, 0, 0, "TV",' }
       end
     end # cmd: .listquery

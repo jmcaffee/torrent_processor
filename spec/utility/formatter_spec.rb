@@ -63,7 +63,7 @@ describe Formatter do
 
       it 'prints a row of dashes' do
         formatter.print_rule
-        expect(CaptureLogger.messages.include?('-'*40)).to be_true
+        expect(CaptureLogger.messages.include?('-'*40)).to be_truthy
       end
     end # .print_rule
 
@@ -73,7 +73,7 @@ describe Formatter do
         msg = 'Foo Bar'
         formatter.print_header msg
 
-        expect(CaptureLogger.messages.include?(msg)).to be_true
+        expect(CaptureLogger.messages.include?(msg)).to be_truthy
       end
 
       it 'prints row of "=" matching length of message' do
@@ -81,7 +81,7 @@ describe Formatter do
         hdr = '=' * msg.size
         formatter.print_header msg
 
-        expect(CaptureLogger.messages.include?(hdr)).to be_true
+        expect(CaptureLogger.messages.include?(hdr)).to be_truthy
       end
     end # .print_header
 

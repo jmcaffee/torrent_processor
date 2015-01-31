@@ -29,7 +29,7 @@ describe RSSPlugin do
     let(:cmd) { '.rssfeeds' }
 
     it 'display current RSS feeds' do
-      expect(plugin.rss_feeds(args)).to be_true
+      expect(plugin.rss_feeds(args)).to be_truthy
       expect( CaptureLogger.contains 'TestTorrent1Feed' )
       expect( CaptureLogger.contains 'TestTorrent2Feed' )
       expect( CaptureLogger.contains '2 Feed(s) found' )
@@ -41,7 +41,7 @@ describe RSSPlugin do
     let(:cmd) { '.rssfilters' }
 
     it 'display current RSS filters' do
-      expect(plugin.rss_filters(args)).to be_true
+      expect(plugin.rss_filters(args)).to be_truthy
       expect( CaptureLogger.contains 'TestTorrent1' )
       expect( CaptureLogger.contains 'TestTorrent2' )
       expect( CaptureLogger.contains '2 Filter(s) found' )
@@ -54,7 +54,7 @@ describe RSSPlugin do
 
     it 'display details of an RSS feed' do
       TorrentProcessor::Plugin::RSSPlugin.any_instance.stub(:getInput).and_return('0')
-      expect(plugin.rss_feed_details(args)).to be_true
+      expect(plugin.rss_feed_details(args)).to be_truthy
       expect( CaptureLogger.contains 'torrent_name: Test Torrent 1' )
       expect( CaptureLogger.contains 'torrent_name: Test Torrent 2' )
     end
@@ -66,7 +66,7 @@ describe RSSPlugin do
 
     it 'display details of an RSS filter' do
       TorrentProcessor::Plugin::RSSPlugin.any_instance.stub(:getInput).and_return('0')
-      expect(plugin.rss_filter_details(args)).to be_true
+      expect(plugin.rss_filter_details(args)).to be_truthy
       expect( CaptureLogger.contains 'feed_name         : TestTorrent1' )
       expect( CaptureLogger.contains 'feed_name         : TestTorrent2' )
     end

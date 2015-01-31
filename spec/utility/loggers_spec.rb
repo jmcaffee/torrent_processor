@@ -56,7 +56,7 @@ describe FileLogger do
 
         subject.rotate_log
 
-        expect(File.exists?(log_01)).to be_true
+        expect(File.exists?(log_01)).to be_truthy
       end
     end
   end
