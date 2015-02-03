@@ -29,8 +29,15 @@ describe TPSetup do
   end
 
   let(:app_data_path) do
-    appdata = ENV['APPDATA'].gsub('\\', '/')
-    File.join(appdata, 'torrentprocessor')
+    appdata = ''
+    if Ktutils::OS.windows?
+      appdata = ENV['APPDATA'].gsub('\\', '/')
+      appdata = File.join(appdata, 'torrentprocessor')
+    else
+      appdata = ENV['HOME']
+      appdata = File.join(appdata, '.torrentprocessor')
+    end
+    appdata
   end
 
   let(:data_old_cfg_file) do
