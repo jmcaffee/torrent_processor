@@ -41,7 +41,7 @@ describe SevenZip do
   context ".default_switches" do
 
     it "defaults to 'Yes for all' switch" do
-      expect(SevenZip.default_switches).to eq '-y'
+      expect(SevenZip.default_switches).to include '-y'
     end
   end
 
