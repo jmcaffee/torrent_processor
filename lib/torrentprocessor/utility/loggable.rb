@@ -18,7 +18,7 @@ module TorrentProcessor::Utility
     end
 
     def log msg = ''
-      @logger.log msg
+      logger.log msg
     end
   end
 end
