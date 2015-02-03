@@ -49,7 +49,6 @@ module TorrentProcessor::Plugin
     TEST_CONNECTION_CMD = '.tmdbtestcon'
     MOVIE_SEARCH_CMD    = '.tmdbmoviesearch'
 
-    attr_reader :logger
     attr_reader :api_key
     attr_reader :language
 
@@ -76,14 +75,14 @@ module TorrentProcessor::Plugin
     def parse_args args
       args = defaults.merge(args)
 
-      @logger       = args[:logger]   if args[:logger]
+      logger        = args[:logger]   if args[:logger]
       self.api_key  = args[:api_key]  if args[:api_key]
       self.language = args[:language] if args[:language]
     end
 
     def defaults
       {
-        #:logger     => NullLogger
+        #:logger     => NullLogger,
       }
     end
 

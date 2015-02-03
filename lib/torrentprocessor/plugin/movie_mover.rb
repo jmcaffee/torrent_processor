@@ -46,11 +46,12 @@ module TorrentProcessor::Plugin
   class MovieMover
     require_relative 'movie_db'
 
+    include TorrentProcessor::Utility::Loggable
+
     DETAILS_FILE  = 'mover.details'
     LOCK_FILE     = 'mover.lock'
     COMPLETE_FILE = 'mover.completed'
 
-    attr_reader :logger
     attr_reader :db
 
     def initialize(args)
@@ -60,20 +61,15 @@ module TorrentProcessor::Plugin
 
     def defaults
       {
-        :logger     => NullLogger,
-        :movie_db   => Runtime.service.moviedb
+        :movie_db   => Runtime.service.moviedb,
       }
     end
 
     def parse_args args
       args = defaults.merge(args)
 
-      @logger = args[:logger]   if args[:logger]
+      logger  = args[:logger]   if args[:logger]
       @db     = args[:movie_db] if args[:movie_db]
-    end
-
-    def log msg = ''
-      @logger.log msg
     end
 
     def within_time_frame start_time, stop_time
@@ -172,7 +168,7 @@ module TorrentProcessor::Plugin
       target_path = Pathname.new File.join(dir, target_file)
       FileUtils.mv src_path, target_path
 
-      if TorrentProcessor::Service::Robocopy.copy_file(dir, target_dir, target_file, @logger)
+      if TorrentProcessor::Service::Robocopy.copy_file(dir, target_dir, target_file, logger)
         create_process_complete_file(dir)
       else
         # The copy failed. Rename the file back to the original for the next attempt.
