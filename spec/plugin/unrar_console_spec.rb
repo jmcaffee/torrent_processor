@@ -51,10 +51,10 @@ describe Unrar do
   context '#cmd_unrar' do
 
       let(:target_root_dir)     { File.join(test_root_dir, 'target') }
-      let(:test_root_dir)       { 'tmp/spec/unrar_plugin_console' }
-      let(:torrent_dir)  { 'tmp/spec/unrar_plugin_console/target' }
-      let(:torrent_file) { File.join( torrent_dir, torrent[:filename], 'test_250kb.avi' ) }
-      let(:cmd) { '.unrar' }
+      let(:test_root_dir)       { spec_tmp_dir('unrar_plugin_console/') }
+      let(:torrent_dir)         { spec_tmp_dir('unrar_plugin_console/target/') }
+      let(:torrent_file)        { File.join( torrent_dir, torrent[:filename], 'test_250kb.avi' ) }
+      let(:cmd)                 { '.unrar' }
 
       before(:each) do
         if !torrent_dir.nil? &&
@@ -77,8 +77,11 @@ describe Unrar do
     context 'given a path' do
 
       let(:cmd) { ".unrar #{File.join(torrent_dir, torrent[:filename])}" }
+      let(:create_multi_rar) { create_rar_file(File.join(torrent_dir, torrent[:filename])) }
 
       it 'unrars an archive' do
+        create_multi_rar
+
         unrar_plug.cmd_unrar(cmd_args)
 
         # size? returns nil if file doesn't exist or file size is 0:
@@ -88,6 +91,8 @@ describe Unrar do
       context 'new style archive' do
 
         it 'deletes rar files on successful extraction' do
+          create_multi_rar
+
           unrar_plug.cmd_unrar(cmd_args)
 
           expect(File.exists?(torrent_file)).to be true
@@ -144,18 +149,19 @@ describe Unrar do
       # In these scenarios, the rar file(s) the ID references are in the
       # 'completed' directory.
       #
-      # Unrar will need to 'unrar' the files AT the source ('completed')
+      # Unrar will need to 'unrar' the files AT the target (sickbeard incoming media)
       # directory location.
 
       let(:cmd) { ".unrar 1" }
-      let(:torrent_file) { File.join( torrent[:filedir], 'test_250kb.avi' ) }
-      let(:torrent_dir)  { torrent[:file_dir] }
 
-      it 'unrars an archive' do
-        create_downloaded_torrent('spec/data/multi_rar', Pathname(torrent[:filedir]).dirname)
-        puts "torrent_file: #{torrent_file}"
-        puts "torrent: #{torrent.inspect}"
-        puts "torrent from db: #{db_stub.find_torrent_by_id(1).inspect}"
+      # Simulate a rar torrent that has been copied to the SickBeard pool
+      let(:torrent_file) { File.join(spec_tmp_dir('unrar_plugin_console/target/multi_rar'), 'test_250kb.avi' ) }
+      let(:torrent_dir)  { spec_tmp_dir('unrar_plugin_console/target') }
+      let(:create_multi_rar) { create_rar_file(File.join(torrent_dir, torrent[:filename])) }
+
+      it 'unrars an archive in target dir' do
+        create_multi_rar
+
         unrar_plug.cmd_unrar(cmd_args)
 
         expect(File.exists?(torrent_file)).to be true
@@ -164,6 +170,8 @@ describe Unrar do
       context 'new style archive' do
 
         it 'deletes rar files on successful extraction' do
+          create_multi_rar
+
           unrar_plug.cmd_unrar(cmd_args)
 
           expect(File.exists?(torrent_file)).to be true
@@ -187,7 +195,14 @@ describe Unrar do
           }
         end
 
+        # Simulate a rar torrent that has been copied to the SickBeard pool
+        let(:torrent_file) { File.join(spec_tmp_dir('unrar_plugin_console/target/old_style_rar'), 'test_250kb.avi' ) }
+        let(:torrent_dir)  { spec_tmp_dir('unrar_plugin_console/target') }
+        let(:create_multi_rar) { create_rar_file(File.join(torrent_dir, torrent[:filename])) }
+
         it 'deletes rar files on successful extraction' do
+          create_multi_rar
+
           unrar_plug.cmd_unrar(cmd_args)
 
           expect(File.exists?(torrent_file)).to be true

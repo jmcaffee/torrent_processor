@@ -7,7 +7,7 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-#require_relative '../utility'
+require 'pathname'
 
 module TorrentProcessor::Plugin
 
@@ -117,16 +117,62 @@ module TorrentProcessor::Plugin
     end
 
     def extract_rar dest_path
-      unless (Dir[File.join(dest_path, '*.rar')].size > 0)
+      rar = find_rar dest_path
+      if rar.nil?
         log 'Skipping unrar attempt: No .rar archive in directory'
         return
       end
 
-      unless extract_archive(dest_path, @logger) == true
+      unless extract_archive(rar, @logger) == true
         raise PluginError, 'Unrar failed'
       end
 
       delete_archive_files dest_path
+    end
+
+    ###
+    # Find the first .rar file in provided path
+    #
+    # nested: recurse into child dirs when true
+    # returns nil or path to .rar file
+    #
+
+    def find_rar dir_path, nested = true
+      rars = []
+      if Ktutils::OS.windows?
+        # Dir won't work with windows separators, so force unix separators.
+        dir_path.gsub!('\\','/')
+      end
+
+      if nested
+        rars =  Dir[File.join(dir_path, '/**/*.r??')]
+      else
+        rars =  Dir[File.join(dir_path, '/*.r??')]
+      end
+      return nil unless rars.size > 0
+      return rars.sort.first
+    end
+
+    ###
+    # Find all .rar files in provided path
+    #
+    # nested: recurse into child dirs when true
+    # returns array of .rar files (or empty array)
+    #
+
+    def find_rars dir_path, nested = true
+      rars = []
+      if Ktutils::OS.windows?
+        # Dir won't work with windows separators, so force unix separators.
+        dir_path.gsub!('\\','/')
+      end
+
+      if nested
+        rars =  Dir[File.join(dir_path, '/**/*.r??')]
+      else
+        rars =  Dir[File.join(dir_path, '/*.r??')]
+      end
+      return rars.sort
     end
 
     def unrar_torrent id
@@ -136,7 +182,11 @@ module TorrentProcessor::Plugin
     end
 
     def extract_archive path, logger
-      TorrentProcessor::Service::SevenZip.extract_rar(path, path, logger)
+      dest_dir = Pathname(path)
+      # Strip the filename from path (if there's a filename)
+      dest_dir = dest_dir.dirname unless dest_dir.extname.empty?
+
+      TorrentProcessor::Service::SevenZip.extract_rar(path, dest_dir, logger)
     end
 
     def delete_archive_files_from_id id
@@ -148,8 +198,7 @@ module TorrentProcessor::Plugin
     end
 
     def delete_archive_files path
-      # Dir won't work with windows separators, so force unix separators.
-      rars = Dir[File.join(path.gsub('\\','/'), '*.r??')]
+      rars = find_rars path
       log "Deleting rar files from #{path}"
 
       rars.each do |rar|

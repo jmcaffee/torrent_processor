@@ -206,5 +206,8 @@ def generate_configuration dir_name, &block
   end
 end
 
+require_relative 'support/dirs'
+require_relative 'support/files'
+
 require_relative '../lib/torrentprocessor'
 require_relative '../lib/torrentprocessor/service/seven_zip'
