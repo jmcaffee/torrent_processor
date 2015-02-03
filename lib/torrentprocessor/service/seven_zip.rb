@@ -92,12 +92,22 @@ module TorrentProcessor::Service
 
     def SevenZip.default_switches
       switches =  '-y'          # Assume Yes on all queries
+      if Ktutils::OS.unix?
+        switches << ' -r'
+      end
+      switches
     end
 
     def SevenZip.extract_rar(src_dir, out_dir, logger = nil)
+      src_dir = to_os_path(src_dir)
+      out_dir = to_os_path(out_dir)
+
       switches = SevenZip.default_switches
       switches << " -o#{SevenZip.quote(out_dir)}"
 
+      if Ktutils::OS.unix?
+        src_dir += '/*.rar' unless src_dir.end_with?('.rar')
+      end
       cmd_line = "#{SevenZip.default_commands} #{switches} #{SevenZip.quote(src_dir)}"
       app_cmd = "#{SevenZip.quote(app_path)} #{cmd_line}"
       logger.log "Executing: #{app_cmd}" unless logger.nil?
@@ -107,6 +117,12 @@ module TorrentProcessor::Service
       result = `#{app_cmd}`
       unless result.include? 'Everything is Ok'
         logger.log ("    ERROR: #{app_path} failed. Command line it was called with: ".concat(app_cmd) ) unless logger.nil?
+        if Ktutils::OS.unix?
+          if result.include? 'Unsupported Method'
+            logger.log("    (Unsupported Method) Install p7zip-rar package and try again")
+            logger.log("    See http://www.aptgetlife.co.uk/7z-7zip-errors-with-unsupported-method-message/ for details.")
+          end
+        end
         return false
       end
 
@@ -120,6 +136,19 @@ module TorrentProcessor::Service
     #
     def SevenZip.quote(str)
       return "\"#{str}\""
+    end
+
+    ###
+    # Convert file separators to OS specific separators
+    #
+    # str:: String to convert
+    #
+    def SevenZip.to_os_path(str)
+      if Ktutils::OS.unix?
+        return str.to_s.gsub("\\", '/')
+      else
+        return str.to_s.gsub('/', "\\")
+      end
     end
   end # class SevenZip
 end # module TorrentProcessor::Service

@@ -129,7 +129,7 @@ describe Unrar do
 
         before(:each) do
           blocking_dir_delete(torrent_dir)
-          create_downloaded_torrent('spec/data/multi_rar', torrent_dir)
+          create_downloaded_torrent('spec/data/multi_rar', spec_tmp_dir('unrar_plugin_console/target'))
         end
 
         let(:torrent_dir)  { 'tmp\\spec\\unrar_plugin_console\\target' }
@@ -137,7 +137,7 @@ describe Unrar do
         it 'deletes rar files on successful extraction' do
           unrar_plug.cmd_unrar(cmd_args)
 
-          expect(File.exists?(torrent_file)).to be true
+          expect((!File.size?(torrent_file.gsub('\\', '/')).nil?)).to be true
           rars = Dir[File.join(torrent_dir.gsub('\\','/'),'**/*.r??')]
           expect(rars.count).to be 0
         end

@@ -162,10 +162,8 @@ module TorrentProcessor::Plugin
 
     def find_rars dir_path, nested = true
       rars = []
-      if Ktutils::OS.windows?
-        # Dir won't work with windows separators, so force unix separators.
-        dir_path.gsub!('\\','/')
-      end
+      # Dir won't work with windows separators, so force unix separators.
+      dir_path = to_posix_path(dir_path)
 
       if nested
         rars =  Dir[File.join(dir_path, '/**/*.r??')]
@@ -198,13 +196,22 @@ module TorrentProcessor::Plugin
     end
 
     def delete_archive_files path
-      rars = find_rars path
+      rars = find_rars to_posix_path(path)
       log "Deleting rar files from #{path}"
 
       rars.each do |rar|
         log "  rm #{rar}"
         FileUtils.rm rar
       end
+    end
+
+    ###
+    # Convert windows file separators to posix
+    #
+    # str:: String to convert
+    #
+    def to_posix_path(str)
+      return str.to_s.gsub("\\", '/')
     end
   end # class
 end # module
