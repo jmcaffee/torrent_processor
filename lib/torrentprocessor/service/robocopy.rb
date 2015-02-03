@@ -47,6 +47,20 @@ module TorrentProcessor::Service
     end
 
     def Robocopy.copy_file(src_dir, dest_dir, file, logger = nil)
+      # Do a straight system copy if running on unix (robocopy doesn't exist).
+      if Ktutils::OS.unix?
+        src_path = Pathname(src_dir) + file
+        dest_path = Pathname(dest_dir)
+        dest_path.mkpath
+        begin
+          FileUtils.cp src_path, dest_dir
+          return true
+        rescue SystemCallError => e
+          Robocopy.log_output logger, '0', 'FileUtils.cp', "#{src_path}, #{dest_dir}", e.message
+          return false
+        end
+      end
+
       app_path = "robocopy"
       switches = Robocopy.default_switches
       switches << " /LOG+:#{Robocopy.quote(File.join(src_dir,'robocopy.log'))}"  # Log data to file
@@ -70,6 +84,20 @@ module TorrentProcessor::Service
     # Copy a directory
     #
     def Robocopy.copy_dir(src_dir, dest_dir, copy_empty_dirs = true, logger = nil)
+      # Do a straight system copy if running on unix (robocopy doesn't exist).
+      if Ktutils::OS.unix?
+        src_path = Pathname(src_dir)
+        dest_path = Pathname(dest_dir)
+        dest_path.mkpath
+        begin
+          FileUtils.cp_r src_path, dest_dir
+          return true
+        rescue SystemCallError => e
+          Robocopy.log_output logger, '0', 'FileUtils.cp', "#{src_path}, #{dest_dir}", e.message
+          return false
+        end
+      end
+
       app_path = "robocopy"
       switches = Robocopy.default_switches
       switches << ' /E' if copy_empty_dirs    # Copy empty dirs

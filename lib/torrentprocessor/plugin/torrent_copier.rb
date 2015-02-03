@@ -44,13 +44,11 @@ module TorrentProcessor::Plugin
 
       # Copy the torrent.
 
-      require 'pry'; binding.pry
-      
       copy_torrent dest_path, dir_helper.subdirectory?
 
       # Verify copy was successful.
 
-      target_path = "#{dest_path}\\#{torrent[:filename]}"
+      target_path = File.join(dest_path, torrent[:filename])
       target_path = "#{dest_path}" if dir_helper.subdirectory?
       verify_successful_copy target_path
     end
