@@ -208,6 +208,7 @@ end
 
 require_relative 'support/dirs'
 require_relative 'support/files'
+require_relative 'support/database_helper'
 
 require_relative '../lib/torrentprocessor'
 require_relative '../lib/torrentprocessor/service/seven_zip'

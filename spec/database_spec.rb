@@ -18,7 +18,7 @@ describe Database do
 
   let(:db) do
     obj = Database.new(init_args)
-    obj.filename = db_file
+    obj.filepath = 'memory'
     obj
   end
 
@@ -61,8 +61,17 @@ describe Database do
   let(:db_file)       { 'test.db' }
 
   it "database file name can be overridden" do
-    db.filename = 'testing.db'
-    expect(db.filename).to eq 'testing.db'
+    DatabaseHelper.with_mem_db do |db|
+      db.filename = 'testing.db'
+      expect(db.filename).to eq 'testing.db'
+    end
+  end
+
+  it "database file path can be overridden" do
+    DatabaseHelper.with_mem_db do |db|
+      db.filepath = 'memory'
+      expect(db.filepath).to eq 'memory'
+    end
   end
 
   it "defaults to 'tp.db'" do
@@ -70,193 +79,231 @@ describe Database do
     expect(test_db.filename).to eq 'tp.db'
   end
 
-  it "creates a new database at cfg[:appPath]" do
-    db.connect
-    expect(File.exists?(db_path)).to be true
+  it "creates a new database at cfg[:app_path]" do
+    test_db = Database.new(init_args)
+    test_db.connect
+    test_db.create_database
+    expect(File.exists?(test_db.filepath)).to be true
   end
 
   context "#database" do
 
     it "connects to a database if not already connected" do
-      database = db.database
-      expect(database).to_not be nil
-      expect(db.closed?).to be false
+      DatabaseHelper.with_mem_db do |db|
+        database = db.database
+        expect(database).to_not be nil
+        expect(db.closed?).to be false
+      end
     end
   end
 
   context "#close" do
 
     it "closes a database" do
-      database = db.database
-      db.close
-      expect(db.closed?).to be true
+      DatabaseHelper.with_mem_db do |db|
+        database = db.database
+        db.close
+        expect(db.closed?).to be true
+      end
     end
 
     it "has no effect if database already closed" do
-      database = db.database
-      db.close
-      expect(db.closed?).to be true
-      db.close
+      DatabaseHelper.with_mem_db do |db|
+        database = db.database
+        db.close
+        expect(db.closed?).to be true
+        db.close
+      end
     end
   end
 
   context "#connect" do
 
     it "connects to a database and returns the instance" do
-      database = db.connect
-      expect(database).to_not be nil
+      DatabaseHelper.with_mem_db do |db|
+        database = db.database
+        expect(database).to_not be nil
+      end
     end
   end
 
   context "#create_database" do
 
-    before(:each) do
-      db.close
-      blocking_file_delete db_path
-    end
-
     it "creates the database schema" do
-      db.connect
-      db.create_database
-      result = db.execute('SELECT * FROM torrents;')
-      expect(result.size).to be 0
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        result = db.execute('SELECT * FROM torrents;')
+        expect(result.size).to eq 0
+      end
     end
 
     it "gracefully handles already existing tables/triggers" do
-      db.connect
-      db.create_database
-      db.create_database
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        db.create_database
+      end
     end
   end
 
   context "#find_torrent_by_id" do
 
-      before(:each) do
-        db.close
-        blocking_file_delete db_path
-        db.connect
+    it "returns a hash of torrent data" do
+      DatabaseHelper.with_mem_db do |db|
         db.create_database
         5.times do |i|
           db.create(tdata("ab#{i+1}", "Name #{i+1}"))
         end
-      end
 
-    it "returns a hash of torrent data" do
-      actual = db.find_torrent_by_id(1)
-      expect(actual[:name]).to eq 'Name 1'
+        actual = db.find_torrent_by_id(1)
+        expect(actual[:name]).to eq 'Name 1'
+      end
     end
   end
 
   context "#schema_version" do
 
-    before(:each) do
-      db.close
-      blocking_file_delete db_path
-    end
-
     it "returns the current schema version" do
-      db.connect
-      db.execute('PRAGMA user_version = 3;')
-      expect(db.schema_version).to eq 3
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+
+        db.execute('PRAGMA user_version = 3;')
+        expect(db.schema_version).to eq 3
+      end
     end
   end
 
   context Database::Schema do
 
-    before(:each) do
-      db.close
-      blocking_file_delete db_path
-    end
-
     context ".perform_migrations" do
 
-      before(:each) do
-        db.connect
-        db.create_database
-      end
-
       it "runs migrations when DB schema version is less than schema VERSION" do
-        Database::Schema.perform_migrations db
-        expect(db.schema_version).to eq 1
+        DatabaseHelper.with_mem_db do |db|
+          db.create_database
+
+          Database::Schema.perform_migrations db
+          expect(db.schema_version).to eq 1
+        end
       end
 
       it "doesn't run migrations when DB schema version >= schema VERSION" do
-        db.execute('PRAGMA user_version = 1;')
-        Database::Schema.perform_migrations db
-        expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+        DatabaseHelper.with_mem_db do |db|
+          db.create_database
+
+          db.execute('PRAGMA user_version = 1;')
+          Database::Schema.perform_migrations db
+          expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+        end
       end
     end
 
     context ".migrate_to_v1" do
 
-      before(:each) do
-        db.connect
-        db.create_database
-        5.times do |i|
-          db.create(tdata("ab#{i}", "Name #{i}"))
+      it "upgrades the schema to version 1" do
+        DatabaseHelper.with_mem_db do |db|
+          db.execute('PRAGMA user_version = 0;')
+          db.create_database
+          5.times do |i|
+            db.create(tdata("ab#{i}", "Name #{i}"))
+          end
+
+          Database::Schema.migrate_to_v1 db
+          expect(db.schema_version).to eq 1
         end
       end
 
-      it "upgrades the schema to version 1" do
-        Database::Schema.migrate_to_v1 db
-        expect(db.schema_version).to eq 1
-      end
-
       it "does not run if schema version > 1" do
-        db.execute('PRAGMA user_version = 3;')
-        Database::Schema.migrate_to_v1 db
+        DatabaseHelper.with_mem_db do |db|
+          db.execute('PRAGMA user_version = 0;')
+          db.create_database
+          5.times do |i|
+            db.create(tdata("ab#{i}", "Name #{i}"))
+          end
 
-        expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
-        expect(db.schema_version).to eq 3
+          db.execute('PRAGMA user_version = 3;')
+          Database::Schema.migrate_to_v1 db
+
+          expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+          expect(db.schema_version).to eq 3
+        end
       end
 
       it "drops app_lock table" do
-        expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+        DatabaseHelper.with_mem_db do |db|
+          db.execute('PRAGMA user_version = 0;')
+          db.create_database
+          5.times do |i|
+            db.create(tdata("ab#{i}", "Name #{i}"))
+          end
 
-        Database::Schema.migrate_to_v1 db
-        expect { db.execute('SELECT * FROM app_lock;') }.to raise_exception
+          expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
+
+          Database::Schema.migrate_to_v1 db
+          #puts (db.execute('SELECT * FROM app_lock;')).inspect
+          expect { db.execute('SELECT * FROM app_lock;') }.to raise_exception
+        end
       end
 
       it "changes tp_state value 'download complete' to 'downloaded'" do
+        DatabaseHelper.with_mem_db do |db|
+          db.execute('PRAGMA user_version = 0;')
+          db.create_database
+          5.times do |i|
+            db.create(tdata("ab#{i}", "Name #{i}"))
+          end
 
-        old_state = 'download complete'
-        db.update_torrent_state('ab0', old_state)
-        db.update_torrent_state('ab2', old_state)
+          old_state = 'download complete'
+          db.update_torrent_state('ab0', old_state)
+          db.update_torrent_state('ab2', old_state)
 
-        expect(db.execute('SELECT * FROM torrents;').size).to eq 5
+          expect(db.execute('SELECT * FROM torrents;').size).to eq 5
 
-        Database::Schema.migrate_to_v1 db
-        select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
-        expect(
-          db.execute( select_old_state_from_torrents ).size).to eq 0
+          Database::Schema.migrate_to_v1 db
+          select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
+          expect(
+            db.execute( select_old_state_from_torrents ).size).to eq 0
+        end
       end
 
       it "changes tp_state value 'awaiting processing' to 'processing'" do
+        DatabaseHelper.with_mem_db do |db|
+          db.execute('PRAGMA user_version = 0;')
+          db.create_database
+          5.times do |i|
+            db.create(tdata("ab#{i}", "Name #{i}"))
+          end
 
-        old_state = 'awaiting processing'
-        db.update_torrent_state('ab0', old_state)
-        db.update_torrent_state('ab2', old_state)
+          old_state = 'awaiting processing'
+          db.update_torrent_state('ab0', old_state)
+          db.update_torrent_state('ab2', old_state)
 
-        expect(db.execute('SELECT * FROM torrents;').size).to eq 5
+          expect(db.execute('SELECT * FROM torrents;').size).to eq 5
 
-        Database::Schema.migrate_to_v1 db
-        select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
-        expect(
-          db.execute( select_old_state_from_torrents ).size).to eq 0
+          Database::Schema.migrate_to_v1 db
+          select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
+          expect(
+            db.execute( select_old_state_from_torrents ).size).to eq 0
+        end
       end
 
       it "changes tp_state value 'awaiting removal' to 'removing'" do
+        DatabaseHelper.with_mem_db do |db|
+          db.execute('PRAGMA user_version = 0;')
+          db.create_database
+          5.times do |i|
+            db.create(tdata("ab#{i}", "Name #{i}"))
+          end
 
-        old_state = 'awaiting removal'
-        db.update_torrent_state('ab0', old_state)
-        db.update_torrent_state('ab2', old_state)
+          old_state = 'awaiting removal'
+          db.update_torrent_state('ab0', old_state)
+          db.update_torrent_state('ab2', old_state)
 
-        expect(db.execute('SELECT * FROM torrents;').size).to eq 5
+          expect(db.execute('SELECT * FROM torrents;').size).to eq 5
 
-        Database::Schema.migrate_to_v1 db
-        select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
-        expect(
-          db.execute( select_old_state_from_torrents ).size).to eq 0
+          Database::Schema.migrate_to_v1 db
+          select_old_state_from_torrents = 'SELECT * FROM torrents WHERE tp_state ="' + old_state + '";'
+          expect(
+            db.execute( select_old_state_from_torrents ).size).to eq 0
+        end
       end
     end
   end
