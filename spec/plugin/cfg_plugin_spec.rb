@@ -91,7 +91,7 @@ describe CfgPlugin do
   let(:args) do
     {
       :cmd      => cmd,
-      #:logger   => SimpleLogger,
+      :logger   => CaptureLogger,
       :utorrent => ut_stub,
       :database => db_stub,
     }
@@ -147,26 +147,52 @@ describe CfgPlugin do
 
     context '#cfg_addfilter' do
 
-      let(:cmd) { '.addfilter my.torrent.tracker 1000' }
+      context 'with args' do
+        let(:cmd) { '.addfilter my.torrent.tracker 1000' }
 
-      it "add a tracker seed filter" do
-        plugin.cfg_addfilter args
-        expect(TorrentProcessor.configuration.filters['my.torrent.tracker']).to eq '1000'
+        it "add a tracker seed filter" do
+          plugin.cfg_addfilter args
+          expect(TorrentProcessor.configuration.filters['my.torrent.tracker']).to eq '1000'
+        end
+      end
+
+      context 'without args' do
+        let(:cmd) { '.addfilter' }
+
+        it "displays a helpful message" do
+          CaptureLogger.reset
+
+          plugin.cfg_addfilter args
+          expect(CaptureLogger.messages.include?('Usage: .addfilter some.tracker.url ratio')).to be true
+        end
       end
     end
 
     context '#cfg_delfilter' do
 
-      let(:cmd) { '.delfilter my.torrent.tracker' }
+      context 'with args' do
+        let(:cmd) { '.delfilter my.torrent.tracker' }
 
-      before(:each) do
-        TorrentProcessor.configuration.filters['my.torrent.tracker'] = '1500'
+        before(:each) do
+          TorrentProcessor.configuration.filters['my.torrent.tracker'] = '1500'
+        end
+
+        it "delete a tracker seed filter" do
+          plugin.cfg_delfilter args
+          expect(TorrentProcessor.configuration.filters['my.torrent.tracker']).to be nil
+        end
       end
 
-      it "delete a tracker seed filter" do
-        plugin.cfg_delfilter args
-        expect(TorrentProcessor.configuration.filters['my.torrent.tracker']).to be nil
+      context 'without args' do
+        let(:cmd) { '.delfilter' }
+
+        it "displays a helpful message" do
+          plugin.cfg_delfilter args
+          expect(CaptureLogger.messages.include?('Usage: .delfilter some.tracker.url')).to be true
+          expect(CaptureLogger.messages.include?('       use .listfilters to see a list of current filters')).to be true
+        end
       end
+
     end
 
     context '#cfg_listfilters' do

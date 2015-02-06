@@ -115,6 +115,8 @@ module TorrentProcessor::Plugin
         save_cfg
 
         log " Filter added. Tracker: #{new_filter[0]}, Max ratio: #{new_filter[1]}"
+      else
+        log 'Usage: .addfilter some.tracker.url ratio'
       end
 
       return true
@@ -127,7 +129,11 @@ module TorrentProcessor::Plugin
       parse_args args
 
       del_filter = cmd_arguments('.delfilter', args[:cmd])
-      return true if del_filter.empty?
+      if del_filter.empty?
+        log 'Usage: .delfilter some.tracker.url'
+        log '       use .listfilters to see a list of current filters'
+        return true
+      end
 
       if cfg.filters[del_filter].nil?
         log " Unknown filter: #{del_filter}"
