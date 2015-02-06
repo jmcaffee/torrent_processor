@@ -20,7 +20,6 @@ group :development do
   gem 'puck',       ">=1.0.0.pre",  :require => false
   gem 'jruby-jars', "= 1.7.18",     :require => false
 
-  gem 'warbler',            :require => false
   gem 'rdoc',               :require => false
   gem 'pry',                :require => false
   gem 'pry-nav',            :require => false
