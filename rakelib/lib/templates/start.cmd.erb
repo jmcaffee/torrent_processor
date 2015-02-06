@@ -1,0 +1,11 @@
+@echo off
+: Batch file to execute <%= app_name %> <%= app_version %>
+:
+setlocal
+
+set apppath=%~dp0
+set appdir=%apppath:~0,-1%
+
+java -jar %appdir%/<%= app_name.downcase %>-<%= app_version %>.jar <%= app_name.downcase %> %*
+
+endlocal

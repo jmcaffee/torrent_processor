@@ -17,15 +17,14 @@ require 'rdoc/task'
 require 'ostruct'
 #require 'rakeUtils'
 require 'rspec/core/rake_task'
-require 'warbler'
+require 'puck'
 
-Warbler::Task.new
 
 # Setup common directory structure
 
 
 PROJNAME        = "TorrentProcessor"
-BUILDDIR        = "build"
+BUILDDIR        = "./build"
 DISTDIR         = "./dist"
 
 $:.unshift File.expand_path("../lib", __FILE__)
@@ -46,7 +45,6 @@ CLOBBER.include("#{DISTDIR}/**/*.*")
 
 directory BUILDDIR
 directory DISTDIR
-
 
 #############################################################################
 #### Imports
@@ -73,9 +71,39 @@ end
 
 task :default => [:spec]
 
+desc "Build jar and scripts"
+task :build => [BUILDDIR, :jar, 'script:generate_cmd'] do
+end
+
+namespace :build do
+  desc "Clean build dir"
+  task :clean do
+    rm_r 'build'
+  end
+end
+
+task :jar do
+  jar = Puck::Jar.new(
+    app_name: "#{PROJNAME.downcase}-#{PKG_VERSION}"
+  )
+  jar.create!
+end
+
+desc 'Build project and package for distribution'
+task :dist => [:build, DISTDIR] do
+  archive_name = "#{PROJNAME.downcase}-#{PKG_VERSION}.7z"
+  cd './build' do
+    files = Dir['*.*']
+
+    result = `7z a ./#{archive_name} #{files.join(' ')}`
+    puts result
+  end
+
+  mv "./build/#{archive_name}", './dist'
+end
 
 desc "Install gem and build installer"
-task :dist => [:clean, :gem, :purge_gem_versions, :install_gem, :exe_installer]
+task :dist_gem => [:clean, :gem, :purge_gem_versions, :install_gem, :exe_installer]
 
 task :purge_gem_versions do
   sh("gem uninstall #{PROJNAME.downcase} --all --executables")
