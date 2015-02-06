@@ -9,12 +9,26 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-begin
+# Exceptions really slow jruby down.
+# Skip trying to require the lib directly and just update
+# the LOAD_PATH from the start.
+
+#begin
+#  require 'torrentprocessor'
+#rescue LoadError
+  # See https://github.com/iconara/puck/issues/12 re: LOAD_PATH
+  #puts "raw path: #{File.expand_path("../../lib", __FILE__)}"
+  #path = File.expand_path("../../lib", __FILE__).sub(/^classpath:(C:\/)/, 'classpath:')
+  #puts "path: #{path}"
+  $LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
+  #$LOAD_PATH.unshift(path)
+  #puts 'LOAD_PATH:'
+  #$LOAD_PATH.each do |p|
+  #  puts "  #{p}"
+  #end
+  ###$LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__).sub(/^classpath:(C:\/)/, 'classpath:'))
   require 'torrentprocessor'
-rescue LoadError
-  $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-  require 'torrentprocessor'
-end
+#end
 require 'user-choices'
 
 
