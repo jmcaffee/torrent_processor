@@ -61,6 +61,7 @@ module TorrentProcessor
     def initialize
       @utorrent = UTorrentConfiguration.new
       @tmdb = TMdbConfiguration.new
+      @filters = {}
     end
 
     class UTorrentConfiguration
