@@ -1,31 +1,31 @@
 module DatabaseHelper
 
-  def self.with_mem_db(cfg_args = nil)
-    cfg_args ||= default_init_args
+  def self.with_mem_db(cfg_args = {})
+    cfg_args = default_init_args.merge cfg_args
     raise 'no block provided' unless block_given?
 
     db = Database.new(cfg_args)
     # Turn off verbose mode while setting up.
-    old = db.verbose
-    db.verbose = false
+    #old = db.verbose
+    #db.verbose = false
 
     db.filepath = ':memory:'
 
     db.connect
-    db.drop_all
+    #db.drop_all
     # Reset verbose mode.
-    db.verbose = old
+    #db.verbose = old
 
     yield db
 
-    db.verbose = false
+    #db.verbose = false
     db.close
   end
 
   def self.default_init_args
     {
       :cfg => default_cfg,
-      #:verbose => true, # Default: false
+      :verbose => false, # Default: false
       :logger => ::ScreenLogger,
     }
   end

@@ -109,8 +109,13 @@ module TorrentProcessor
     ###
     # Execute a batch query against the DB
     #
-    def execute_batch(query)
-      database.run(query)
+    # queries: array of query statements
+    def execute_batch(queries)
+      database.transaction do
+        Array(queries).each do |query|
+          database.run(query)
+        end
+      end
     end
 
 

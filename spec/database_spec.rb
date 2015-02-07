@@ -130,6 +130,7 @@ describe Database do
   context "#create_database" do
 
     it "creates the database schema" do
+      #DatabaseHelper.with_mem_db({:verbose => true}) do |db|
       DatabaseHelper.with_mem_db do |db|
         db.create_database
         result = db.execute('SELECT * FROM torrents;')
@@ -168,6 +169,125 @@ describe Database do
 
         db.execute('PRAGMA user_version = 3;')
         expect(db.schema_version).to eq 3
+      end
+    end
+  end
+
+  context "#exists_in_db?" do
+
+    it "returns true if hash in db" do
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        torrents = {}
+        5.times do |i|
+          t = tdata("ab#{i+1}", "Name #{i+1}")
+          torrents[t.hash] = t
+        end
+
+        torrents.each do |k,v|
+          db.create v
+        end
+
+        expect(db.exists_in_db?("ab1")).to eq true
+      end
+    end
+
+    it "returns false if hash not in db" do
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        torrents = {}
+        5.times do |i|
+          t = tdata("ab#{i+1}", "Name #{i+1}")
+          torrents[t.hash] = t
+        end
+
+        torrents.each do |k,v|
+          db.create v
+        end
+
+        expect(db.exists_in_db?("xyz")).to eq false
+      end
+    end
+  end
+
+  context "#execute_batch" do
+
+    it "executes insert query in transaction mode" do
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        torrents = {}
+        5.times do |i|
+          t = tdata("ab#{i+1}", "Name #{i+1}")
+          torrents[t.hash] = t
+        end
+
+        # Record shouldn't exist yet.
+        expect(db.exists_in_db?("ab3")).to eq false
+
+        query = db.build_batch_insert_query torrents
+        db.execute_batch query
+
+        expect(db.exists_in_db?("ab3")).to eq true
+      end
+    end
+
+    it "executes update query in transaction mode" do
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        # Populate the database
+        torrents = {}
+        5.times do |i|
+          t = tdata("ab#{i+1}", "Name #{i+1}")
+          torrents[t.hash] = t
+        end
+
+        query = db.build_batch_insert_query torrents
+        db.execute_batch query
+
+        # Update the database with name changes
+        torrents = {}
+        5.times do |i|
+          t = tdata("ab#{i+1}", "Name #{i+5}")
+          torrents[t.hash] = t
+        end
+
+        query = db.build_batch_update_query torrents
+        db.execute_batch query
+
+        result = db.read('SELECT name FROM torrents WHERE hash = "ab4"')
+        expect( result.first.first ).to eq 'Name 8'
+      end
+    end
+  end
+
+  context "#update_torrents" do
+
+    it "inserts and updates torrents" do
+      DatabaseHelper.with_mem_db do |db|
+        db.create_database
+        # Populate the database so these will be updates.
+        torrents = {}
+        5.times do |i|
+          t = tdata("ab#{i+1}", "Name #{i+1}")
+          torrents[t.hash] = t
+        end
+
+        query = db.build_batch_insert_query torrents
+        db.execute_batch query
+
+        # Add new records to be inserts
+        5.times do |i|
+          t = tdata("ab#{i+6}", "Name #{i+6}")
+          torrents[t.hash] = t
+        end
+
+        db.update_torrents torrents
+
+        result = db.read('SELECT name FROM torrents WHERE hash = "ab2"')
+        expect( result.first.first ).to eq 'Name 2'
+
+        result = db.read('SELECT name FROM torrents WHERE hash = "ab8"')
+        expect( result.first.first ).to eq 'Name 8'
       end
     end
   end
@@ -238,7 +358,6 @@ describe Database do
           expect(db.execute('SELECT * FROM app_lock;').size).to eq 1
 
           Database::Schema.migrate_to_v1 db
-          #puts (db.execute('SELECT * FROM app_lock;')).inspect
           expect { db.execute('SELECT * FROM app_lock;') }.to raise_exception
         end
       end

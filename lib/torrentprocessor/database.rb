@@ -20,6 +20,8 @@ module TorrentProcessor
    include Utility::Verbosable
 
     attr_reader :cfg
+    attr_accessor :filename
+    attr_accessor :filepath
 
     ###
     # Database constructor
@@ -47,16 +49,12 @@ module TorrentProcessor
       }
     end
 
-    def filename= fname
-      @filename = fname
-    end
-
     def filename
       @filename ||= 'tp.db'
     end
 
     def filepath
-      File.join( cfg.app_path, filename )
+      @filepath ||= File.join( cfg.app_path, filename )
     end
 
     def adapter
@@ -111,6 +109,14 @@ module TorrentProcessor
       return (adapter.execute('PRAGMA user_version;')[0][0]).to_i
     end
 
+    def drop_all
+      tables = read "SELECT name from sqlite_master WHERE type = 'table' ORDER BY name;"
+      tables.each do |t|
+        log "Dropping table #{t.first}" if verbose
+        execute "DROP TABLE IF EXISTS #{t.first};"
+      end
+    end
+
     ###
     # Upgrade the DB schema if needed
     #
@@ -133,11 +139,13 @@ module TorrentProcessor
     ###
     # Execute a batch query against the DB
     #
-    def execute_batch(query)
+    # queries: array of query statements
+    #
+    def execute_batch(queries)
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
-      log('DB: Executing batch query: ' + query) if verbose
-      rows = adapter.execute_batch( query )
+      log('DB: Executing batch query: ' + queries) if verbose
+      rows = adapter.execute_batch( queries )
     end
 
 
@@ -152,7 +160,7 @@ module TorrentProcessor
     # torrent:: Torrent Data to update
     #
     def create(tdata)
-      query = buildCreateQuery( tdata )
+      query = build_create_query( tdata )
       log('DB: Create: ' + query) if verbose
       return adapter.insert( query )
     end
@@ -164,7 +172,7 @@ module TorrentProcessor
     # torrent:: Torrent Data to update
     #
     def update(tdata)
-      query = buildUpdateQuery( tdata )
+      query = build_update_query( tdata )
       log('DB: Update: ' + query) if verbose
       return adapter.update( query )
     end
@@ -203,19 +211,15 @@ module TorrentProcessor
 
       log "DB: #{updates.length} torrent(s) to update" if verbose
       if updates.length > 0
-        # FIXME
-        query = buildBatchUpdateQuery( updates )
-        #$LOG.info query
+        query = build_batch_update_query( updates )
+        log query if verbose
         adapter.execute_batch( query )
       end
 
       log "DB: #{inserts.length} torrent(s) to insert" if verbose
       if inserts.length > 0
-        # FIXME
-        query = buildBatchInsertQuery( inserts )
-        #File.open("r:/tools/ruby/torrentprocessor/trunk/query.sql", 'w') {|f| f.write( query ); f.flush; }
-        #puts query
-        #$LOG.info query
+        query = build_batch_insert_query( inserts )
+        log query if verbose
         adapter.execute_batch( query )
       end
     end
@@ -227,7 +231,7 @@ module TorrentProcessor
     # returns:: true/false
     #
     def exists_in_db?(hash)
-      result = adapter.execute( "SELECT count() FROM torrents WHERE hash = \"#{hash}\";" )
+      result = read( "SELECT count() FROM torrents WHERE hash = \"#{hash}\";" )
       return false if Integer(result[0][0]) < 1
       return true
     end
@@ -308,7 +312,7 @@ module TorrentProcessor
     #
     # tdata:: TorrentData object
     #
-    def buildUpdateQuery( tdata )
+    def build_update_query( tdata )
 
       query = <<EOQ
 UPDATE torrents SET
@@ -330,13 +334,12 @@ EOQ
     #
     # torrents:: Hash of TorrentData objects
     #
-    def buildBatchUpdateQuery( torrents )
-      query = "BEGIN;\n"
+    def build_batch_update_query( torrents )
+      queries = []
       torrents.each do |k,v|
-        query += buildUpdateQuery( v )
+        queries << build_update_query( v )
       end
-      query += "\nEND;"
-      return query
+      return queries
     end
 
 
@@ -345,13 +348,12 @@ EOQ
     #
     # torrents:: Hash of TorrentData objects
     #
-    def buildBatchInsertQuery( torrents )
-      query = "BEGIN;\n"
+    def build_batch_insert_query( torrents )
+      queries = []
       torrents.each do |k,v|
-        query += buildCreateQuery( v )
+        queries << build_create_query( v )
       end
-      query += "\nEND;"
-      return query
+      return queries
     end
 
 
@@ -360,7 +362,7 @@ EOQ
     #
     # tdata:: TorrentData object
     #
-    def buildCreateQuery( tdata )
+    def build_create_query( tdata )
       query = <<EOQ
 INSERT INTO torrents (
   hash,
@@ -538,7 +540,7 @@ EOQ
       def self.migrate_to_v1(db)
         ver = db.schema_version
         return if ver >= 1
-        #$LOG.debug "Migrating DB to v1..."
+        db.log "Migrating DB to v1..." if db.verbose
 
         result = db.execute('DROP TABLE IF EXISTS app_lock;')
 
@@ -552,7 +554,7 @@ EOQ
         result = db.execute q
 
         db.execute('PRAGMA user_version = 1;')
-        #$LOG.debug "v1 migration complete."
+        db.log "v1 migration complete." if db.verbose
       end
     end # class
   end # class Database
