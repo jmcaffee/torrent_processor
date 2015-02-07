@@ -7,9 +7,9 @@ GIT
 
 GIT
   remote: git@github.com:jmcaffee/ktutils.git
-  revision: 34a34110cdf2506db453d2247398a2be97ff19a9
+  revision: 4306bc9e169087e2ddb963a17f3d339e8afd0bbf
   specs:
-    ktutils (0.0.2)
+    ktutils (0.0.3)
 
 GEM
   remote: https://rubygems.org/
