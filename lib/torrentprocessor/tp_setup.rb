@@ -1,5 +1,5 @@
 ##############################################################################
-# File::    tpsetup.rb
+# File::    tp_setup.rb
 # Purpose:: Torrent Processor Setup object assists with setting up TP.
 #
 # Author::    Jeff McAffee 08/07/2011
@@ -9,7 +9,6 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require 'jdbc/sqlite3'
 require 'ktutils/os'
 
 

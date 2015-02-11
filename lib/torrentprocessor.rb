@@ -104,10 +104,11 @@ require 'torrentprocessor/service'
 require 'torrentprocessor/controller'
 require 'torrentprocessor/processor'
 require 'torrentprocessor/runtime'
-require 'torrentprocessor/tpsetup'
+require 'torrentprocessor/tp_setup'
 require 'torrentprocessor/database'
 require 'torrentprocessor/console'
 require 'torrentprocessor/plugin'
+require 'torrentprocessor/torrent_app'
 
 # If compiling with OCRA we want these gems available to us so we need
 # to require them.
