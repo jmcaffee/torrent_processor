@@ -1,5 +1,5 @@
 ##############################################################################
-# File::    torrentprocessor.rb
+# File::    torrent_processor.rb
 # Purpose:: Include file for TorrentProcessor library
 #
 # Author::    Jeff McAffee 07/31/2011
@@ -98,17 +98,17 @@ end
 ##############################################################################
 # Require each lib file
 #
-require 'torrentprocessor/version'
-require 'torrentprocessor/utility'
-require 'torrentprocessor/service'
-require 'torrentprocessor/controller'
-require 'torrentprocessor/processor'
-require 'torrentprocessor/runtime'
-require 'torrentprocessor/tp_setup'
-require 'torrentprocessor/database'
-require 'torrentprocessor/console'
-require 'torrentprocessor/plugin'
-require 'torrentprocessor/torrent_app'
+require 'torrent_processor/version'
+require 'torrent_processor/utility'
+require 'torrent_processor/service'
+require 'torrent_processor/controller'
+require 'torrent_processor/processor'
+require 'torrent_processor/runtime'
+require 'torrent_processor/tp_setup'
+require 'torrent_processor/database'
+require 'torrent_processor/console'
+require 'torrent_processor/plugin'
+require 'torrent_processor/torrent_app'
 
 # If compiling with OCRA we want these gems available to us so we need
 # to require them.

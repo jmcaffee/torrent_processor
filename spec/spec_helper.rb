@@ -212,5 +212,5 @@ require_relative 'support/database_helper'
 require_relative 'support/torrent_spec_helper'
 require_relative 'support/utorrent_helper'
 
-require_relative '../lib/torrentprocessor'
-require_relative '../lib/torrentprocessor/service/seven_zip'
+require_relative '../lib/torrent_processor'
+require_relative '../lib/torrent_processor/service/seven_zip'

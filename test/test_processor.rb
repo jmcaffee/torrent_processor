@@ -14,7 +14,7 @@ require 'logger'
 
 require 'fileutils'
 
-require 'lib/torrentprocessor'
+require 'lib/torrent_processor'
 
 
 ###

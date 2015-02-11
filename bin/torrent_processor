@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # vi: ft=ruby
 ##############################################################################
-# File::    torrentprocessor.rb
+# File::    torrent_processor.rb
 # Purpose:: Utility to ...
 #
 # Author::    Jeff McAffee 07/31/2011
@@ -14,7 +14,7 @@
 # the LOAD_PATH from the start.
 
 #begin
-#  require 'torrentprocessor'
+#  require 'torrent_processor'
 #rescue LoadError
   # See https://github.com/iconara/puck/issues/12 re: LOAD_PATH
   #puts "raw path: #{File.expand_path("../../lib", __FILE__)}"
@@ -27,7 +27,7 @@
   #  puts "  #{p}"
   #end
   ###$LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__).sub(/^classpath:(C:\/)/, 'classpath:'))
-  require 'torrentprocessor'
+  require 'torrent_processor'
 #end
 require 'user-choices'
 
@@ -102,7 +102,7 @@ class TorrentProcessorApp < UserChoices::Command
 
 
   # Execute the TorrentProcessor application.
-  # This method is called automatically when 'torrentprocessor(.rb)' is executed from the command line.
+  # This method is called automatically when 'torrent_processor(.rb)' is executed from the command line.
   def execute
     if(@user_choices[:version])
       puts TorrentProcessor::logo()

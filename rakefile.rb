@@ -28,7 +28,7 @@ BUILDDIR        = "./build"
 DISTDIR         = "./dist"
 
 $:.unshift File.expand_path("../lib", __FILE__)
-require "torrentprocessor/version"
+require "torrent_processor/version"
 
 PKG_VERSION = TorrentProcessor::VERSION
 PKG_FILES   = Dir["**/*"].select { |d| d =~ %r{^(README|bin/|data/|ext/|lib/|spec/|test/)} }
@@ -110,7 +110,7 @@ task :purge_gem_versions do
 end
 
 task :install_gem do
-  sh("gem install pkg/torrentprocessor-#{PKG_VERSION}.gem -l --no-document")
+  sh("gem install pkg/torrent_processor-#{PKG_VERSION}.gem -l --no-document")
 end
 
 #############################################################################
@@ -184,7 +184,7 @@ task :help do
   puts "Use the following command line to build and install the gem, then"
   puts "build the executable (by letting Ocra run the gem)."
   puts 
-  puts "rake clean gem && gem install pkg\\torrentprocessor-#{PKG_VERSION}.gem -l --no-ri --no-rdoc && rake exe"
+  puts "rake clean gem && gem install pkg\\torrent_processor-#{PKG_VERSION}.gem -l --no-ri --no-rdoc && rake exe"
   puts
   puts "The executable will be located in the build dir when finished."
   puts
@@ -224,7 +224,7 @@ SPEC = Gem::Specification.new do |s|
   s.require_path = 'lib'
   #s.autorequire = 'rake'
   s.files = PKG_FILES
-  s.executables = "torrentprocessor"
+  s.executables = "torrent_processor"
   s.author = "Jeff McAffee"
   s.email = "gems@ktechdesign.com"
   s.homepage = "http://gems.ktechdesign.com"
