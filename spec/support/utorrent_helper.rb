@@ -1,4 +1,3 @@
-require 'torrent_spec_helper'
 
 module UTorrentHelper
 

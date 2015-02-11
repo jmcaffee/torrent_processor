@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'database_helper'
-require 'utorrent_helper'
 
 include TorrentProcessor::Plugin
 

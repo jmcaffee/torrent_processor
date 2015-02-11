@@ -8,7 +8,6 @@
 ##############################################################################
 
 require 'spec_helper'
-require 'torrent_spec_helper'
 
 include TorrentProcessor::Plugin
 

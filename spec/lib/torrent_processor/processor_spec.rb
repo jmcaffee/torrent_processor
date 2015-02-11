@@ -8,7 +8,7 @@
 ##############################################################################
 
 require 'spec_helper'
-require_relative '../lib/torrentprocessor/plugin/movie_mover'
+require 'torrentprocessor/plugin/movie_mover'
 
 include TorrentProcessor
 
