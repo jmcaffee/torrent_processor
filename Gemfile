@@ -21,6 +21,8 @@ group :development do
   gem 'jruby-jars', "= 1.7.18",     :require => false
 
   gem 'rdoc',               :require => false
+  gem 'guard',              :require => false
+  gem 'guard-rspec',        :require => false
   gem 'pry',                :require => false
   gem 'pry-nav',            :require => false
   gem 'pry-rescue',         :require => false
