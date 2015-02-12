@@ -51,6 +51,11 @@ module TorrentProcessor
       @database = nil
     end
 
+    def closed?
+      return true if @database.nil? || @database.closed?
+      return false
+    end
+
     ###
     # Execute a read query against the DB
     #
@@ -95,7 +100,9 @@ module TorrentProcessor
     def execute_batch(query)
       # NOTE: execute will only execute the *first* statement in a query.
       # Use execute_batch if the query contains mulitple statements.
-      rows = database.execute_batch( query )
+      query.unshift "BEGIN;\n"
+      query.push "\nEND;"
+      rows = database.execute_batch( query.join(' ') )
     end
 
 
