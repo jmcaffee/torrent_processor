@@ -208,6 +208,7 @@ end
 
 require_relative 'support/dirs'
 require_relative 'support/files'
+require_relative 'support/mocks'
 require_relative 'support/database_helper'
 require_relative 'support/torrent_spec_helper'
 require_relative 'support/utorrent_helper'
