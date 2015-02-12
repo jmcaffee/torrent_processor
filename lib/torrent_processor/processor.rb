@@ -54,6 +54,7 @@ module TorrentProcessor
       @cfg      = args[:cfg]      if args[:cfg]
       @moviedb  = args[:moviedb]  if args[:moviedb]
       @utorrent = args[:utorrent] if args[:utorrent]
+      @torrent_app = args[:torrent_app] if args[:torrent_app]
       @database = args[:database] if args[:database]
     end
 
@@ -75,21 +76,27 @@ module TorrentProcessor
       @database.verbose = flag if @database
     end
 
+    def torrent_app
+      return @torrent_app unless @torrent_app.nil?
+
+      @torrent_app = TorrentApp.new(:cfg => cfg,
+                                    :webui => utorrent,
+                                    :database => database )
+    end
+
     ###
-    # Process torrent files retrieved from UTorrent application
+    # Process torrent files retrieved from Torrent application
     #
     def process()
-      retrieve_utorrent_settings()
+      retrieve_torrent_app_settings()
 
       log( "Requesting torrent list update" )
 
       # Get a list of torrents.
-      cacheID = database.read_cache()
-      utorrent.get_torrent_list( cacheID )
-      database.update_cache( utorrent.cache )
+      torrents = torrent_app.torrent_list
 
       # Update the db's list of torrents.
-      database.update_torrents( utorrent.torrents )
+      database.update_torrents( torrents )
 
       # Apply filters if needed.
       # NOTE: The seed limits are only applied to 'new' torrents. This should limit the application so that
@@ -123,40 +130,27 @@ module TorrentProcessor
 
 
     ###
-    # Retrieve the current uTorrent settings. seed_ratio in particular.
+    # Retrieve the current Torrent App settings. seed_ratio in particular.
     #
-    def retrieve_utorrent_settings()
-      log( "--- Requesting uTorrent Settings ---" )
-      settings = utorrent.get_utorrent_settings()
+    def retrieve_torrent_app_settings()
+      app_name = torrent_app.app_name
+      log( "--- Requesting #{app_name} Settings ---" )
 
-      seed_ratio = 0
-      dir_completed_download = ''
-
-      settings.each do |i|
-        if i[0] == "seed_ratio"
-          seed_ratio = Integer(i[2])
-          next
-        end
-
-        if i[0] == "dir_completed_download"
-          dir_completed_download = i[2]
-          # The search for an existing directory fails if the completed
-          # downloads dir string ends with a back slash (in winBLOWs) so strip
-          # if off if it exists.
-          dir_completed_download = dir_completed_download[0..-2] if dir_completed_download.end_with?('\\')
-          next
-        end
-      end
+      seed_ratio = torrent_app.seed_ratio
+      dir_completed_download = torrent_app.completed_downloads_dir
 
       # Store utorrent data in the configuration object.
 
-      TorrentProcessor.configure do |config|
-        config.utorrent.seed_ratio              = seed_ratio
-        config.utorrent.dir_completed_download  = dir_completed_download
+      case app_name
+      when 'uTorrent'
+        TorrentProcessor.configure do |config|
+          config.utorrent.seed_ratio              = seed_ratio
+          config.utorrent.dir_completed_download  = dir_completed_download
+        end
       end
 
-      log( "    uTorrent seed ratio: #{seed_ratio.to_s}" )
-      log( "    uTorrent completed download dir: #{dir_completed_download}" )
+      log( "    #{app_name} seed ratio: #{seed_ratio.to_s}" )
+      log( "    #{app_name} completed download dir: #{dir_completed_download}" )
     end
 
 
