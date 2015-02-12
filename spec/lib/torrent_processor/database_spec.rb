@@ -24,7 +24,7 @@ describe Database do
 
   let(:init_args) do
     {
-      :cfg => mock_cfg('database'),
+      :cfg => Mocks.cfg('database'),
       #:verbose => true, # Default: false
       :logger => ::ScreenLogger,
     }

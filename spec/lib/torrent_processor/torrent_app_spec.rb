@@ -1,14 +1,13 @@
 require 'spec_helper'
 
 include TorrentProcessor
-include UTorrentHelper
 
 describe TorrentApp do
 
   let(:app) {
-    TorrentApp.new(:cfg => mock_cfg('torrent_app'),
-                   :webui => utorrent_stub,
-                   :database => mock_db)
+    TorrentApp.new(:cfg => Mocks.cfg('torrent_app'),
+                   :webui => Mocks.utorrent,
+                   :database => Mocks.db)
   }
 
   context "#new" do
@@ -44,7 +43,7 @@ describe TorrentApp do
   context "#torrent_list" do
 
     it "returns a list of torrents" do
-      expect(app.torrent_list).to eq 'uTorrent'
+      expect(app.torrent_list.count).to be > 0
     end
   end
 end
