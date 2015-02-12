@@ -25,8 +25,8 @@ describe Console do
   let(:args) do
     {
       :logger     => CaptureLogger,
-      :utorrent   => utorrent_stub,
-      :database   => db_stub,
+      :utorrent   => Mocks.utorrent,
+      :database   => Mocks.db,
       :processor  => processor_stub
     }
   end
@@ -35,21 +35,6 @@ describe Console do
     pth = 'tmp/spec/console'
     mkpath pth
     pth
-  end
-
-  let(:utorrent_stub) do
-    obj = double('utorrent')
-    obj.stub(:get_torrent_list) { [] }
-    obj.stub(:torrents) { [] }
-    obj.stub(:get_utorrent_settings) { [] }
-    obj.stub(:settings) { [] }
-    obj
-  end
-
-  let(:db_stub) do
-    obj = double('database')
-    obj.stub(:close) { true }
-    obj
   end
 
   let(:processor_stub) do
@@ -62,8 +47,8 @@ describe Console do
     it 'instantiates a console object' do
       Console.new(
         :logger   => CaptureLogger,
-        :utorrent => utorrent_stub,
-        :database => db_stub,
+        :utorrent => Mocks.utorrent,
+        :database => Mocks.db,
         :processor => processor_stub)
     end
   end
@@ -71,7 +56,7 @@ describe Console do
   describe '#execute' do
 
     it 'starts the console' do
-      TorrentProcessor::Console.any_instance.stub(:getInput).and_return('.exit')
+      allow_any_instance_of(TorrentProcessor::Console).to receive(:getInput).and_return('.exit')
       console.execute
     end
   end
@@ -80,13 +65,10 @@ describe Console do
 
     context 'TMdb comands' do
 
-      TorrentProcessor.configure do |config|
-        config.tmdb.api_key = '***REMOVED***'
-      end
-
       describe 'cmd: .tmdbtestcon' do
 
         it "tests the TMdb connection" do
+          Mocks.tmdb_class
           console.process_cmd '.tmdbtestcon'
         end
       end
@@ -94,8 +76,8 @@ describe Console do
       describe 'cmd: .tmdbmoviesearch' do
 
         it "searches for a movie" do
+          Mocks.tmdb_class
           console.process_cmd '.tmdbmoviesearch fight club'
-          #console.process_cmd '.tmdbmoviesearch'
         end
       end
     end

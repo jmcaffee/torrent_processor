@@ -13,6 +13,8 @@ module Mocks
     allow(obj).to receive(:get_utorrent_settings) { TorrentSpecHelper.ut_settings_data }
     allow(obj).to receive(:settings)          { TorrentSpecHelper.utorrent_settings_data }
     allow(obj).to receive(:get_torrent_job_properties) { TorrentSpecHelper.utorrent_job_properties_data }
+    allow(obj).to receive(:torrents_removed?) { false }
+    allow(obj).to receive(:remove_torrent)
 
     obj
   end

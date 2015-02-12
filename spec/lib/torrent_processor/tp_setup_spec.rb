@@ -18,12 +18,6 @@ describe TPSetup do
 
   let(:data_dir) { 'spec/data' }
 
-  let(:db_stub) do
-    obj = double('database')
-    obj.stub(:close) { true }
-    obj
-  end
-
   let(:cfg_path) do
     File.join(app_data_path, 'config.yml')
   end
@@ -64,7 +58,7 @@ describe TPSetup do
   let(:args) do
     {
       #:logger   => SimpleLogger,
-      :database => db_stub,
+      :database => Mocks.db,
     }
   end
 

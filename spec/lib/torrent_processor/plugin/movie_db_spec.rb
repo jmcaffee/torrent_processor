@@ -8,7 +8,7 @@ describe MovieDB do
 
       let(:args) do
         {
-          api_key: '***REMOVED***',
+          api_key: ENV['TMDB_API_KEY'],
           #logger: SimpleLogger,
         }
       end
@@ -56,7 +56,7 @@ describe MovieDB do
 
       it "provides console commands" do
         cmds = MovieDB.register_cmds
-        cmds.size.should eq 2
+        expect(cmds.size).to eq 2
       end
 
       context "when testing the connection" do

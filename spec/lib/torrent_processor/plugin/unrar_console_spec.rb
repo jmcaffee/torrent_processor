@@ -21,24 +21,16 @@ describe Unrar do
         {
           :cmd      => cmd,
           :logger   => logger,
-          :utorrent => utorrent_stub,
-          :database => db_stub,
+          :utorrent => Mocks.utorrent,
+          :database => mock_db,
         }
     end
+    # We use let :mock_db above so we can override the object's 'allow to receive'
+    # later on (see 'deletes rar files on successful extraction' test.
+    let(:mock_db) { Mocks.db }
 
     let(:logger) { NullLogger }
     #let(:logger)  { SimpleLogger }
-
-    let(:db_stub) do
-      obj = double("database")
-      obj.stub(:find_torrent_by_id) { torrent }
-      obj
-    end
-
-    let(:utorrent_stub) do
-      obj = double("utorrent")
-      obj
-    end
 
     let(:torrent) do
       {
@@ -160,6 +152,7 @@ describe Unrar do
       let(:create_multi_rar) { create_rar_file(File.join(torrent_dir, torrent[:filename])) }
 
       it 'unrars an archive in target dir' do
+        allow(mock_db).to receive(:find_torrent_by_id).with(1).and_return(torrent)
         create_multi_rar
 
         unrar_plug.cmd_unrar(cmd_args)
@@ -170,6 +163,7 @@ describe Unrar do
       context 'new style archive' do
 
         it 'deletes rar files on successful extraction' do
+          allow(mock_db).to receive(:find_torrent_by_id).with(1).and_return(torrent)
           create_multi_rar
 
           unrar_plug.cmd_unrar(cmd_args)
@@ -201,6 +195,7 @@ describe Unrar do
         let(:create_multi_rar) { create_rar_file(File.join(torrent_dir, torrent[:filename])) }
 
         it 'deletes rar files on successful extraction' do
+          allow(mock_db).to receive(:find_torrent_by_id).with(1).and_return(torrent)
           create_multi_rar
 
           unrar_plug.cmd_unrar(cmd_args)

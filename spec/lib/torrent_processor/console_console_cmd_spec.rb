@@ -8,14 +8,8 @@ describe Console do
 
   let(:init_args) do
     {
-      :processor => processor_stub,
+      :processor => Mocks.processor,
     }
-  end
-
-  let(:processor_stub) do
-    obj = double('processor')
-    obj.stub(:process)
-    obj
   end
 
   describe '#process_console_cmd' do

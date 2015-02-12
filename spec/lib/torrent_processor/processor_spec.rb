@@ -23,66 +23,18 @@ describe Processor do
     obj
   end
 
+  let(:utorrent_stub) { Mocks.utorrent }
+  let(:db_stub) { Mocks.db }
+
   let(:args) do
     {
       #:logger   => SimpleLogger,
       #:cfg      => cfg_stub,
       :cfg      => Mocks.cfg,
-      :moviedb  => moviedb_stub,
+      :moviedb  => Mocks.tmdb,
       :utorrent => utorrent_stub,
       :database => db_stub,
     }
-  end
-
-  let(:cfg_tmdb_stub) do
-    obj = double('tmdb_configuration')
-    obj.stub(:target_movies_path)   { 'tmp/spec/processor/movies-target' }
-    obj.stub(:can_copy_start_time)  { '00:00' }
-    obj.stub(:can_copy_stop_time)   {'23:59'  }
-    obj
-  end
-
-  let(:moviedb_stub) do
-    obj = double('moviedb')
-    obj
-  end
-
-  let(:utorrent_stub) do
-    obj = double('utorrent')
-    obj.stub(:startSession) { true }
-    obj.stub(:get_utorrent_settings) do
-      [
-        ['seed_ratio', 1, 0],
-        ['dir_completed_download', 1, 'completed-dir']
-      ]
-    end
-    obj.stub(:get_torrent_list) { [] }
-    obj.stub(:cache) { 'cache' }
-    obj.stub(:torrents) { { 'hash1' => 'torrent data' } }
-    obj.stub(:torrents_removed?) { false }
-    obj
-  end
-
-  let(:db_stub) do
-    obj = double('database')
-    obj.stub(:read_cache) { 'cache' }
-    obj.stub(:update_cache) { true }
-    obj.stub(:update_torrents) { true }
-    obj.stub(:update_torrent_state) { true }
-
-    obj.stub(:execute) do |q|
-      if q == 'SELECT hash, name, folder, label FROM torrents WHERE tp_state = "processing";'
-        res = [
-          #[ 'hash0', 'testTorrent0', 'download-dir', 'TV' ],
-          [ 'hash1', 'testTorrent1', 'download-dir', 'TV' ]
-        ]
-      else
-        res = []
-      end
-      res
-    end
-
-    obj
   end
 
   describe '#new' do
@@ -91,9 +43,9 @@ describe Processor do
       Processor.new(
         #:logger   => SimpleLogger,
         :cfg      => Mocks.cfg,
-        :moviedb  => moviedb_stub,
-        :utorrent => utorrent_stub,
-        :database => db_stub )
+        :moviedb  => Mocks.tmdb,
+        :utorrent => Mocks.utorrent,
+        :database => Mocks.db )
     end
   end
 
@@ -102,7 +54,7 @@ describe Processor do
     context 'plugin raises exception' do
 
       it 'aborts processing the torrent' do
-        TorrentProcessor::Plugin::TorrentCopier.any_instance.should_receive(:execute) {
+        allow_any_instance_of(TorrentProcessor::Plugin::TorrentCopier).to receive(:execute) {
           raise TorrentProcessor::Plugin::PluginError, 'an exception'
         }
 
@@ -112,44 +64,39 @@ describe Processor do
 
     context 'torrent state is NULL' do
 
-      let(:utorrent_stub) do
-        obj = double('utorrent')
-        obj.stub(:startSession) { true }
-        obj.stub(:get_utorrent_settings) do
-          [
-            ['seed_ratio', 0, 0],
-            ['dir_completed_download', 1, 'completed-dir']
-          ]
-        end
-        obj.stub(:get_torrent_list) { [] }
-        obj.stub(:cache) { 'cache' }
-        obj.stub(:torrents) { [] }
-        obj.stub(:torrents_removed?) { false }
-        obj.stub(:get_torrent_job_properties) do
-          {
-            'props' =>
-            [
-              {
-                'seed_override' => 0,
-                'seed_ratio' => 100,
-                'trackers' => 'my.test.tracker'
-              }
-            ]
-          }
-        end
-        obj
-      end
-
       context 'download in progress' do
 
-        let(:db_stub) do
-          obj = double('database')
-          obj.stub(:read_cache) { 'cache' }
-          obj.stub(:update_cache) { true }
-          obj.stub(:update_torrents) { true }
-          #obj.stub(:update_torrent_state) { true }
-
-          obj.stub(:execute) do |q|
+        it 'applies seed limit filters to new torrents and changes state to downloading' do
+          # Override cfg mock to return appropriate filters.
+          allow(Mocks.cfg).to receive(:filters) { { 'test' => '0' } }
+          allow(utorrent_stub).to receive(:get_utorrent_settings).and_return(
+              [
+                ['seed_ratio', 0, 0],
+                ['dir_completed_download', 1, 'completed-dir']
+              ]
+          )
+          allow(utorrent_stub).to receive(:get_torrent_job_properties).and_return(
+              {
+                'props' =>
+                [
+                  {
+                    'seed_override' => 0,
+                    'seed_ratio' => 100,
+                    'trackers' => 'my.test.tracker'
+                  }
+                ]
+              }
+          )
+          expect(utorrent_stub).to receive(:set_job_properties).with(
+            {
+              'hash1' =>
+              {
+                'seed_override' => 1,
+                'seed_ratio' => 0
+              }
+            }
+          )
+          allow(db_stub).to receive(:execute) do |q|
             if q == 'SELECT hash, percent_progress, name FROM torrents WHERE tp_state IS NULL;'
               res = [
                 #[ 'hash0', 'testTorrent0', 'download-dir', 'TV' ],
@@ -160,23 +107,7 @@ describe Processor do
             end
             res
           end
-
-          obj
-        end
-
-        it 'applies seed limit filters to new torrents and changes state to downloading' do
-          # Override cfg mock to return appropriate filters.
-          allow(Mocks.cfg).to receive(:filters) { { 'test' => '0' } }
-          utorrent_stub.should_receive(:set_job_properties).with(
-            {
-              'hash1' =>
-              {
-                'seed_override' => 1,
-                'seed_ratio' => 0
-              }
-            }
-          )
-          db_stub.should_receive(:update_torrent_state).with('hash1', 'downloading')
+          expect(db_stub).to receive(:update_torrent_state).with('hash1', 'downloading')
 
           processor.process
         end
@@ -184,14 +115,27 @@ describe Processor do
 
       context 'download is complete' do
 
-        let(:db_stub) do
-          obj = double('database')
-          obj.stub(:read_cache) { 'cache' }
-          obj.stub(:update_cache) { true }
-          obj.stub(:update_torrents) { true }
-          #obj.stub(:update_torrent_state) { true }
-
-          obj.stub(:execute) do |q|
+        it 'changes state to downloaded' do
+          allow(utorrent_stub).to receive(:set_job_properties)
+          allow(utorrent_stub).to receive(:get_utorrent_settings).and_return(
+              [
+                ['seed_ratio', 0, 0],
+                ['dir_completed_download', 1, 'completed-dir']
+              ]
+          )
+          allow(utorrent_stub).to receive(:get_torrent_job_properties).and_return(
+              {
+                'props' =>
+                [
+                  {
+                    'seed_override' => 0,
+                    'seed_ratio' => 100,
+                    'trackers' => 'my.test.tracker'
+                  }
+                ]
+              }
+          )
+          allow(db_stub).to receive(:execute) do |q|
             if q == 'SELECT hash, percent_progress, name FROM torrents WHERE tp_state IS NULL;'
               res = [
                 #[ 'hash0', 'testTorrent0', 'download-dir', 'TV' ],
@@ -202,13 +146,7 @@ describe Processor do
             end
             res
           end
-
-          obj
-        end
-
-        it 'changes state to downloaded' do
-          utorrent_stub.stub(:set_job_properties)
-          db_stub.should_receive(:update_torrent_state).with('hash1', 'downloaded')
+          expect(db_stub).to receive(:update_torrent_state).with('hash1', 'downloaded')
           processor.process
         end
       end # context download is complete
@@ -218,14 +156,8 @@ describe Processor do
 
       context 'torrent finished downloading' do
 
-        let(:db_stub) do
-          obj = double('database')
-          obj.stub(:read_cache) { 'cache' }
-          obj.stub(:update_cache) { true }
-          obj.stub(:update_torrents) { true }
-          #obj.stub(:update_torrent_state) { true }
-
-          obj.stub(:execute) do |q|
+        it 'changes state to downloaded' do
+          allow(db_stub).to receive(:execute) do |q|
             if q == 'SELECT hash, percent_progress, name FROM torrents WHERE tp_state = "downloading";'
               res = [
                 #[ 'hash0', 'testTorrent0', 'download-dir', 'TV' ],
@@ -236,12 +168,8 @@ describe Processor do
             end
             res
           end
+          expect(db_stub).to receive(:update_torrent_state).with('hash1', 'downloaded')
 
-          obj
-        end
-
-        it 'changes state to downloaded' do
-          db_stub.should_receive(:update_torrent_state).with('hash1', 'downloaded')
           processor.process
         end
       end # context torrent finished downloading
@@ -249,14 +177,8 @@ describe Processor do
 
     context 'torrent state is downloaded' do
 
-      let(:db_stub) do
-        obj = double('database')
-        obj.stub(:read_cache) { 'cache' }
-        obj.stub(:update_cache) { true }
-        obj.stub(:update_torrents) { true }
-        #obj.stub(:update_torrent_state) { true }
-
-        obj.stub(:execute) do |q|
+      it 'changes state to processing' do
+        allow(db_stub).to receive(:execute) do |q|
           if q == 'SELECT hash, name FROM torrents WHERE tp_state = "downloaded";'
             res = [
               #[ 'hash0', 'testTorrent0', 'download-dir', 'TV' ],
@@ -267,12 +189,7 @@ describe Processor do
           end
           res
         end
-
-        obj
-      end
-
-      it 'changes state to processing' do
-        db_stub.should_receive(:update_torrent_state).with('hash1', 'processing')
+        expect(db_stub).to receive(:update_torrent_state).with('hash1', 'processing')
         processor.process
       end
     end # context torrent state is downloaded
@@ -280,30 +197,12 @@ describe Processor do
     context 'torrent state is processing' do
 
       before do
-        TorrentProcessor::Plugin::TorrentCopier.any_instance.stub(:execute)
-        TorrentProcessor::Plugin::Unrar.any_instance.stub(:execute)
+        allow_any_instance_of(TorrentProcessor::Plugin::TorrentCopier).to receive(:execute)
+        allow_any_instance_of(TorrentProcessor::Plugin::Unrar).to receive(:execute)
       end
 
       it 'runs processing plugins against the torrent' do
-        TorrentProcessor::Plugin::TorrentCopier.any_instance.should_receive(:execute)
-        TorrentProcessor::Plugin::Unrar.any_instance.should_receive(:execute)
-        processor.process
-      end
-
-      it 'changes state to processed' do
-        utorrent_stub.stub(:get_torrent_job_properties).and_return(
-          {
-            'props' =>
-            [
-              {
-                'seed_override' => 1,
-                'seed_ratio' => 0,
-                'trackers' => 'my.test.tracker'
-              }
-            ]
-          }
-                                                                  )
-        db_stub.stub(:execute) do |q|
+        allow(db_stub).to receive(:execute) do |q|
           if q.include? 'processing'
             [
                 [ 'hash1', 'testTorrent1', 'completed-dir', 'TV' ]
@@ -312,7 +211,35 @@ describe Processor do
             []
           end
         end
-        db_stub.should_receive(:update_torrent_state).with('hash1', 'processed')
+        expect(db_stub).to receive(:update_torrent_state).with('hash1', 'processed')
+        expect_any_instance_of(TorrentProcessor::Plugin::TorrentCopier).to receive(:execute)
+        expect_any_instance_of(TorrentProcessor::Plugin::Unrar).to receive(:execute)
+        processor.process
+      end
+
+      it 'changes state to processed' do
+        allow(utorrent_stub).to receive(:get_torrent_job_properties).and_return(
+          {
+            'props' =>
+            [
+              {
+                'seed_override' => 1,
+                'seed_ratio' => 0,
+                'trackers' => 'my.test.tracker'
+              }
+            ]
+          }
+                                                                  )
+        allow(db_stub).to receive(:execute) do |q|
+          if q.include? 'processing'
+            [
+                [ 'hash1', 'testTorrent1', 'completed-dir', 'TV' ]
+            ]
+          else
+            []
+          end
+        end
+        expect(db_stub).to receive(:update_torrent_state).with('hash1', 'processed')
 
         processor.process
       end
@@ -321,7 +248,7 @@ describe Processor do
     context 'torrent state is processed' do
 
       it 'changes state to seeding' do
-        db_stub.stub(:execute) do |q|
+        allow(db_stub).to receive(:execute) do |q|
           if q.include? 'processed'
             [
                 [ 'hash1', 'testTorrent1' ]
@@ -330,7 +257,7 @@ describe Processor do
             []
           end
         end
-        db_stub.should_receive(:update_torrent_state).with('hash1', 'seeding')
+        expect(db_stub).to receive(:update_torrent_state).with('hash1', 'seeding')
 
         processor.process
       end
@@ -339,7 +266,7 @@ describe Processor do
     context 'torrent state is seeding' do
 
       it 'changes state to removing' do
-        utorrent_stub.stub(:get_torrent_job_properties).and_return(
+        allow(utorrent_stub).to receive(:get_torrent_job_properties).and_return(
           {
             'props' =>
             [
@@ -351,8 +278,7 @@ describe Processor do
             ]
           }
                                                                   )
-        utorrent_stub.stub(:remove_torrent)
-        db_stub.stub(:execute) do |q|
+        allow(db_stub).to receive(:execute) do |q|
           if q.include? 'seeding'
             [
                 [ 'hash1', 0, 'testTorrent1' ]
@@ -361,13 +287,13 @@ describe Processor do
             []
           end
         end
-        db_stub.should_receive(:update_torrent_state).with('hash1', 'removing')
+        expect(db_stub).to receive(:update_torrent_state).with('hash1', 'removing')
 
         processor.process
       end
 
       it 'send removal request to utorrent' do
-        utorrent_stub.stub(:get_torrent_job_properties).and_return(
+        allow(utorrent_stub).to receive(:get_torrent_job_properties).and_return(
           {
             'props' =>
             [
@@ -379,7 +305,7 @@ describe Processor do
             ]
           }
                                                                   )
-        db_stub.stub(:execute) do |q|
+        allow(db_stub).to receive(:execute) do |q|
           if q.include? 'seeding'
             [
                 [ 'hash1', 0, 'testTorrent1' ]
@@ -388,8 +314,8 @@ describe Processor do
             []
           end
         end
-        db_stub.should_receive(:update_torrent_state).with('hash1', 'removing')
-        utorrent_stub.should_receive(:remove_torrent).with('hash1')
+        expect(db_stub).to receive(:update_torrent_state).with('hash1', 'removing')
+        expect(utorrent_stub).to receive(:remove_torrent).with('hash1')
 
         processor.process
       end
@@ -402,9 +328,9 @@ describe Processor do
         context 'utorrent has removal info' do
 
           it 'remove torrent from database' do
-            utorrent_stub.stub(:torrents_removed?).and_return(true)
-            utorrent_stub.stub(:removed_torrents).and_return({ 'hash1' => 'data' })
-            db_stub.stub(:execute) do |q|
+            allow(utorrent_stub).to receive(:torrents_removed?).and_return(true)
+            allow(utorrent_stub).to receive(:removed_torrents).and_return({ 'hash1' => 'data' })
+            allow(db_stub).to receive(:execute) do |q|
               if q.include? 'removing'
                 [
                     [ 'hash1', 'testTorrent1' ]
@@ -413,7 +339,7 @@ describe Processor do
                 []
               end
             end
-            db_stub.should_receive(:delete_torrent).with('hash1')
+            expect(db_stub).to receive(:delete_torrent).with('hash1')
 
             processor.process
           end
@@ -422,9 +348,8 @@ describe Processor do
         context 'utorrent does NOT have removal info' do
 
           it 'remove torrent from database' do
-            utorrent_stub.stub(:torrents_removed?).and_return(false)
-            utorrent_stub.stub(:torrents).and_return({})
-            db_stub.stub(:execute) do |q|
+            allow(utorrent_stub).to receive(:torrents).and_return({})
+            allow(db_stub).to receive(:execute) do |q|
               if q.include? 'removing'
                 [
                     [ 'hash1', 'testTorrent1' ]
@@ -433,7 +358,7 @@ describe Processor do
                 []
               end
             end
-            db_stub.should_receive(:delete_torrent).with('hash1')
+            expect(db_stub).to receive(:delete_torrent).with('hash1')
 
             processor.process
           end
@@ -447,17 +372,17 @@ describe Processor do
 
         let(:torrent_data_stub) do
           obj = double('torrent_data')
-          obj.stub(:name) { 'Awesome Show s1e05' }
+          allow(obj).to receive(:name) { 'Awesome Show s1e05' }
           obj
         end
 
         it 'remove torrent from database' do
-          utorrent_stub.stub(:torrents_removed?).and_return(true)
-          utorrent_stub.stub(:removed_torrents).and_return({ 'hash1' => torrent_data_stub })
-          db_stub.stub(:execute) do |q|
+          allow(utorrent_stub).to receive(:torrents_removed?).and_return(true)
+          allow(utorrent_stub).to receive(:removed_torrents).and_return({ 'hash1' => torrent_data_stub })
+          allow(db_stub).to receive(:execute) do |q|
             []
           end
-          db_stub.should_receive(:delete_torrent).with('hash1')
+          expect(db_stub).to receive(:delete_torrent).with('hash1')
 
           processor.process
         end
@@ -465,7 +390,7 @@ describe Processor do
     end # context torrent state is NOT removing
 
     it 'moves completed movies' do
-      TorrentProcessor::Plugin::MovieMover.any_instance.should_receive(:process)
+      expect_any_instance_of(TorrentProcessor::Plugin::MovieMover).to receive(:process)
 
       processor.process
     end # context move completed movies

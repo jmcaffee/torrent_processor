@@ -17,74 +17,7 @@ describe CfgPlugin do
   subject(:plugin) { CfgPlugin.new }
 
   let(:tmp_path) do
-    pth = 'tmp/spec/cfg_plugin'
-    mkpath pth
-    pth
-  end
-
-  let(:controller_stub) do
-    obj = double('controller')
-    obj.stub(:cfg) { cfg_stub }
-    obj.stub(:database) { db_stub }
-    obj
-  end
-
-  let(:db_stub) do
-    obj = double('database')
-    obj.stub(:close) { true }
-    obj
-  end
-
-  let(:cfg_stub) do
-    cfg = TorrentProcessor.configuration
-
-    cfg.app_path          = tmp_path
-    cfg.logging           = false
-    cfg.max_log_size      = 0
-    cfg.log_dir           = tmp_path
-    cfg.tv_processing     = File.join(tmp_path, 'media/tv')
-    cfg.movie_processing  = File.join(tmp_path, 'media/movies')
-    cfg.other_processing  = File.join(tmp_path, 'media/other')
-    cfg.filters           = {}
-
-    cfg.utorrent.ip                     = '192.168.1.103'
-    cfg.utorrent.port                   = '8082'
-    cfg.utorrent.user                   = 'admin'
-    cfg.utorrent.pass                   = 'abc'
-    cfg.utorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
-    cfg.utorrent.seed_ratio             = 0
-
-    cfg.tmdb.api_key              = '***REMOVED***'
-    cfg.tmdb.language             = 'en'
-    cfg.tmdb.target_movies_path   = File.join(tmp_path, 'movies_final')
-    cfg.tmdb.can_copy_start_time  = "00:00"
-    cfg.tmdb.can_copy_stop_time   = "23:59"
-    cfg
-  end
-
-  let(:ut_stub) do
-    obj = double('utorrent')
-    obj.stub(:get_torrent_list) do
-      {}
-    end
-
-    obj.stub(:torrents) do
-      {}
-    end
-
-    obj.stub(:get_utorrent_settings) do
-      {}
-    end
-
-    obj.stub(:settings) do
-      {}
-    end
-
-    obj.stub(:sendGetQuery) do
-      {}
-    end
-
-    obj
+    spec_tmp_dir('cfg_plugin').to_s
   end
 
   # Common set of args passed to plugins by the console object.
@@ -92,8 +25,8 @@ describe CfgPlugin do
     {
       :cmd      => cmd,
       :logger   => CaptureLogger,
-      :utorrent => ut_stub,
-      :database => db_stub,
+      :utorrent => Mocks.utorrent,
+      :database => Mocks.db,
     }
   end
 

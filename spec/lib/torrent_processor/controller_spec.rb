@@ -13,7 +13,7 @@ include TorrentProcessor
 describe Controller do
 
   subject(:controller) do
-    TPSetup.any_instance.stub(:app_data_path).and_return(work_dir)
+    allow_any_instance_of(TorrentProcessor::TPSetup).to receive(:app_data_path).and_return(work_dir)
     generate_configuration(work_dir)
     Controller.new
   end
@@ -24,18 +24,13 @@ describe Controller do
     dir
   end
 
-  let(:db_stub) do
-    obj = double('database')
-    obj
-  end
-
   #let(:logger) { SimpleLogger }
   let(:logger) { NullLogger }
 
   let(:setup_args) do
     {
       #:logger => logger,
-      :database => db_stub
+      :database => Mocks.db
     }
   end
 
@@ -56,18 +51,18 @@ describe Controller do
   describe '#process' do
 
     before(:each) do
-      FileLogger.stub(:log)
-      TorrentProcessor::Processor.any_instance.stub(:process)
+      allow_any_instance_of(FileLogger).to receive(:log)
+      allow_any_instance_of(TorrentProcessor::Processor).to receive(:process)
     end
 
     context 'setup has not been completed' do
 
       before(:each) do
-        TorrentProcessor::TPSetup.any_instance.stub(:check_setup_completed) { false }
+        allow_any_instance_of(TorrentProcessor::TPSetup).to receive(:check_setup_completed).and_return(false)
       end
 
       it "exits program" do
-        TorrentProcessor::Processor.any_instance.should_not_receive(:process)
+        expect_any_instance_of(TorrentProcessor::Processor).not_to receive(:process)
 
         expect { controller.process }.to raise_exception
       end
@@ -76,11 +71,11 @@ describe Controller do
     context 'setup has been completed' do
 
       before(:each) do
-        TorrentProcessor::TPSetup.any_instance.stub(:check_setup_completed) { true }
+        allow_any_instance_of(TorrentProcessor::TPSetup).to receive(:check_setup_completed).and_return(true)
       end
 
       it "calls Processor#process" do
-        TorrentProcessor::Processor.any_instance.should_receive(:process)
+        expect_any_instance_of(TorrentProcessor::Processor).to receive(:process)
 
         controller.process
       end
