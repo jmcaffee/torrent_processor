@@ -48,7 +48,7 @@ describe RSSPlugin do
     let(:cmd) { '.feeddetails' }
 
     it 'display details of an RSS feed' do
-      TorrentProcessor::Plugin::RSSPlugin.any_instance.stub(:getInput).and_return('0')
+      allow_any_instance_of(TorrentProcessor::Plugin::RSSPlugin).to receive(:getInput).and_return('0')
       expect(plugin.rss_feed_details(args)).to be_truthy
       expect( CaptureLogger.contains 'torrent_name: Test Torrent 1' )
       expect( CaptureLogger.contains 'torrent_name: Test Torrent 2' )
@@ -60,7 +60,7 @@ describe RSSPlugin do
     let(:cmd) { '.filterdetails' }
 
     it 'display details of an RSS filter' do
-      TorrentProcessor::Plugin::RSSPlugin.any_instance.stub(:getInput).and_return('0')
+      allow_any_instance_of(TorrentProcessor::Plugin::RSSPlugin).to receive(:getInput).and_return('0')
       expect(plugin.rss_filter_details(args)).to be_truthy
       expect( CaptureLogger.contains 'feed_name         : TestTorrent1' )
       expect( CaptureLogger.contains 'feed_name         : TestTorrent2' )

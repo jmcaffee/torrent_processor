@@ -8,9 +8,9 @@ module Mocks
 
   def self.db
     obj = double('database')
-    obj.stub(:connect)  { true }
-    obj.stub(:close)    { true }
-    obj.stub(:execute) do |q|
+    allow(obj).to receive(:connect)  { true }
+    allow(obj).to receive(:close)    { true }
+    allow(obj).to receive(:execute) do |q|
       if q.include? 'SELECT hash FROM torrents'
         [
           [ 'abc' ]
@@ -35,7 +35,7 @@ module Mocks
         []
       end
     end
-    obj.stub(:read) do |q|
+    allow(obj).to receive(:read) do |q|
       if q.include? 'SELECT hash FROM torrents'
         [
           [ 'abc' ]
@@ -61,13 +61,13 @@ module Mocks
       end
     end
 
-    obj.stub(:delete_torrent) do |arg|
+    allow(obj).to receive(:delete_torrent) do |arg|
     end
 
-    obj.stub(:read_cache) { 'cache' }
-    obj.stub(:update_cache)
-    obj.stub(:update_torrents)
-    obj.stub(:upgrade)
+    allow(obj).to receive(:read_cache) { 'cache' }
+    allow(obj).to receive(:update_cache)
+    allow(obj).to receive(:update_torrents)
+    allow(obj).to receive(:upgrade)
 
     obj
   end

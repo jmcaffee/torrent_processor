@@ -35,7 +35,7 @@ describe Console do
     context 'cmd: .feeddetails' do
 
       it 'display details of an RSS feed' do
-        TorrentProcessor::Plugin::RSSPlugin.any_instance.stub(:getInput).and_return('0')
+        allow_any_instance_of(TorrentProcessor::Plugin::RSSPlugin).to receive(:getInput).and_return('0')
         expect(console.process_cmd('.feeddetails')).to be_truthy
       end
     end # cmd: .feeddetails
@@ -43,7 +43,7 @@ describe Console do
     context 'cmd: .filterdetails' do
 
       it 'display details of an RSS filter' do
-        TorrentProcessor::Plugin::RSSPlugin.any_instance.stub(:getInput).and_return('0')
+        allow_any_instance_of(TorrentProcessor::Plugin::RSSPlugin).to receive(:getInput).and_return('0')
         expect(console.process_cmd('.filterdetails')).to be_truthy
       end
     end # cmd: .filterdetails

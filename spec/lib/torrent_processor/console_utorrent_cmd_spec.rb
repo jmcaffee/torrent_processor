@@ -9,24 +9,9 @@ describe Console do
   let(:init_args) do
     {
       :logger => CaptureLogger,
-      :utorrent => utorrent_stub,
-      :database => database_stub,
+      :utorrent => Mocks.utorrent,
+      :database => Mocks.db,
     }
-  end
-
-  let(:utorrent_stub) do
-    obj = double('utorrent')
-    obj.stub(:get_utorrent_settings)
-    obj.stub(:send_get_query)
-    obj.stub(:settings)                   { TorrentSpecHelper.utorrent_settings_data() }
-    obj.stub(:get_torrent_job_properties) { TorrentSpecHelper.utorrent_job_properties_data() }
-    obj.stub(:get_torrent_list)           { TorrentSpecHelper.utorrent_torrent_list_data() }
-    obj.stub(:torrents)                   { TorrentSpecHelper.utorrent_torrents_data() }
-    obj
-  end
-
-  let(:database_stub) do
-    obj = double('database')
   end
 
   describe '#process_cmd' do
@@ -52,7 +37,7 @@ describe Console do
     context 'cmd: .jobprops' do
 
       it 'display utorrent job properties' do
-        TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
+        allow_any_instance_of(TorrentProcessor::Plugin::UTPlugin).to receive(:getInput).and_return('0')
         expect(console.process_cmd('.jobprops')).to be_truthy
         expect { CaptureLogger.contains 'Horizon.S52E16' }
       end
@@ -77,7 +62,7 @@ describe Console do
     context 'cmd: .tdetails' do
 
       it 'display details of a torrent in utorrent' do
-        TorrentProcessor::Plugin::UTPlugin.any_instance.stub(:getInput).and_return('0')
+        allow_any_instance_of(TorrentProcessor::Plugin::UTPlugin).to receive(:getInput).and_return('0')
         expect(console.process_cmd('.tdetails')).to be_truthy
         expect { CaptureLogger.contains 'availability       : 65536' }
       end

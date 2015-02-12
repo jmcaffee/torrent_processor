@@ -23,4 +23,18 @@ describe UTorrentAdapter do
       expect(adapter.app_name).to eq 'uTorrent'
     end
   end
+
+  context "#seed_ratio" do
+
+    it "returns the torrent app's configured global seed ratio" do
+      expect(adapter.seed_ratio).to eq 0
+    end
+  end
+
+  context "#completed_downloads_dir" do
+
+    it "returns the torrent app's configured global seed ratio" do
+      expect(adapter.completed_downloads_dir).to eq "C:\\XMBC-Apps\\Torrents\\downloads-completed"
+    end
+  end
 end
