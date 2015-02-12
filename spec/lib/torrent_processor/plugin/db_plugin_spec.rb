@@ -4,17 +4,14 @@ include TorrentProcessor::Plugin
 
 describe DBPlugin do
 
-  include DatabaseHelper
-  include UTorrentHelper
-
   subject(:plugin) { DBPlugin.new }
 
   let(:args) do
     {
       :cmd      => cmd,
       :logger   => CaptureLogger,
-      :database => database_stub(),
-      :utorrent => utorrent_stub(),
+      :database => Mocks.db,
+      :utorrent => Mocks.utorrent,
     }
   end
 

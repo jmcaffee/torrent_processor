@@ -4,16 +4,13 @@ include TorrentProcessor
 
 describe Console do
 
-  include DatabaseHelper
-  include UTorrentHelper
-
   subject(:console) { Console.new(init_args) }
 
   let(:init_args) do
     {
       :logger => CaptureLogger,
-      :utorrent => utorrent_stub(),
-      :database => database_stub(),
+      :utorrent => Mocks.utorrent,
+      :database => Mocks.db,
     }
   end
 

@@ -27,7 +27,7 @@ describe Processor do
     {
       #:logger   => SimpleLogger,
       #:cfg      => cfg_stub,
-      :cfg      => mock_cfg,
+      :cfg      => Mocks.cfg,
       :moviedb  => moviedb_stub,
       :utorrent => utorrent_stub,
       :database => db_stub,
@@ -90,7 +90,7 @@ describe Processor do
     it 'instantiates a processor object' do
       Processor.new(
         #:logger   => SimpleLogger,
-        :cfg      => mock_cfg,
+        :cfg      => Mocks.cfg,
         :moviedb  => moviedb_stub,
         :utorrent => utorrent_stub,
         :database => db_stub )
@@ -166,7 +166,7 @@ describe Processor do
 
         it 'applies seed limit filters to new torrents and changes state to downloading' do
           # Override cfg mock to return appropriate filters.
-          allow(mock_cfg).to receive(:filters) { { 'test' => '0' } }
+          allow(Mocks.cfg).to receive(:filters) { { 'test' => '0' } }
           utorrent_stub.should_receive(:set_job_properties).with(
             {
               'hash1' =>
