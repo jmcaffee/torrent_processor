@@ -9,7 +9,6 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require_relative 'service/utorrent'
 require_relative 'plugin'
 
 
@@ -33,7 +32,6 @@ module TorrentProcessor
 
   attr_reader     :cfg
   attr_reader     :database
-  attr_reader     :utorrent
   attr_reader     :moviedb
 
     ###
@@ -49,13 +47,14 @@ module TorrentProcessor
 
     def parse_args args
       args = defaults.merge(args)
+      @init_args = args
+
       @logger   = args[:logger]   if args[:logger]
       @verbose  = args[:verbose]  if args[:verbose]
       @cfg      = args[:cfg]      if args[:cfg]
       @moviedb  = args[:moviedb]  if args[:moviedb]
-      @utorrent = args[:utorrent] if args[:utorrent]
-      @torrent_app = args[:torrent_app] if args[:torrent_app]
       @database = args[:database] if args[:database]
+      @torrent_app = args[:torrent_app] if args[:torrent_app]
     end
 
     def defaults
@@ -71,17 +70,16 @@ module TorrentProcessor
 
     def verbose= flag
       @verbose = flag
-      @moviedb.verbose = flag if @moviedb
-      @utorrent.verbose = flag if @utorrent
-      @database.verbose = flag if @database
+
+      @moviedb.verbose      = flag if @moviedb
+      @torrent_app.verbose  = flag if @torrent_app
+      @database.verbose     = flag if @database
     end
 
     def torrent_app
       return @torrent_app unless @torrent_app.nil?
 
-      @torrent_app = TorrentApp.new(:cfg => cfg,
-                                    :webui => utorrent,
-                                    :database => database )
+      @torrent_app = TorrentApp.new(@init_args)
     end
 
     ###
@@ -106,14 +104,14 @@ module TorrentProcessor
       # Update the db torrent list states
       update_torrent_states()
 
-      # Remove any torrents from the db that have been removed from utorrent (due to a request).
-      if utorrent.torrents_removed?
-        remove_torrents( utorrent.removed_torrents )
+      # Remove any torrents from the db that have been removed from torrent app (due to a request).
+      if torrent_app.torrents_removed?
+        remove_torrents( torrent_app.removed_torrents )
       else
         # 'Cleanup' DB by removing torrents that are in the DB (STATE_REMOVING)
-        # but are no longer in the (utorrent) torrents list due to missing a cache.
-        # By missing a cache, utorrent is not sending the 'removed' torrents, only what is currently in its list.
-        remove_missing_torrents( utorrent.torrents )
+        # but are no longer in the (torrent app) torrents list due to missing a cache.
+        # By missing a cache, torrent app is not sending the 'removed' torrents, only what is currently in its list.
+        remove_missing_torrents( torrent_app.torrents )
       end
 
       # Process torrents that are awaiting processing.
@@ -139,10 +137,10 @@ module TorrentProcessor
       seed_ratio = torrent_app.seed_ratio
       dir_completed_download = torrent_app.completed_downloads_dir
 
-      # Store utorrent data in the configuration object.
 
       case app_name
       when 'uTorrent'
+        # Store utorrent data in the configuration object.
         TorrentProcessor.configure do |config|
           config.utorrent.seed_ratio              = seed_ratio
           config.utorrent.dir_completed_download  = dir_completed_download
@@ -166,7 +164,7 @@ module TorrentProcessor
 
         # For each torrent, get its properties and apply a seed limit if needed.
         rows.each do |r|
-          response = utorrent.get_torrent_job_properties( r[0] )
+          response = torrent_app.get_torrent_job_properties( r[0] )
           if (! response["props"].nil? )
 
             props = response["props"][0]
@@ -201,7 +199,7 @@ module TorrentProcessor
         end   # each row
 
         if ( filter_props.length > 0 )
-          response = utorrent.set_job_properties( filter_props )
+          response = torrent_app.set_job_properties( filter_props )
         end
     end
 
@@ -251,7 +249,7 @@ module TorrentProcessor
 
 
     ###
-    # Remove torrents from DB that have been removed from utorrent
+    # Remove torrents from DB that have been removed from torrent app
     #
     # torrents:: torrents that have been removed
     #
@@ -282,12 +280,12 @@ module TorrentProcessor
 
 
     ###
-    # Remove torrents from DB that have been removed from utorrent
+    # Remove torrents from DB that have been removed from torrent app
     #
-    # torrents:: current list of torrents passed from utorrent
+    # torrents:: current list of torrents passed from torrent app
     #
     def remove_missing_torrents(torrents)
-        log( "Removing (pending removal) torrents from DB that are no longer in the uTorrent list" )
+        log( "Removing (pending removal) torrents from DB that are no longer in the torrent app list" )
 
         # From DB - Get list of torrents that are STATE_REMOVING
         q = "SELECT hash, name FROM torrents WHERE tp_state = \"#{STATE_REMOVING}\";"
@@ -374,8 +372,8 @@ module TorrentProcessor
             database.update_torrent_state( r[0], STATE_REMOVING )
             log( "State set to STATE_REMOVING: #{r[2]}" )
 
-            # Request removal via utorrent
-            utorrent.remove_torrent( r[0] )
+            # Request removal via torrent app
+            torrent_app.remove_torrent( r[0] )
             log( "Removal request sent: #{r[2]}" )
           end
         end
@@ -387,21 +385,15 @@ module TorrentProcessor
     # Determine the target seed ratio for a torrent.
     #
     def get_target_seed_ratio(name, hash)
-      target_ratio = TorrentProcessor.configuration.utorrent.seed_ratio
-            # This torrent may have an overridden target seed ratio.
-            # Pull down the torrent job properties to check and see.
-      response = utorrent.get_torrent_job_properties( hash )
-      if (! response["props"].nil? )
+      base_ratio = TorrentProcessor.configuration.utorrent.seed_ratio
 
-        props = response["props"][0]
-        seed_override = props["seed_override"]
-        seed_ratio = props["seed_ratio"]
-        if (seed_override == 1)
-          target_ratio = Integer(seed_ratio)
-          log( "Torrent [#{name}] has overridden target seed ratio" )
-          log( "  target ratio = #{target_ratio}" )
-        end
+      # This torrent may have an overridden target seed ratio.
+      target_ratio = torrent_app.get_torrent_seed_ratio hash, base_ratio
+      if target_ratio != base_ratio
+        log( "Torrent [#{name}] has overridden target seed ratio" )
+        log( "  target ratio = #{target_ratio}" )
       end
+
       # Add some padding to the target ratio since the final ratio is almost
       # never exactly reached.
       # 5 = .05 percent.

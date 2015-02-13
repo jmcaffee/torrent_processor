@@ -20,8 +20,20 @@ module TorrentProcessor
 
     attr_reader :cfg
     attr_reader :name
+    attr_reader :webui_type
 
-    def_delegators :adapter, :seed_ratio, :completed_downloads_dir, :app_name, :torrent_list
+    def_delegators  :adapter,
+                    :seed_ratio,
+                    :completed_downloads_dir,
+                    :app_name,
+                    :torrent_list,
+                    :get_torrent_job_properties,
+                    :set_job_properties,
+                    :torrents_removed?,
+                    :removed_torrents,
+                    :torrents,
+                    :remove_torrent,
+                    :get_torrent_seed_ratio
 
     ###
     # TorrentApp constructor
@@ -29,30 +41,49 @@ module TorrentProcessor
     # controller:: controller object
     #
     def initialize(args)
+      if args[:webui] and !args[:webui_type]
+        raise ":webui_type required when :webui provided"
+      end
       parse_args args
-      @args = args
 
       @adapter    = nil
     end
 
     def parse_args args
       args = defaults.merge(args)
-      @cfg = args[:cfg] if args[:cfg]
-      @verbose = args[:verbose] if args[:verbose]
-      @logger = args[:logger] if args[:logger]
+      @init_args = args
+
+      @cfg        = args[:cfg]        if args[:cfg]
+      @verbose    = args[:verbose]    if args[:verbose]
+      @logger     = args[:logger]     if args[:logger]
+      @webui_type = args[:webui_type] if args[:webui_type]
     end
 
     def defaults
       {
         #:logger => NullLogger,
         #:verbose => false,
+        :webui_type => :utorrent,
       }
     end
 
     def adapter
       return @adapter unless @adapter.nil?
 
-      @adapter = Service::UTorrentAdapter.new(@args)
+      if @webui_type == :utorrent
+        @adapter = Service::UTorrentAdapter.new(@init_args)
+      else
+        raise "Unknown webui_type: :#{@webui_type}"
+      end
+    end
+
+    ###
+    # Override Verbosable verbose= to set flag on attached objects
+    #
+
+    def verbose= flag
+      @verbose = flag
+      adapter.verbose = flag if @adapter
     end
   end # class
 end # module

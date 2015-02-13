@@ -42,18 +42,64 @@ module TorrentProcessor
         torrents
       end
 
+      def get_torrent_job_properties torrent_hash
+        webui.get_torrent_job_properties torrent_hash
+      end
+
+      def set_job_properties props
+        webui.set_job_properties props
+      end
+
+      def torrents_removed?
+        webui.torrents_removed?
+      end
+
+      def removed_torrents
+        webui.removed_torrents
+      end
+
+      ###
+      # Return list of cached torrents
+      #
+      def torrents
+        webui.torrents
+      end
+
+      def remove_torrent torrent_hash
+        webui.remove_torrent torrent_hash
+      end
+
+      def get_torrent_seed_ratio torrent_hash, default_ratio
+        target_ratio = default_ratio
+
+        # This torrent may have an overridden target seed ratio.
+        # Pull down the torrent job properties to check and see.
+        response = webui.get_torrent_job_properties( torrent_hash )
+        if (! response["props"].nil? )
+
+          props = response["props"][0]
+          seed_override = props["seed_override"]
+          seed_ratio = props["seed_ratio"]
+          if (seed_override == 1)
+            target_ratio = Integer(seed_ratio)
+          end
+        end
+
+        target_ratio
+      end
+
     private
 
       def parse_args args
         args = defaults.merge(args)
-        @cfg = args[:cfg] if args[:cfg]
-        @verbose = args[:verbose] if args[:verbose]
-        @logger = args[:logger] if args[:logger]
-        @webui = args[:webui] if args[:webui]
+        @cfg      = args[:cfg]      if args[:cfg]
+        @verbose  = args[:verbose]  if args[:verbose]
+        @logger   = args[:logger]   if args[:logger]
+        @webui    = args[:webui]    if args[:webui]
         @database = args[:database] if args[:database]
 
         unless @cfg.nil?
-          @ip = @cfg.utorrent.ip
+          @ip   = @cfg.utorrent.ip
           @port = @cfg.utorrent.port
           @user = @cfg.utorrent.user
           @pass = @cfg.utorrent.pass

@@ -28,12 +28,12 @@ describe Processor do
 
   let(:args) do
     {
-      #:logger   => SimpleLogger,
-      #:cfg      => cfg_stub,
-      :cfg      => Mocks.cfg,
-      :moviedb  => Mocks.tmdb,
-      :utorrent => utorrent_stub,
-      :database => db_stub,
+      #:logger     => SimpleLogger,
+      :cfg        => Mocks.cfg,
+      :moviedb    => Mocks.tmdb,
+      :webui      => utorrent_stub,
+      :webui_type => :utorrent,
+      :database   => db_stub,
     }
   end
 
@@ -41,11 +41,12 @@ describe Processor do
 
     it 'instantiates a processor object' do
       Processor.new(
-        #:logger   => SimpleLogger,
-        :cfg      => Mocks.cfg,
-        :moviedb  => Mocks.tmdb,
-        :utorrent => Mocks.utorrent,
-        :database => Mocks.db )
+        #:logger     => SimpleLogger,
+        :cfg        => Mocks.cfg,
+        :moviedb    => Mocks.tmdb,
+        :webui      => Mocks.utorrent,
+        :webui_type => :utorrent,
+        :database   => Mocks.db )
     end
   end
 
