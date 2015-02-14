@@ -12,6 +12,9 @@ require_relative 'utorrent'
 module TorrentProcessor
   module Service
     class UTorrentAdapter
+      include TorrentProcessor::Utility::Loggable
+      include TorrentProcessor::Utility::Verbosable
+
       def initialize(args)
         parse_args args
       end
@@ -86,6 +89,53 @@ module TorrentProcessor
         end
 
         target_ratio
+      end
+
+      def apply_seed_limits torrent_hashes, filters
+
+        filter_props = {}
+
+        # For each torrent, get its properties and apply a seed limit if needed.
+        torrent_hashes.each do |tdata|
+          hash = tdata[:hash]
+          name = tdata[:name]
+
+          response = get_torrent_job_properties( hash )
+          if (! response["props"].nil? )
+
+            props = response["props"][0]
+            seed_override = props["seed_override"]
+            seed_ratio = props["seed_ratio"]
+            raw_trackers = props["trackers"]
+
+            if (seed_override != 1)   # Don't bother if an override is already set.
+
+              # Break the list of trackers into individual strings and load the filters (if any).
+              trackers = raw_trackers.split("\r\n")
+
+              # Check each tracker against all filters looking for a match.
+              if (! trackers.nil? && trackers.length > 0 )
+                if (! filters.nil? && filters.length > 0 )
+                  trackers.each do |tracker|
+                    filters.each do |filtered_tracker, limit|
+                      if ( tracker.include?(filtered_tracker) )
+
+                        # Found a match... add it to the props list to be applied when we're finished here.
+                        filter_props[hash] = {"seed_override" => 1, "seed_ratio" => Integer(limit)}
+                        log( "Applying tracker filter to #{name}." )
+                        log( "    seed_ratio: #{limit}" )
+                      end   # tracker includes filtered_tracker
+                    end   # each filter
+                  end   # each tracker
+                end   # filters not empty
+              end   # trackers not empty
+            end   # seed override not in effect
+          end   # props not nil
+        end   # each row
+
+        if ( filter_props.length > 0 )
+          response = set_job_properties( filter_props )
+        end
       end
 
     private

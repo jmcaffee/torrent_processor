@@ -128,4 +128,24 @@ describe TorrentApp do
       app.get_torrent_seed_ratio hash, 0
     end
   end
+
+  context "#apply_seed_limits" do
+
+    it "apply tracker filter seed limits to a collection of torrents" do
+      torrents_to_limit = [
+        { hash: 'hash1', name: 'torrent1' },
+        { hash: 'hash2', name: 'torrent2' },
+        { hash: 'hash3', name: 'torrent3' },
+      ]
+      filters = [
+        { url: 'url1', limit: 20 },
+        { url: 'url2', limit: 41 },
+      ]
+
+      expect(utorrent_stub).to receive(:get_torrent_job_properties).with('hash1')
+      expect(utorrent_stub).to receive(:get_torrent_job_properties).with('hash2')
+      expect(utorrent_stub).to receive(:get_torrent_job_properties).with('hash3')
+      app.apply_seed_limits torrents_to_limit, filters
+    end
+  end
 end

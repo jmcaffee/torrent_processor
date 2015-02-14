@@ -33,7 +33,8 @@ module TorrentProcessor
                     :removed_torrents,
                     :torrents,
                     :remove_torrent,
-                    :get_torrent_seed_ratio
+                    :get_torrent_seed_ratio,
+                    :apply_seed_limits
 
     ###
     # TorrentApp constructor

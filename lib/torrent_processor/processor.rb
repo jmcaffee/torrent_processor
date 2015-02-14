@@ -160,47 +160,11 @@ module TorrentProcessor
         q = "SELECT hash, percent_progress, name FROM torrents WHERE tp_state IS NULL;"
         rows = database.execute(q)
 
-        filter_props = {}
+        # Create an array of hashes containing a torrent hash and a torrent name.
+        torrents_to_update = rows.map { |r| { hash: r[0], name: r[2] } }
 
-        # For each torrent, get its properties and apply a seed limit if needed.
-        rows.each do |r|
-          response = torrent_app.get_torrent_job_properties( r[0] )
-          if (! response["props"].nil? )
-
-            props = response["props"][0]
-            seed_override = props["seed_override"]
-            seed_ratio = props["seed_ratio"]
-            raw_trackers = props["trackers"]
-
-            if (seed_override != 1)   # Don't bother if an override is already set.
-
-              # Break the list of trackers into individual strings and load the filters (if any).
-              trackers = raw_trackers.split("\r\n")
-              filters = cfg.filters
-
-              # Check each tracker against all filters looking for a match.
-              if (! trackers.nil? && trackers.length > 0 )
-                if (! filters.nil? && filters.length > 0 )
-                  trackers.each do |tracker|
-                    filters.each do |filtered_tracker, limit|
-                      if ( tracker.include?(filtered_tracker) )
-
-                        # Found a match... add it to the props list to be applied when we're finished here.
-                        filter_props[r[0]] = {"seed_override" => 1, "seed_ratio" => Integer(limit)}
-                        log( "Applying tracker filter to #{r[2]}." )
-                        log( "    seed_ratio: #{limit}" )
-                      end   # tracker includes filtered_tracker
-                    end   # each filter
-                  end   # each tracker
-                end   # filters not empty
-              end   # trackers not empty
-            end   # seed override not in effect
-          end   # props not nil
-        end   # each row
-
-        if ( filter_props.length > 0 )
-          response = torrent_app.set_job_properties( filter_props )
-        end
+        # Apply seed limits to given torrents.
+        torrent_app.apply_seed_limits torrents_to_update, cfg.filters
     end
 
 
