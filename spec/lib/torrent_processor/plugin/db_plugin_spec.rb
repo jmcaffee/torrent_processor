@@ -11,7 +11,8 @@ describe DBPlugin do
       :cmd      => cmd,
       :logger   => CaptureLogger,
       :database => Mocks.db,
-      :utorrent => Mocks.utorrent,
+      :webui => Mocks.utorrent,
+      :webui_type => :utorrent,
     }
   end
 

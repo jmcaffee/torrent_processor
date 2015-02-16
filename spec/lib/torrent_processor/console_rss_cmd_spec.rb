@@ -8,9 +8,10 @@ describe Console do
 
   let(:init_args) do
     {
-      :logger => CaptureLogger,
-      :utorrent => Mocks.utorrent,
+      :logger   => CaptureLogger,
       :database => Mocks.db,
+      :webui    => Mocks.utorrent,
+      :webui_type => :utorrent,
     }
   end
 

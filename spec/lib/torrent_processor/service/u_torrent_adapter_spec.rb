@@ -125,4 +125,31 @@ describe UTorrentAdapter do
       adapter.apply_seed_limits torrents_to_limit, filters
     end
   end
+
+  context "#settings" do
+
+    it "returns uTorrent settings" do
+      expect(utorrent_stub).to receive(:get_utorrent_settings)
+
+      adapter.settings
+    end
+  end
+
+  context "#rssfilters" do
+
+    it "returns uTorrent rss filters" do
+      expect(utorrent_stub).to receive(:rssfilters)
+
+      adapter.rssfilters
+    end
+  end
+
+  context "#rssfeeds" do
+
+    it "returns uTorrent rss feeds" do
+      expect(utorrent_stub).to receive(:rssfeeds)
+
+      adapter.rssfeeds
+    end
+  end
 end

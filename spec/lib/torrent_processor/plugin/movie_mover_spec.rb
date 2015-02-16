@@ -16,7 +16,7 @@ describe MovieMover do
 
       let(:mdb_args) do
         {
-          api_key: '***REMOVED***',
+          api_key: ENV['TMDB_API_KEY'],
           language: 'en',
           #logger:   SimpleLogger,
         }

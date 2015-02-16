@@ -9,7 +9,8 @@ describe Console do
   let(:init_args) do
     {
       :logger => CaptureLogger,
-      :utorrent => Mocks.utorrent,
+      :webui => Mocks.utorrent,
+      :webui_type => :utorrent,
       :database => Mocks.db,
     }
   end
@@ -55,7 +56,7 @@ describe Console do
 
     context 'cmd: .reconcile' do
 
-      it 'reconcile the DB with uTorrent current state (TODO)' do
+      it "reconcile the DB with torrent app's current state (TODO)" do
         expect(console.process_cmd('.reconcile')).to be_truthy
       end
     end # cmd: .reconcile

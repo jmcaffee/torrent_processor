@@ -7,10 +7,10 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
 
-  class MovieDB
-    include TorrentProcessor::Utility::Loggable
+  class MovieDB < BasePlugin
     include TorrentProcessor::Utility::Verbosable
 
     require 'themoviedb'
@@ -72,10 +72,11 @@ module TorrentProcessor::Plugin
       parse_args args
     end
 
-    def parse_args args
-      args = defaults.merge(args)
+    protected
 
-      logger        = args[:logger]   if args[:logger]
+    def parse_args args
+      super
+
       self.api_key  = args[:api_key]  if args[:api_key]
       self.language = args[:language] if args[:language]
     end
@@ -85,6 +86,8 @@ module TorrentProcessor::Plugin
         #:logger     => NullLogger,
       }
     end
+
+    public
 
     def api_key=(key)
       Tmdb::Api.key(key)
@@ -261,4 +264,5 @@ module TorrentProcessor::Plugin
       best_picks
     end
   end # class MovieDB
+  end # module
 end # module TorrentProcessor::ProcessorPlugin

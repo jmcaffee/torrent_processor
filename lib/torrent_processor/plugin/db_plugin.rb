@@ -11,12 +11,11 @@
 
 module TorrentProcessor::Plugin
 
-  class DBPlugin
+  class DBPlugin < BasePlugin
 
     include TorrentProcessor::Utility
 
     attr_reader :database
-    attr_reader :utorrent
 
     def DBPlugin.register_cmds
       { ".dbconnect"      => Command.new(DBPlugin, :db_connect,         "Connect to TorrentProcessor DB"),
@@ -33,6 +32,17 @@ module TorrentProcessor::Plugin
       }
     end
 
+  protected
+
+    def parse_args args
+      @torrent_app = nil
+      super
+
+      Formatter.logger = @logger
+
+      # Enforce expections of passed args:
+      args.fetch(:database)
+    end
 
     def defaults
       {
@@ -40,17 +50,13 @@ module TorrentProcessor::Plugin
       }
     end
 
-    def parse_args args
-      args = defaults.merge args
-      @logger   = args.fetch(:logger)
-      Formatter.logger = @logger
-      @database = args.fetch(:database)
-      @utorrent = args.fetch(:utorrent)
+  private
+
+    def torrent_app
+      @torrent_app ||= TorrentProcessor::TorrentApp.new(init_args)
     end
 
-    def log msg = ''
-      @logger.log msg
-    end
+  public
 
     ###
     # Open a connection to the DB
@@ -77,7 +83,8 @@ module TorrentProcessor::Plugin
     end
 
     ###
-    # Clear all torrent data from the DB and refresh with new data from uTorrent.
+    # Clear all torrent data from the DB and refresh
+    # with new data from torrent app.
     #
     def db_update(args)
       cmd = args.fetch(:cmd)
@@ -92,13 +99,9 @@ module TorrentProcessor::Plugin
         database.delete_torrent( r[0] )
       end
 
-      # Get a list of torrents.
-      cacheID = database.read_cache()
-      utorrent.get_torrent_list( cacheID )
-      database.update_cache( utorrent.cache )
-
-      # Update the db's list of torrents.
-      database.update_torrents( utorrent.torrents )
+      # Get a list of torrents and
+      # update the db's list of torrents.
+      database.update_torrents( torrent_app.torrent_list )
       log "DB updated"
       return true
     end

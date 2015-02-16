@@ -9,7 +9,8 @@
 
 require 'yaml'
 
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
 
   class MovieMoverDetails
 
@@ -43,10 +44,8 @@ module TorrentProcessor::Plugin
 
 
 
-  class MovieMover
+  class MovieMover < BasePlugin
     require_relative 'movie_db'
-
-    include TorrentProcessor::Utility::Loggable
 
     DETAILS_FILE  = 'mover.details'
     LOCK_FILE     = 'mover.lock'
@@ -59,18 +58,21 @@ module TorrentProcessor::Plugin
       parse_args args
     end
 
+    protected
+
+    def parse_args args
+      super
+
+      @db     = args[:movie_db] if args[:movie_db]
+    end
+
     def defaults
       {
         :movie_db   => Runtime.service.moviedb,
       }
     end
 
-    def parse_args args
-      args = defaults.merge(args)
-
-      logger  = args[:logger]   if args[:logger]
-      @db     = args[:movie_db] if args[:movie_db]
-    end
+    public
 
     def within_time_frame start_time, stop_time
       start = Time.parse(start_time)
@@ -277,4 +279,5 @@ module TorrentProcessor::Plugin
       glob << '}'
     end
   end # class MovieMover
+  end # module
 end # module TorrentProcessor::Plugin

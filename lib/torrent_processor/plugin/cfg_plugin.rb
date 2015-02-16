@@ -1,5 +1,5 @@
 ##############################################################################
-# File::    cfgplugin.rb
+# File::    cfg_plugin.rb
 # Purpose:: TorrentProcessor Configuration Plugin class.
 #
 # Author::    Jeff McAffee 02/22/2012
@@ -10,9 +10,10 @@
 require 'ktcommon/ktcmdline'
 #require_relative '../utility/formatter'
 
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
 
-  class CfgPlugin
+  class CfgPlugin < BasePlugin
     include ::KtCmdLine
     include TorrentProcessor
     include TorrentProcessor::Utility
@@ -169,12 +170,7 @@ module TorrentProcessor::Plugin
       return true
     end
 
-  private
-
-    def parse_args args
-      args = defaults.merge(args)
-      self.logger = args[:logger] if args[:logger]
-    end
+  protected
 
     def defaults
       {
@@ -182,18 +178,12 @@ module TorrentProcessor::Plugin
       }
     end
 
+  private
+
     ###
     # Strips a command off of a string.
     def cmd_arguments cmd, cmd_string
       args = cmd_string.gsub(cmd, '').strip
-    end
-
-    def logger=(log_obj)
-      @logger = log_obj
-    end
-
-    def log msg = ''
-      @logger.log msg
     end
 
     def cfg
@@ -204,4 +194,5 @@ module TorrentProcessor::Plugin
       TorrentProcessor.save_configuration
     end
   end # class CfgPlugin
+  end # module
 end # module TorrentProcessor::Plugin

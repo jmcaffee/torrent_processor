@@ -23,6 +23,11 @@ module TorrentProcessor
         'uTorrent'
       end
 
+      def settings
+        # Get uTorrent settings
+        webui.get_utorrent_settings
+      end
+
       def seed_ratio
         return @seed_ratio unless @seed_ratio.nil?
 
@@ -136,6 +141,14 @@ module TorrentProcessor
         if ( filter_props.length > 0 )
           response = set_job_properties( filter_props )
         end
+      end
+
+      def rssfilters
+        webui.rssfilters
+      end
+
+      def rssfeeds
+        webui.rssfeeds
       end
 
     private

@@ -8,12 +8,11 @@
 ##############################################################################
 
 
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
 
-  class TorrentCopier
-    #require_relative '../service/robocopy'
+  class TorrentCopier < BasePlugin
 
-    attr_reader :logger
     attr_reader :other_processing
     attr_reader :tv_processing
     attr_reader :movie_processing
@@ -53,7 +52,16 @@ module TorrentProcessor::Plugin
       verify_successful_copy target_path
     end
 
-  private
+    protected
+
+    def parse_args args
+      super
+
+      @completed_dir    = args[:completed_dir]      if args[:completed_dir]
+      @other_processing = args[:other_processing]   if args[:other_processing]
+      @tv_processing    = args[:tv_processing]      if args[:tv_processing]
+      @movie_processing = args[:movie_processing]   if args[:movie_processing]
+    end
 
     def defaults
       { :logger           => ::NullLogger,
@@ -64,18 +72,7 @@ module TorrentProcessor::Plugin
       }
     end
 
-    def parse_args args
-      args = defaults.merge(args)
-      @logger           = args[:logger]             if args[:logger]
-      @completed_dir    = args[:completed_dir]      if args[:completed_dir]
-      @other_processing = args[:other_processing]   if args[:other_processing]
-      @tv_processing    = args[:tv_processing]      if args[:tv_processing]
-      @movie_processing = args[:movie_processing]   if args[:movie_processing]
-    end
-
-    def log msg = ''
-      @logger.log msg
-    end
+    private
 
     def default_torrent_args
       {hash: nil, filename: nil, filedir: '', label: ''}
@@ -110,5 +107,6 @@ module TorrentProcessor::Plugin
       end
     end
   end # class
+  end # module
 end # module
 

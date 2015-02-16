@@ -9,9 +9,10 @@
 
 require 'pathname'
 
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
 
-  class Unrar
+  class Unrar < BasePlugin
 
     def Unrar.register_cmds
       { ".unrar"            => Command.new(Unrar, :cmd_unrar, "Un-rar an archive"),
@@ -69,26 +70,21 @@ module TorrentProcessor::Plugin
       extract_rar destination_location
     end
 
-  private
+    protected
+
+    def parse_args args
+      super
+
+      # Enforce expectations of passed args:
+      args.fetch(:database)
+    end
 
     def defaults
       { :logger           => ::NullLogger,
       }
     end
 
-    def parse_args args
-      args = defaults.merge(args)
-      @logger   = args[:logger]   if args[:logger]
-      @database = args[:database] if args[:database]
-    end
-
-    def log msg = ''
-      @logger.log msg
-    end
-
-    def database
-      @database
-    end
+    private
 
     def default_args
       {hash: nil, filename: nil, filedir: '', label: ''}
@@ -214,4 +210,5 @@ module TorrentProcessor::Plugin
       return str.to_s.gsub("\\", '/')
     end
   end # class
+  end # module
 end # module

@@ -9,7 +9,7 @@
 
 require 'ktcommon/ktpath'
 require 'ktcommon/ktcmdline'
-require_relative 'service/utorrent'
+require_relative 'torrent_app'
 require_relative 'utility/formatter'
 require_relative 'plugin'
 require_relative 'utility/loggers'
@@ -27,7 +27,7 @@ module TorrentProcessor
 
   attr_reader :logger
   attr_reader :verbose
-  attr_reader :utorrent
+  attr_reader :torrent_app
   attr_reader :database
   attr_reader :processor
 
@@ -48,11 +48,14 @@ module TorrentProcessor
 
     def parse_args args
       args = defaults.merge(args)
-      @logger    = args[:logger]    if args[:logger]
-      @verbose   = args[:verbose]   if args[:verbose]
-      @utorrent  = args[:utorrent]  if args[:utorrent]
-      @database  = args[:database]  if args[:database]
-      @processor = args[:processor] if args[:processor]
+      @init_args = args
+
+      @logger     = args[:logger]     if args[:logger]
+      @verbose    = args[:verbose]    if args[:verbose]
+      @webui_type = args[:webui_type] if args[:webui_type]
+      @webui      = args[:webui]      if args[:webui]
+      @database   = args[:database]   if args[:database]
+      @processor  = args[:processor]  if args[:processor]
 
       Formatter.logger = @logger
     end
@@ -62,6 +65,10 @@ module TorrentProcessor
         :logger     => ::ScreenLogger,
         :verbose    => false
       }
+    end
+
+    def torrent_app
+      @torrent_app ||= TorrentApp.new(@init_args)
     end
 
     ###
@@ -89,13 +96,13 @@ module TorrentProcessor
         begin
           result = nil
           elapsed = Benchmark.realtime do
-            result = (@qmode == :webui ? utorrent.send_get_query(q) : database.execute(q))
+            result = (@qmode == :webui ? torrent_app.send_get_query(q) : database.execute(q))
           end
           if @qmode == :webui
             log result if @rmode == :body
             if @rmode == :raw
-              log utorrent.response.inspect
-              log utorrent.response.body
+              log torrent_app.response.inspect
+              log torrent_app.response.body
             end
           end # qmode is webui
 
@@ -121,8 +128,6 @@ module TorrentProcessor
 
 
       end # while q != .quit
-
-      #utorrent.query("list")
     end
 
     ###
@@ -135,11 +140,12 @@ module TorrentProcessor
       elapsed = Benchmark.realtime do
         result = CmdPluginManager.command(cmd,
           {
-            :cmd      => cmd,
-            :logger   => logger,
-            :verbose  => verbose,
-            :utorrent => utorrent,
-            :database => database,
+            :cmd        => cmd,
+            :logger     => logger,
+            :verbose    => verbose,
+            :webui_type => @webui_type,
+            :webui      => @webui,
+            :database   => database,
           })
       end
       log "[#{elapsed} sec]" unless result.nil?
@@ -169,7 +175,7 @@ module TorrentProcessor
       configure_console_commands
       configure_config_commands
       configure_db_commands
-      configure_utorrent_commands
+      configure_torrent_commands
       configure_rss_commands
       configure_utility_commands
     end
@@ -238,20 +244,20 @@ module TorrentProcessor
     end
 
     ###
-    # Configure uTorrent specific commands
+    # Configure Torrent specific commands
     #
-    def configure_utorrent_commands
+    def configure_torrent_commands
       CmdPluginManager.register_plugin(:ut, UTPlugin)
-      @utorrent_cmds = CmdPluginManager.command_list(:ut)
+      @torrent_cmds = CmdPluginManager.command_list(:ut)
 
       # Add the commands to a cmd array.
-      @utorrent_cmds.each do |c|
+      @torrent_cmds.each do |c|
         @cmds << c[0]
       end
     end
 
     ###
-    # Configure uTorrent RSS specific commands
+    # Configure Torrent RSS specific commands
     #
     def configure_rss_commands
       CmdPluginManager.register_plugin(:rss, RSSPlugin)
@@ -292,7 +298,7 @@ module TorrentProcessor
       display_command_list( "Console Commands:", @console_cmds )
       display_command_list( "Configuration Commands:", @cfg_cmds )
       display_command_list( "DB Commands:", @db_cmds )
-      display_command_list( "uTorrent Commands:", @utorrent_cmds )
+      display_command_list( "Torrent Commands:", @torrent_cmds )
       display_command_list( "RSS Commands:", @rss_cmds )
       display_command_list( "Utility Commands:", @util_cmds )
 
@@ -384,9 +390,9 @@ module TorrentProcessor
     # Insert torrents into DB with data from torrents list
     #
     def db_insert
-      data = utorrent.getTorrentList
-      log "Torrents count: #{utorrent.torrents.length.to_s}"
-      torrents = utorrent.torrents
+      data = torrent_app.getTorrentList
+      log "Torrents count: #{torrent_app.torrents.length.to_s}"
+      torrents = torrent_app.torrents
       database.connect
       torrents.each do |k,v|
         database.create(v)
@@ -398,10 +404,10 @@ module TorrentProcessor
     #
 
     def update_plugins_verbose_mode flag
-      @utorrent.verbose = flag
-      @database.verbose = flag
-      @database.logger = logger
-      @processor.verbose = flag
+      @torrent_app.verbose  = flag
+      @database.verbose     = flag
+      @database.logger      = logger
+      @processor.verbose    = flag
     end
   end # class Console
 end # module TorrentProcessor

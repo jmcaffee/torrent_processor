@@ -148,4 +148,28 @@ describe TorrentApp do
       app.apply_seed_limits torrents_to_limit, filters
     end
   end
+
+  context "#settings" do
+
+    it "return torrent app settings" do
+      expect(utorrent_stub).to receive(:get_utorrent_settings)
+      app.settings
+    end
+  end
+
+  context "#rssfilters" do
+
+    it "return rss filters from torrent app" do
+      expect(utorrent_stub).to receive(:rssfilters)
+      app.rssfilters
+    end
+  end
+
+  context "#rssfeeds" do
+
+    it "return rss feeds from torrent app" do
+      expect(utorrent_stub).to receive(:rssfeeds)
+      app.rssfeeds
+    end
+  end
 end

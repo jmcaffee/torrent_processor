@@ -39,7 +39,11 @@ describe Unrar do
     let(:test_root_dir)       { 'tmp/spec/unrar_plugin' }
     let(:logger)              { NullLogger }
 
-    let(:context_args) { { :logger => logger } }
+    let(:context_args) {
+      { :logger => logger,
+        :database => Mocks.db
+      }
+    }
 
     context 'given a .rar archive' do
 

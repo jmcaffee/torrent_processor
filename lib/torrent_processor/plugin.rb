@@ -9,12 +9,13 @@
 
 ##########################################################################
 # TorrentProcessor module
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
+    class PluginError < StandardError; end
+  end
+end # module
 
-  class PluginError < StandardError; end
-
-end # module TorrentProcessor::Plugin
-
+require_relative('plugin/base_plugin')
 require_relative('plugin/cfg_plugin')
 require_relative('plugin/db_plugin')
 require_relative('plugin/ut_plugin')

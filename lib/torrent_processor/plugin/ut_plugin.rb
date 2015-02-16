@@ -1,6 +1,6 @@
 ##############################################################################
 # File::    utplugin.rb
-# Purpose:: uTorrent Plugin class.
+# Purpose:: Torrent App Plugin class.
 #
 # Author::    Jeff McAffee 02/21/2012
 # Copyright:: Copyright (c) 2012, kTech Systems LLC. All rights reserved.
@@ -9,9 +9,10 @@
 
 require 'benchmark'
 
-module TorrentProcessor::Plugin
+module TorrentProcessor
+  module Plugin
 
-  class UTPlugin
+  class UTPlugin < BasePlugin
     #require_relative '../service/utorrent'
     #require_relative '../utility/formatter'
     include TorrentProcessor
@@ -19,13 +20,13 @@ module TorrentProcessor::Plugin
     include Utility
 
     def UTPlugin.register_cmds
-      { ".testcon" =>     Command.new(UTPlugin, :ut_test_connection,  "Test the uTorrent WebUI connection"),
-        ".utsettings" =>  Command.new(UTPlugin, :ut_settings,         "Grab the current uTorrent settings"),
-        ".jobprops" =>    Command.new(UTPlugin, :ut_jobprops,         "Retrieve a torrent's job properties"),
-        ".tlist" =>       Command.new(UTPlugin, :ut_list,             "Get a list of torrents from uTorrent"),
-        ".tnames" =>      Command.new(UTPlugin, :ut_names,            "Display names of torrents in uTorrent"),
-        ".tdetails" =>    Command.new(UTPlugin, :ut_torrent_details,  "Display torrent(s) details"),
-        ".listquery" =>   Command.new(UTPlugin, :ut_list_query,       "Return response output of list query"),
+      { ".testcon" =>     Command.new(UTPlugin, :cmd_test_connection,  "Test the Torrent App WebUI connection"),
+        ".tsettings" =>   Command.new(UTPlugin, :cmd_settings,         "Grab the current Torrent App settings"),
+        ".jobprops" =>    Command.new(UTPlugin, :cmd_jobprops,         "Retrieve a torrent's job properties"),
+        ".tlist" =>       Command.new(UTPlugin, :cmd_list,             "Get a list of torrents from Torrent App"),
+        ".tnames" =>      Command.new(UTPlugin, :cmd_names,            "Display names of torrents in Torrent App"),
+        ".tdetails" =>    Command.new(UTPlugin, :cmd_torrent_details,  "Display torrent(s) details"),
+        ".listquery" =>   Command.new(UTPlugin, :cmd_list_query,       "Return response output of list query"),
         #"." => Command.new(UTPlugin, :, ""),
       }
     end
@@ -33,7 +34,7 @@ module TorrentProcessor::Plugin
     ###
     # Test the webui connection
     #
-    def ut_test_connection(args)
+    def cmd_test_connection(args)
       parse_args args
       cmdtxt = args[:cmd]
 
@@ -41,8 +42,7 @@ module TorrentProcessor::Plugin
       log "..."
 
       begin
-        ut = TorrentProcessor::Service::UTorrent::UTorrentWebUI.new(cfg.utorrent.ip, cfg.utorrent.port, cfg.utorrent.user, cfg.utorrent.pass)
-        utorrent.send_get_query("/gui/?list=1")
+        torrent_app.torrent_list
 
       rescue Exception => e
         log
@@ -57,53 +57,53 @@ module TorrentProcessor::Plugin
       return true
     end
 
-    def ut_settings(args)
+    def cmd_settings(args)
       parse_args args
       cmdtxt = args[:cmd]
 
-      utorrent.get_utorrent_settings()
+      torrent_app.settings
 
       Formatter.print_rule
-      log "  uTorrent Settings"
+      log "  Torrent App Settings"
       Formatter.print_rule
       log
-      #log utorrent.settings.class
-      utorrent.settings.each do |i|
-        #log utorrent.settings.inspect
+      #log torrent_app.settings.class
+      torrent_app.settings.each do |i|
+        #log torrent_app.settings.inspect
         log i.inspect
       end
       return true
     end
 
-    def ut_jobprops(args)
+    def cmd_jobprops(args)
       parse_args args
       cmdtxt = args[:cmd]
 
-      utorrent.get_torrent_list()
-      hashes = select_torrent_hashes( utorrent.torrents )
+      torrent_app.torrent_list
+      hashes = select_torrent_hashes( torrent_app.torrents )
       return true if hashes.nil?
 
       log "  Retrieving Job Properties..."
-      dump_jobprops( utorrent, hashes )
+      dump_jobprops( hashes )
       return true
     end
 
-    def ut_list(args)
+    def cmd_list(args)
       parse_args args
 
-      data = utorrent.get_torrent_list()
-      display_current_torrent_list( utorrent.torrents )
-      log " #{utorrent.torrents.length} Torrent(s) found."
+      data = torrent_app.torrent_list
+      display_current_torrent_list( torrent_app.torrents )
+      log " #{torrent_app.torrents.length} Torrent(s) found."
       log
 
       return true
     end
 
-    def ut_names(args)
+    def cmd_names(args)
       parse_args args
 
-      data = utorrent.get_torrent_list()
-      len = utorrent.torrents.length
+      data = torrent_app.torrent_list
+      len = torrent_app.torrents.length
       if len == 0
         log "No torrents to dump"
         return true
@@ -115,7 +115,7 @@ module TorrentProcessor::Plugin
       Formatter.print_rule
       log
 
-      utorrent.torrents.each do |k,v|
+      torrent_app.torrents.each do |k,v|
         log "...#{k.slice(-4,4)}\t#{v.name}"
       end
 
@@ -129,17 +129,17 @@ module TorrentProcessor::Plugin
     ###
     # Display torrent details
     #
-    def ut_torrent_details(args)
+    def cmd_torrent_details(args)
       parse_args args
 
-      utorrent.get_torrent_list()
-      hashes = select_torrent_hashes( utorrent.torrents )
+      torrent_app.torrent_list
+      hashes = select_torrent_hashes( torrent_app.torrents )
       return true if hashes.nil?
 
       hashes.each do |torr|
         log Formatter.print_rule
         hsh = torr[0]
-        Formatter.print(utorrent.torrents[hsh].to_hsh)
+        Formatter.print(torrent_app.torrents[hsh].to_hsh)
       end # each torr
 
       log Formatter.print_rule
@@ -148,7 +148,7 @@ module TorrentProcessor::Plugin
     end
 
     ###
-    # Return the response data from a uTorrent list query
+    # Return the response data from a Torrent App list query
     #
     # *Args*
     #
@@ -158,10 +158,10 @@ module TorrentProcessor::Plugin
     #
     # nothing
     #
-    def ut_list_query(args)
+    def cmd_list_query(args)
       parse_args args
 
-      response = utorrent.get_torrent_list()
+      response = torrent_app.torrent_list
       Formatter.print_rule
       log response.inspect
       Formatter.print_rule
@@ -169,47 +169,31 @@ module TorrentProcessor::Plugin
       return true
     end
 
-  private
+  protected
 
     def parse_args args
-      args = defaults.merge(args)
+      @torrent_app = nil
+      super
+
       if args[:logger]
-        self.logger = args[:logger]
         Formatter.logger = args[:logger]
       end
-      #self.logger    = args[:logger]   if args[:logger]
-      self.utorrent  = args[:utorrent] if args[:utorrent]
-      self.database  = args[:database] if args[:database]
+
+      unless args[:webui]
+        raise "#{self.class}#parse_args: Missing :webui option"
+      end
     end
 
     def defaults
       {
-        :logger     => NullLogger
+        :cfg     => cfg
       }
     end
 
-    def utorrent=(ut_obj)
-      @utorrent = ut_obj
-    end
+  private
 
-    def utorrent
-      @utorrent
-    end
-
-    def database=(db_obj)
-      @database = db_obj
-    end
-
-    def database
-      @database
-    end
-
-    def logger=(logger_obj)
-      @logger = logger_obj
-    end
-
-    def log msg = ''
-      @logger.log msg
+    def torrent_app
+      @torrent_app ||= TorrentApp.new(init_args)
     end
 
     def cfg
@@ -219,17 +203,17 @@ module TorrentProcessor::Plugin
     ###
     # Display torrent job property data
     #
-    def dump_jobprops( ut, hashes )
+    def dump_jobprops( hashes )
 
       hashes.each do |hsh|
 
         thsh = hsh[0]
         tname = hsh[1]
-        response = utorrent.get_torrent_job_properties( thsh )
+        response = torrent_app.get_torrent_job_properties( thsh )
         #log rows.inspect
         log "Name: #{tname}"
 
-        log "Error: Not found in uTorrent." if response["props"].nil?
+        log "Error: Not found in Torrent App." if response["props"].nil?
         return if response["props"].nil?
 
         tab = "  "
@@ -332,5 +316,6 @@ module TorrentProcessor::Plugin
       # Return the selected hash in an array
       return ([] << indexed_hsh[index])
     end
-  end # class UTPlugin
-end # module TorrentProcessor::Plugin
+  end # class
+  end # module
+end # module
