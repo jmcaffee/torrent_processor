@@ -16,3 +16,6 @@ coverage/
 
 # warbler generated files
 torrent_processor.jar
+
+# Environment setup scripts
+.envsetup
