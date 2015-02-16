@@ -1,4 +1,4 @@
-# TorrentProcessor README
+# TorrentProcessor
 
 
 ## Summary
@@ -82,7 +82,34 @@ $$ List out the questions and what they are for $$
 
 ## Scheduling
 
+## Testing
 
+To successfully run the TMDb tests, you'll need you're TMDb API key (see above).
+Create a file named `.envsetup` in the project root containing the following:
+
+    #!/bin/bash
+    # vi: ft=shell
+
+    export TMDB_API_KEY=PUT_YOUR_KEY_HERE
+
+Replace `PUT_YOUR_KEY_HERE` with your API key and save it.
+
+Before running tests, in the terminal your start the tests from, source `.envsetup`
+file, then run your tests. The tests will look for the API key in the
+environment variables.
+
+    $ source ./.envsetup
+    $ bundle exec rspec
+
+Or, if using guard:
+
+    $ source ./.envsetup
+    $ bundle exec guard
+
+`.envsetup` is ignored in `.gitignore` so you don't have to worry about your
+API key getting uploaded to the repo.
+
+---
 
 = File:   README.txt
 = Purpose:  Additions, modifications and notes for TorrentProcessor.
