@@ -5,7 +5,8 @@ gem "nokogiri"
 gem "hoe", ">=1.3"
 gem "json"
 gem "ktcommon", :git => 'git@bitbucket.org:ktechsystems/ktcommon.git'
-gem "ktutils",  :git => 'git@github.com:jmcaffee/ktutils.git'
+gem "ktutils"#,  :git => 'git@github.com:jmcaffee/ktutils.git'
+gem "qbt_client"
 gem "s4t-utils"
 gem "sqlite3",      :platforms => [:ruby, :mswin, :mingw]
 gem "dbi",          :platforms => :jruby

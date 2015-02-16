@@ -5,12 +5,6 @@ GIT
     ktcommon (0.0.7)
       git_store
 
-GIT
-  remote: git@github.com:jmcaffee/ktutils.git
-  revision: 4306bc9e169087e2ddb963a17f3d339e8afd0bbf
-  specs:
-    ktutils (0.0.3)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -58,6 +52,7 @@ GEM
     jruby-jars (1.7.18)
     json (1.8.1)
     json (1.8.1-java)
+    ktutils (0.0.3)
     listen (2.8.5)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
@@ -93,6 +88,8 @@ GEM
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
     puck (1.0.0.pre4)
+    qbt_client (0.1.0)
+      httparty (~> 0.7)
     rake (10.1.0)
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
@@ -155,13 +152,14 @@ DEPENDENCIES
   jruby-jars (= 1.7.18)
   json
   ktcommon!
-  ktutils!
+  ktutils
   nokogiri
   pry
   pry-nav
   pry-rescue
   pry-stack_explorer
   puck (>= 1.0.0.pre)
+  qbt_client
   rb-readline
   rdoc
   rspec
