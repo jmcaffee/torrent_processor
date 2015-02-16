@@ -8,7 +8,7 @@ utorrent: !ruby/object:TorrentProcessor::Configuration::UTorrentConfiguration
   seed_ratio: 0
 tmdb: !ruby/object:TorrentProcessor::Configuration::TMdbConfiguration
   language: en
-  api_key: ***REMOVED***
+  api_key: itsasecret
   target_movies_path: tmp/spec/console/movies_final
   can_copy_start_time: '00:00'
   can_copy_stop_time: '23:59'

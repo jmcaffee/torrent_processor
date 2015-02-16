@@ -14,7 +14,7 @@
 :filters:
   thepiratebay: '0'
   announce.torrentday.com: '2500'
-:tmdb_api_key: ***REMOVED***
+:tmdb_api_key: itsasecret
 :target_movies_path: tmp/spec/tpsetup/movies_final
 :can_copy_start_time: '03:00'
 :can_copy_stop_time: '22:00'

@@ -38,7 +38,7 @@ describe TorrentProcessor do
       cfg.utorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
       cfg.utorrent.seed_ratio             = 0
 
-      cfg.tmdb.api_key              = '***REMOVED***'
+      cfg.tmdb.api_key              = ENV['TMDB_API_KEY']
       cfg.tmdb.language             = 'en'
       cfg.tmdb.target_movies_path   = File.join(tmp_path, 'movies_final')
       cfg.tmdb.can_copy_start_time  = "00:00"
