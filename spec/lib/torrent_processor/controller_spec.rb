@@ -51,7 +51,7 @@ describe Controller do
   describe '#process' do
 
     before(:each) do
-      allow_any_instance_of(FileLogger).to receive(:log)
+      allow(FileLogger).to receive(:log)
       allow_any_instance_of(TorrentProcessor::Processor).to receive(:process)
     end
 
