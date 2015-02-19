@@ -19,3 +19,4 @@ torrent_processor.jar
 
 # Environment setup scripts
 .envsetup
+bk.ruby-version
