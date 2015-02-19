@@ -13,7 +13,7 @@ module TorrentProcessor::Service
 end # module TorrentProcessor::Service
 
 require_relative('service/utorrent')
-require_relative 'service/qbittorrent'
+require_relative 'service/q_bit_torrent'
 require_relative('service/robocopy')
 require_relative('service/seven_zip')
 

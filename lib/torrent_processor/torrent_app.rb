@@ -8,6 +8,7 @@
 ##############################################################################
 
 require_relative 'service/u_torrent_adapter'
+require_relative 'service/q_bit_torrent_adapter'
 
 module TorrentProcessor
 
@@ -45,12 +46,12 @@ module TorrentProcessor
     # controller:: controller object
     #
     def initialize(args)
+      @adapter    = nil
+
       if args[:webui] and !args[:webui_type]
         raise ":webui_type required when :webui provided"
       end
       parse_args args
-
-      @adapter    = nil
     end
 
     def parse_args args
@@ -61,6 +62,7 @@ module TorrentProcessor
       @verbose    = args[:verbose]    if args[:verbose]
       @logger     = args[:logger]     if args[:logger]
       @webui_type = args[:webui_type] if args[:webui_type]
+      @adapter    = args[:adapter]    if args[:adapter]
     end
 
     def defaults
@@ -76,6 +78,8 @@ module TorrentProcessor
 
       if @webui_type == :utorrent
         @adapter = Service::UTorrentAdapter.new(@init_args)
+      elsif @webui_type == :qbtorrent
+        @adapter = Service::QBitTorrentAdapter.new(@init_args)
       else
         raise "Unknown webui_type: :#{@webui_type}"
       end
