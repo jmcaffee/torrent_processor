@@ -1,4 +1,5 @@
-##############################################################################
+# encoding: utf-8
+# ##############################################################################
 # File::    torrent_spec_helper.rb
 # Purpose:: Spec helper methods for providing torrent data
 # 
@@ -559,6 +560,175 @@ module TorrentSpecHelper
       ["cache.read_prune", 1, "true", {"access"=>"Y"}],
       ["cache.read_thrash", 1, "false", {"access"=>"Y"}],
     ]
+  end
+
+  def self.qbt_torrent_list_data
+    [
+      {
+          "dlspeed"=>"3.1 MiB/s",
+          "eta"=>"9m",
+          "hash"=>"156b69b8643bd11849a5d8f2122e13fbb61bd041",
+          "name"=>"slackware64-14.1-iso",
+          "num_leechs"=>"1 (14)",
+          "num_seeds"=>"97 (270)",
+          "priority"=>"*",
+          "progress"=>0.172291,
+          "ratio"=>"0.0",
+          "size"=>"2.2 GiB",
+          "state"=>"downloading",
+          "upspeed"=>"0 B/s"
+      },
+      {
+        "dlspeed"=>"1.8 KiB/s",
+        "eta"=>"28d 1h",
+        "hash"=>"1fe5775d32d3e58e48b3a96dd2883c5250882cda",
+        "name"=>"Grimm.S04E12.720p.HDTV.X264-DIMENSION.mkv",
+        "num_leechs"=>"7 (471)",
+        "num_seeds"=>"15 (1866)",
+        "priority"=>"*",
+        "progress"=>1.53669e-07,
+        "ratio"=>"0.0",
+        "size"=>"825.4 MiB",
+        "state"=>"downloading",
+        "upspeed"=>"0 B/s"
+      }
+    ]
+  end
+
+  def self.qbt_torrent_properties_data
+    {
+      "comment"=>"Visit us: https://eztv.ch/ - Bitcoin: 1EZTVaGQ6UsjYJ9fwqGnd45oZ6HGT7WKZd",
+      "creation_date"=>"Friday, February 6, 2015 8:01:22 PM MST",
+      "dl_limit"=>"∞",
+      "nb_connections"=>"0 (100 max)",
+      "piece_size"=>"512.0 KiB",
+      "save_path"=>"/home/jeff/Downloads/",
+      "share_ratio"=>"0.0",
+      "time_elapsed"=>"< 1m",
+      "total_downloaded"=>"646.8 KiB (657.8 KiB this session)",
+      "total_uploaded"=>"0 B (0 B this session)",
+      "total_wasted"=>"428 B",
+      "up_limit"=>"∞"
+    }
+  end
+
+  def self.qbt_torrent_tracker_data
+    [
+      {
+        "msg"=>"",
+        "num_peers"=>"0",
+        "status"=>"Working",
+        "url"=>"udp://open.demonii.com:1337"},
+      {
+        "msg"=>"",
+        "num_peers"=>"0",
+        "status"=>"Not contacted yet",
+        "url"=>"udp://tracker.coppersurfer.tk:6969"},
+      {
+        "msg"=>"",
+        "num_peers"=>"0",
+        "status"=>"Not contacted yet",
+        "url"=>"udp://tracker.leechers-paradise.org:6969"},
+      {
+        "msg"=>"",
+        "num_peers"=>"0",
+        "status"=>"Not contacted yet",
+        "url"=>"udp://exodus.desync.com:6969"}
+    ]
+  end
+
+  def self.qbt_torrent_contents_data
+    [
+      {
+        "is_seed"=>false,
+        "name"=>"Grimm.S04E12.720p.HDTV.X264-DIMENSION.mkv",
+        "priority"=>1,
+        "progress"=>0.0,
+        "size"=>"825.4 MiB"
+      }
+    ]
+  end
+
+  def self.qbt_app_transfer_data
+    {
+      "dl_info"=>"D: 0 B/s/s - T: 657.8 KiB",
+      "up_info"=>"U: 0 B/s/s - T: 0 B"
+    }
+  end
+
+  def self.qbt_settings_data
+    {
+      "alt_dl_limit"=>10,
+      "alt_up_limit"=>10,
+      "anonymous_mode"=>false,
+      "autorun_enabled"=>false,
+      "autorun_program"=>"",
+      "bypass_local_auth"=>false,
+      "dht"=>true,
+      "dhtSameAsBT"=>true,
+      "dht_port"=>6881,
+      "dl_limit"=>-1,
+      "dont_count_slow_torrents"=>false,
+      "download_in_scan_dirs"=>[],
+      "dyndns_domain"=>"changeme.dyndns.org",
+      "dyndns_enabled"=>false,
+      "dyndns_password"=>"",
+      "dyndns_service"=>0,
+      "dyndns_username"=>"",
+      "enable_utp"=>true,
+      "encryption"=>0,
+      "export_dir"=>"",
+      "export_dir_enabled"=>false,
+      "incomplete_files_ext"=>false,
+      "ip_filter_enabled"=>false,
+      "ip_filter_path"=>"",
+      "limit_tcp_overhead"=>false,
+      "limit_utp_rate"=>true,
+      "listen_port"=>6881,
+      "locale"=>"en_US",
+      "lsd"=>true,
+      "mail_notification_auth_enabled"=>false,
+      "mail_notification_email"=>"",
+      "mail_notification_enabled"=>false,
+      "mail_notification_password"=>"",
+      "mail_notification_smtp"=>"smtp.changeme.com",
+      "mail_notification_ssl_enabled"=>false,
+      "mail_notification_username"=>"",
+      "max_active_downloads"=>3,
+      "max_active_torrents"=>5,
+      "max_active_uploads"=>3,
+      "max_connec"=>500,
+      "max_connec_per_torrent"=>100,
+      "max_uploads_per_torrent"=>4,
+      "pex"=>true,
+      "preallocate_all"=>false,
+      "proxy_auth_enabled"=>false,
+      "proxy_ip"=>"0.0.0.0",
+      "proxy_password"=>"",
+      "proxy_peer_connections"=>false,
+      "proxy_port"=>8080,
+      "proxy_type"=>-1,
+      "proxy_username"=>"",
+      "queueing_enabled"=>false,
+      "save_path"=>"/home/jeff/Downloads",
+      "scan_dirs"=>[],
+      "schedule_from_hour"=>8,
+      "schedule_from_min"=>0,
+      "schedule_to_hour"=>20,
+      "schedule_to_min"=>0,
+      "scheduler_days"=>0,
+      "scheduler_enabled"=>false,
+      "ssl_cert"=>"",
+      "ssl_key"=>"",
+      "temp_path"=>"/home/jeff/Downloads/temp",
+      "temp_path_enabled"=>false,
+      "up_limit"=>50,
+      "upnp"=>true,
+      "use_https"=>false,
+      "web_ui_password"=>"ae150cdc82b40c4373d2e15e0ffe8f67",
+      "web_ui_port"=>8083,
+      "web_ui_username"=>"admin"
+    }
   end
 end # module TorrentSpecHelper
 
