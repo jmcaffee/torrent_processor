@@ -13,8 +13,6 @@ module TorrentProcessor
   module Plugin
 
   class UTPlugin < BasePlugin
-    #require_relative '../service/utorrent'
-    #require_relative '../utility/formatter'
     include TorrentProcessor
     include KtCmdLine
     include Utility
@@ -210,11 +208,13 @@ module TorrentProcessor
         thsh = hsh[0]
         tname = hsh[1]
         response = torrent_app.get_torrent_job_properties( thsh )
-        #log rows.inspect
+
         log "Name: #{tname}"
 
-        log "Error: Not found in Torrent App." if response["props"].nil?
-        return if response["props"].nil?
+        if response["props"].nil?
+          log "Error: Not found in Torrent App."
+          return
+        end
 
         tab = "  "
         log tab + "uTorrent Build: #{response["build"]}"
