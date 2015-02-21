@@ -197,7 +197,7 @@ def generate_configuration dir_name, &block
   cfg_file = File.join(dir_name, 'config.yml')
 
   rm cfg_file if File.exists? cfg_file
-  cp 'spec/data/new_config.yml', cfg_file
+  cp 'spec/data/config-v2.yml', cfg_file
   TorrentProcessor.load_configuration cfg_file
 
   if block_given?
@@ -210,7 +210,8 @@ def generate_configuration dir_name, &block
       config.movie_processing         = File.join(dir_name, 'movie')
       config.other_processing         = File.join(dir_name, 'other')
       config.utorrent.dir_completed_download  = File.join(dir_name, 'completed')
-      config.tmdb.target_movies_path            = File.join(dir_name, 'final_movies')
+      config.qbtorrent.dir_completed_download = File.join(dir_name, 'completed')
+      config.tmdb.target_movies_path          = File.join(dir_name, 'final_movies')
 
       mkpath config.tv_processing
       mkpath config.movie_processing
