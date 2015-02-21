@@ -44,7 +44,7 @@ module TorrentProcessor
 
       def torrent_list
         # Get a list of torrents.
-        torrents = webui.torrent_list
+        converted_torrent_list(webui.torrent_list)
       end
 
       def get_torrent_job_properties torrent_hash
@@ -93,7 +93,7 @@ module TorrentProcessor
       # Return list of cached torrents
       #
       def torrents
-        @cached_torrents ||= webui.torrent_list
+        @cached_torrents ||= converted_torrent_list(webui.torrent_list)
       end
 
       def remove_torrent torrent_hash
@@ -176,10 +176,10 @@ module TorrentProcessor
         @database = args[:database] if args[:database]
 
         unless @cfg.nil?
-          @ip   = @cfg.utorrent.ip
-          @port = @cfg.utorrent.port
-          @user = @cfg.utorrent.user
-          @pass = @cfg.utorrent.pass
+          @ip   = @cfg.qbtorrent.ip
+          @port = @cfg.qbtorrent.port
+          @user = @cfg.qbtorrent.user
+          @pass = @cfg.qbtorrent.pass
         end
       end
 
@@ -193,7 +193,7 @@ module TorrentProcessor
       def webui
         return @webui unless @webui.nil?
 
-        @webui = UTorrent::UTorrentWebUI.new(@ip, @port, @user, @pass)
+        @webui = QbtClient::WebUI.new(@ip, @port, @user, @pass)
       end
 
       def database
@@ -214,6 +214,27 @@ module TorrentProcessor
         # downloads dir string ends with a back slash (in winBLOWs) so strip
         # if off if it exists.
         #@completed_downloads_dir = @completed_downloads_dir[0..-2] if @completed_downloads_dir.end_with?('\\')
+      end
+
+      ###
+      # Convert the torrent data structure to a common format for the app
+      #
+
+      def converted_torrent_list torrent_list_data
+        converted_torrents = {}
+
+        torrent_list_data.each do |t|
+          hash = t['hash']
+          # qbt torrent data is split into the list data, and properties data.
+          props = webui.properties hash
+          # Merge the properties data in to the list data.
+          converted_torrents[hash] = TorrentProcessor::Service::QBitTorrent::TorrentData.new(t.merge(props))
+
+          # Convert floating point percentages to integer where 1000 = 100%
+          converted_torrents[hash].normalize_percents
+        end
+
+        converted_torrents
       end
     end # class QBitTorrentAdapter
   end

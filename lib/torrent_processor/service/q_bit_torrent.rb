@@ -14,6 +14,6 @@ module TorrentProcessor
   end
 end
 
-#require_relative 'qbittorrent/torrent_data'
+require_relative 'q_bit_torrent/torrent_data'
 #require_relative 'qbittorrent/rss_torrent_data'
 require_relative 'q_bit_torrent/client'

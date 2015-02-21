@@ -15,18 +15,18 @@ module TorrentProcessor::Service::UTorrent
 
   class TorrentData
 
-    attr_accessor :hash
-    attr_accessor :status
-    attr_accessor :name
+    attr_accessor :hash               # DB field
+    attr_accessor :status             # DB field
+    attr_accessor :name               # DB field
     attr_accessor :size
-    attr_accessor :percent_progress
+    attr_accessor :percent_progress   # DB field
     attr_accessor :downloaded
     attr_accessor :uploaded
-    attr_accessor :ratio
+    attr_accessor :ratio              # DB field
     attr_accessor :upload_speed
     attr_accessor :download_speed
     attr_accessor :eta
-    attr_accessor :label
+    attr_accessor :label              # DB field
     attr_accessor :peers_connected
     attr_accessor :peers_in_swarm
     attr_accessor :seeds_connected
@@ -36,12 +36,12 @@ module TorrentProcessor::Service::UTorrent
     attr_accessor :remaining
     attr_accessor :unk1
     attr_accessor :unk2
-    attr_accessor :msg
+    attr_accessor :msg                # DB field
     attr_accessor :unk4
     attr_accessor :unk5
     attr_accessor :unk6
     attr_accessor :unk7
-    attr_accessor :folder
+    attr_accessor :folder             # DB field
     attr_accessor :unk8
 
     ###

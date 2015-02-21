@@ -39,6 +39,15 @@ describe QBitTorrentAdapter do
     end
   end
 
+  context "#torrent_list" do
+
+    it "returns all torrents" do
+      torrents = adapter.torrent_list
+
+      expect(adapter.get_torrent_job_properties(hash).key?('comment')).to eq true
+    end
+  end
+
   context "#get_torrent_job_properties" do
 
     it "returns properties of a torrent" do
