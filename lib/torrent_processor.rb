@@ -10,6 +10,7 @@
 require 'find'
 require 'logger'
 require 'ktutils/os'
+require 'torrent_processor/version'
 
 module TorrentProcessor
   class << self
@@ -46,6 +47,7 @@ module TorrentProcessor
   end
 
   class Configuration
+    attr_accessor :version
     attr_accessor :app_path
     attr_accessor :logging
     attr_accessor :max_log_size
@@ -55,16 +57,30 @@ module TorrentProcessor
     attr_accessor :other_processing
     attr_accessor :filters
 
+    attr_accessor :backend
     attr_accessor :utorrent
+    attr_accessor :qbtorrent
     attr_accessor :tmdb
 
     def initialize
+      @version = 2
+      @backend = :qbtorrent
       @utorrent = UTorrentConfiguration.new
+      @qbtorrent = QBitTorrentConfiguration.new
       @tmdb = TMdbConfiguration.new
       @filters = {}
     end
 
     class UTorrentConfiguration
+      attr_accessor :ip
+      attr_accessor :port
+      attr_accessor :user
+      attr_accessor :pass
+      attr_accessor :dir_completed_download
+      attr_accessor :seed_ratio
+    end
+
+    class QBitTorrentConfiguration
       attr_accessor :ip
       attr_accessor :port
       attr_accessor :user
@@ -98,7 +114,6 @@ end
 ##############################################################################
 # Require each lib file
 #
-require 'torrent_processor/version'
 require 'torrent_processor/utility'
 require 'torrent_processor/service'
 require 'torrent_processor/controller'

@@ -54,16 +54,49 @@ module TorrentProcessor
       setup_db()
     end
 
-    def config_needs_upgrade?
-      needs_upgrade = false
+    ###
+    # Return the current config version
+    #
+    # -1: no config file exists
+    #
+
+    def current_config_version
       if File.exist? cfg_path
+        qbtorrent_found = false
         File.read(cfg_path).each_line do |line|
           if line.include?('appPath')
-            return true
+            return 0
+
+          elsif line.include?('qbtorrent: !ruby/object')
+            qbtorrent_found = true
+
+          elsif line.include?('version')
+            version_found = line.gsub('version: ', '')
+
+            if version_found.include? '.'
+              return 0
+
+            else
+              return version_found.to_i
+            end
           end
         end
+        # There should be no qbtorrent item in v1
+        return 1 unless qbtorrent_found
       end
-      false
+      -1
+    end
+
+    ###
+    # Return true if current version < new version
+    #
+
+    def config_needs_upgrade?
+      current_version = current_config_version
+      return false if current_version < 0
+
+      new_version = TorrentProcessor::Configuration.new.version
+      current_version < new_version
     end
 
     def backup_config
@@ -74,38 +107,10 @@ module TorrentProcessor
     end
 
     def upgrade_config path
-      #old_config = Config.new(path).load
-      #TorrentProcessor.configure do |config|
-      #  config.app_path         = old_config[:appPath]
-      #  config.logging          = old_config[:logging]
-      #  config.log_dir          = old_config[:logdir]
-      #  config.max_log_size     = old_config[:maxlogsize]
-      #  config.tv_processing    = old_config[:tvprocessing]
-      #  config.movie_processing = old_config[:movieprocessing]
-      #  config.other_processing = old_config[:otherprocessing]
-      #  config.other_processing = old_config[:otherprocessing]
+      current_version = current_config_version
+      return if current_version < 0
 
-      #  # Create an empty hash if needed.
-      #  config.filters = {} if config.filters.nil?
-
-      #  # Copy filters hash.
-      #  old_config[:filters].each do |k,v|
-      #    config.filters[k] = v
-      #  end
-
-      #  config.utorrent.ip    = old_config[:ip]
-      #  config.utorrent.port  = old_config[:port]
-      #  config.utorrent.user  = old_config[:user]
-      #  config.utorrent.pass  = old_config[:pass]
-      #  config.utorrent.pass  = old_config[:pass]
-
-      #  config.tmdb.api_key             = old_config[:tmdb_api_key]
-      #  config.tmdb.target_movies_path  = old_config[:target_movies_path]
-      #  config.tmdb.can_copy_start_time = old_config[:can_copy_start_time]
-      #  config.tmdb.can_copy_stop_time  = old_config[:can_copy_stop_time]
-      #end
-
-      #TorrentProcessor.save_configuration(File.join(path, 'config.yml'))
+      migrate_to_v2 path
     end
 
     ###
@@ -129,6 +134,93 @@ module TorrentProcessor
         appdata = File.join(ENV['HOME'], '.torrentprocessor')
       end
     end
+
+    def migrate_to_v1 path
+      return if current_config_version >= 1
+
+      old_config = YAML.load_file(File.join(path, 'config.yml'))
+
+      # Upgrade to version 1
+      config = TorrentProcessor::Configuration.new
+
+      config.version          = '0.3.2'
+      config.app_path         = old_config[:appPath]
+      config.logging          = old_config[:logging]
+      config.log_dir          = old_config[:logdir]
+      config.max_log_size     = old_config[:maxlogsize]
+      config.tv_processing    = old_config[:tvprocessing]
+      config.movie_processing = old_config[:movieprocessing]
+      config.other_processing = old_config[:otherprocessing]
+      config.other_processing = old_config[:otherprocessing]
+
+      # Create an empty hash if needed.
+      config.filters = {} if config.filters.nil?
+
+      # Copy filters hash.
+      old_config[:filters].each do |k,v|
+        config.filters[k] = v
+      end
+
+      config.utorrent.ip    = old_config[:ip]
+      config.utorrent.port  = old_config[:port]
+      config.utorrent.user  = old_config[:user]
+      config.utorrent.pass  = old_config[:pass]
+
+      config.tmdb.api_key             = old_config[:tmdb_api_key]
+      config.tmdb.target_movies_path  = old_config[:target_movies_path]
+      config.tmdb.can_copy_start_time = old_config[:can_copy_start_time]
+      config.tmdb.can_copy_stop_time  = old_config[:can_copy_stop_time]
+
+      File.open(File.join(path, 'config.yml'), 'w') do |out|
+        YAML.dump(config, out)
+      end
+    end
+
+    def migrate_to_v2 path
+      migrate_to_v1 path
+
+      return if current_config_version >= 2
+
+      old_config = YAML.load_file(File.join(path, 'config.yml'))
+
+      # Upgrade to version 2
+      config = TorrentProcessor::Configuration.new
+
+      config.version          = 2
+      config.app_path         = old_config.app_path
+      config.logging          = old_config.logging
+      config.log_dir          = old_config.log_dir
+      config.max_log_size     = old_config.max_log_size
+      config.tv_processing    = old_config.tv_processing
+      config.movie_processing = old_config.movie_processing
+      config.other_processing = old_config.other_processing
+      config.other_processing = old_config.other_processing
+
+      # Create an empty hash if needed.
+      config.filters = {} if config.filters.nil?
+
+      # Copy filters hash.
+      old_config.filters.each do |k,v|
+        config.filters[k] = v
+      end
+
+      config.backend        = :utorrent
+
+      config.utorrent.ip    = old_config.utorrent.ip
+      config.utorrent.port  = old_config.utorrent.port
+      config.utorrent.user  = old_config.utorrent.user
+      config.utorrent.pass  = old_config.utorrent.pass
+
+      config.tmdb.api_key             = old_config.tmdb.api_key
+      config.tmdb.target_movies_path  = old_config.tmdb.target_movies_path
+      config.tmdb.can_copy_start_time = old_config.tmdb.can_copy_start_time
+      config.tmdb.can_copy_stop_time  = old_config.tmdb.can_copy_stop_time
+
+      File.open(File.join(path, 'config.yml'), 'w') do |out|
+        YAML.dump(config, out)
+      end
+    end
+
 
   private
 
@@ -182,11 +274,31 @@ module TorrentProcessor
         FileUtils.rm( cfg_path ) if File.exists?(cfg_path)
       end
 
+      print_header("Torrent Processor Setup")
+
+      answers = ask_user(["Are you using uTorrent, or qBitTorrent (u/q)", 'q'])
+      backend = answers.first
+
+      # Default to utorrent
+      ip = cfg.utorrent.ip
+      port = cfg.utorrent.port
+      user = cfg.utorrent.user
+      pass = cfg.utorrent.pass
+      tapp_name = 'uTorrent'
+
+      if backend == 'q'
+        ip = cfg.qbtorrent.ip
+        port = cfg.qbtorrent.port
+        user = cfg.qbtorrent.user
+        pass = cfg.qbtorrent.pass
+        tapp_name = 'qBitTorrent'
+      end
+
       questions = []
-      questions << ["IP of machine running uTorrent",                     cfg.utorrent.ip]
-      questions << ["uTorrent webui port",                                cfg.utorrent.port]
-      questions << ["uTorrent webui user name",                           cfg.utorrent.user]
-      questions << ["uTorrent webui user password",                       cfg.utorrent.pass]
+      questions << ["IP of machine running #{tapp_name}",                 ip]
+      questions << ["#{tapp_name} webui port",                            port]
+      questions << ["#{tapp_name} webui user name",                       user]
+      questions << ["#{tapp_name} webui user password",                   pass]
       questions << ["Folder to store logs in (full path)",                cfg.app_path]
       questions << ["Max size of log file in bytes (0 = no limit)",       cfg.max_log_size]
       questions << ["Processing folder for TV Shows (full path)",         cfg.tv_processing]
@@ -248,10 +360,19 @@ module TorrentProcessor
         answers = ask_user(questions)
       end
 
-      cfg.utorrent.ip               = answers[0]
-      cfg.utorrent.port             = answers[1]
-      cfg.utorrent.user             = answers[2]
-      cfg.utorrent.pass             = answers[3]
+      if backend == 'u'
+        cfg.utorrent.ip             = answers[0]
+        cfg.utorrent.port           = answers[1]
+        cfg.utorrent.user           = answers[2]
+        cfg.utorrent.pass           = answers[3]
+        cfg.backend                 = :utorrent
+      else
+        cfg.qbtorrent.ip            = answers[0]
+        cfg.qbtorrent.port          = answers[1]
+        cfg.qbtorrent.user          = answers[2]
+        cfg.qbtorrent.pass          = answers[3]
+        cfg.backend                 = :qbtorrent
+      end
       cfg.log_dir                   = answers[4]
       cfg.max_log_size              = answers[5]
       cfg.tv_processing             = answers[6]
@@ -293,8 +414,7 @@ module TorrentProcessor
     # questions:: array of questions.
     # returns:: array of user's answers. Index of answer matches index of question.
     def ask_user(questions)
-      print_header("Torrent Processor Setup")
-
+      questions = Array(questions)
       answers = []
       questions.each do |tq|
         if tq.is_a?(Array)
