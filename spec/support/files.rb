@@ -34,3 +34,10 @@ def create_old_style_rar_file dest_dir
   cp src, dest_dir
 end
 
+def in_file? search_str, file
+  found = false
+  File.read(file).each_line do |line|
+    return true if line.include? search_str
+  end
+  false
+end
