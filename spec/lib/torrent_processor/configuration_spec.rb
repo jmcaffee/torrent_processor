@@ -99,6 +99,37 @@ describe TorrentProcessor do
       end
     end # context #utorrent
 
+    context '#qbtorrent' do
+
+      subject do
+        TorrentProcessor.configure do |cfg|
+          cfg.qbtorrent.ip                     = '127.0.0.1'
+          cfg.qbtorrent.port                   = '8081'
+          cfg.qbtorrent.user                   = 'testuser'
+          cfg.qbtorrent.pass                   = 'testpass'
+          cfg.qbtorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
+          cfg.qbtorrent.seed_ratio             = 0
+        end
+        TorrentProcessor.configuration.qbtorrent
+      end
+
+      its(:ip) { should == '127.0.0.1' }
+
+      its(:port) { should == '8081' }
+
+      its(:user) { should == 'testuser' }
+
+      its(:pass) { should == 'testpass' }
+
+      its(:dir_completed_download) { should == File.join(tmp_path, 'torrents/completed') }
+
+      its(:seed_ratio) { should == 0 }
+
+      it 'returns a QBitTorrentConfiguration object' do
+        expect(TorrentProcessor.configuration.qbtorrent).to_not be nil
+      end
+    end
+
     context '#tmdb' do
 
       subject do
