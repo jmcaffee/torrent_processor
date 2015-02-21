@@ -3,8 +3,6 @@ module Mocks
     tmp_dir = spec_tmp_dir(relative_tmp_dir)
 
     TorrentProcessor.configure do |cfg|
-    #puts 'CONFIG:'
-    #puts cfg.inspect
 
       cfg.app_path          = tmp_dir
       cfg.logging           = false
