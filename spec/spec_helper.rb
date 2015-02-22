@@ -17,10 +17,9 @@ RSpec.configure do |config|
 
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing
-  # the seed, which is printed after each run.
+  # the seed, which is printed after each run, in .rspec file.
   #     --seed 1234
   config.order = 'random'
-  config.order = 59885
 
   config.mock_with :rspec do |mocks|
 
@@ -180,9 +179,8 @@ class CaptureLogger < NullLogger
     messages.each do |m|
       return true if m.include?(text)
     end
-    msgs = ''
-    messages.each { |m| msgs << m + "\n" }
-    raise "'#{text}' not found in:\n#{msgs}"
+
+    raise "'#{text}' not found in:\n#{Array(messages).join("\n")}"
   end
 
   def CaptureLogger.does_not_contain text
