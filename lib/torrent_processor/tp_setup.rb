@@ -276,7 +276,7 @@ module TorrentProcessor
 
       print_header("Torrent Processor Setup")
 
-      answers = ask_user(["Are you using uTorrent, or qBitTorrent (u/q)", 'q'])
+      answers = ask_user([["Are you using uTorrent, or qBitTorrent (u/q)", 'q']])
       backend = answers.first
 
       # Default to utorrent

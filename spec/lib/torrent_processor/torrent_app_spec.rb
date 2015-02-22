@@ -137,5 +137,10 @@ describe TorrentApp do
       expect(adapter_mock).to receive(:rssfeeds)
       app.rssfeeds
     end
+
+    it "#dump_job_properties" do
+      expect(adapter_mock).to receive(:dump_job_properties)
+      app.dump_job_properties "hash1"
+    end
   end
 end

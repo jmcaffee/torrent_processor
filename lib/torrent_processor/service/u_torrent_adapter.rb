@@ -151,6 +151,39 @@ module TorrentProcessor
         webui.rssfeeds
       end
 
+      def dump_job_properties torrent_hash
+        response = webui.get_torrent_job_properties( torrent_hash )
+
+        if response["props"].nil?
+          log "Error: Not found in Torrent App."
+          return
+        end
+
+        tab = "  "
+        log tab + "uTorrent Build: #{response["build"]}"
+        log "Props:"
+        props = response["props"][0]
+        log tab + "hash: " + props["hash"]
+        log tab + "ulrate:        " + props["ulrate"].to_s
+        log tab + "dlrate:        " + props["dlrate"].to_s
+        log tab + "superseed:     " + props["superseed"].to_s
+        log tab + "dht:           " + props["dht"].to_s
+        log tab + "pex:           " + props["pex"].to_s
+        log tab + "seed_override: " + props["seed_override"].to_s
+        log tab + "seed_ratio:    " + props["seed_ratio"].to_s
+        log tab + "seed_time:     " + props["seed_time"].to_s
+        log tab + "ulslots:       " + props["ulslots"].to_s
+        log tab + "seed_num:      " + props["seed_num"].to_s
+        log
+        log tab + "trackers: "
+        props["trackers"].split("\r\n").each do |tracker|
+          log tab + tab + tracker
+        end
+        log
+        log "------------------------------------"
+        log
+      end
+
     private
 
       def parse_args args

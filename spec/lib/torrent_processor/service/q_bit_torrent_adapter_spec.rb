@@ -223,4 +223,16 @@ describe QBitTorrentAdapter do
       expect(adapter.rssfeeds).to be_empty
     end
   end
+
+  context "#dump_job_properties" do
+
+    it "writes qBitTorrent torrent job properties to the log" do
+      hash = "156b69b8643bd11849a5d8f2122e13fbb61bd041"
+      expect(qbt_stub).to receive(:torrent_list)
+      expect(qbt_stub).to receive(:trackers).with(hash)
+      expect(qbt_stub).to receive(:properties).with(hash)
+
+      adapter.dump_job_properties hash
+    end
+  end
 end

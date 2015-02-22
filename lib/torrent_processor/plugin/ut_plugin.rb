@@ -36,7 +36,19 @@ module TorrentProcessor
       parse_args args
       cmdtxt = args[:cmd]
 
-      log "Attempting to connect to #{cfg.utorrent.ip}:#{cfg.utorrent.port} using login #{cfg.utorrent.user}/#{cfg.utorrent.pass}"
+      ip = cfg.utorrent.ip
+      port = cfg.utorrent.port
+      user = cfg.utorrent.user
+      pass = cfg.utorrent.pass
+
+      if cfg.backend == :qbtorrent
+        ip = cfg.qbtorrent.ip
+        port = cfg.qbtorrent.port
+        user = cfg.qbtorrent.user
+        pass = cfg.qbtorrent.pass
+      end
+
+      log "Attempting to connect to #{ip}:#{port} using login #{user}/#{pass}"
       log "..."
 
       begin
@@ -176,10 +188,6 @@ module TorrentProcessor
       if args[:logger]
         Formatter.logger = args[:logger]
       end
-
-      unless args[:webui]
-        raise "#{self.class}#parse_args: Missing :webui option"
-      end
     end
 
     def defaults
@@ -204,41 +212,7 @@ module TorrentProcessor
     def dump_jobprops( hashes )
 
       hashes.each do |hsh|
-
-        thsh = hsh[0]
-        tname = hsh[1]
-        response = torrent_app.get_torrent_job_properties( thsh )
-
-        log "Name: #{tname}"
-
-        if response["props"].nil?
-          log "Error: Not found in Torrent App."
-          return
-        end
-
-        tab = "  "
-        log tab + "uTorrent Build: #{response["build"]}"
-        log "Props:"
-        props = response["props"][0]
-        log tab + "hash: " + props["hash"]
-        log tab + "ulrate:        " + props["ulrate"].to_s
-        log tab + "dlrate:        " + props["dlrate"].to_s
-        log tab + "superseed:     " + props["superseed"].to_s
-        log tab + "dht:           " + props["dht"].to_s
-        log tab + "pex:           " + props["pex"].to_s
-        log tab + "seed_override: " + props["seed_override"].to_s
-        log tab + "seed_ratio:    " + props["seed_ratio"].to_s
-        log tab + "seed_time:     " + props["seed_time"].to_s
-        log tab + "ulslots:       " + props["ulslots"].to_s
-        log tab + "seed_num:      " + props["seed_num"].to_s
-        log
-        log tab + "trackers: "
-        props["trackers"].split("\r\n").each do |tracker|
-          log tab + tab + tracker
-        end
-        log
-        log "------------------------------------"
-        log
+        torrent_app.dump_job_properties hsh[0]
       end
     end
 

@@ -38,7 +38,8 @@ module TorrentProcessor
                     :apply_seed_limits,
                     :settings,
                     :rssfilters,
-                    :rssfeeds
+                    :rssfeeds,
+                    :dump_job_properties
 
     ###
     # TorrentApp constructor
@@ -61,6 +62,7 @@ module TorrentProcessor
       @cfg        = args[:cfg]        if args[:cfg]
       @verbose    = args[:verbose]    if args[:verbose]
       @logger     = args[:logger]     if args[:logger]
+      @webui_type = @cfg.backend if (@cfg.respond_to?(:backend) && !@cfg.backend.nil?)
       @webui_type = args[:webui_type] if args[:webui_type]
       @adapter    = args[:adapter]    if args[:adapter]
     end

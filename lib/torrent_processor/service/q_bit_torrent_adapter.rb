@@ -165,6 +165,25 @@ module TorrentProcessor
         []
       end
 
+      def dump_job_properties torrent_hash
+        # We want ALL the data, so we've go to go directly to the webui.
+        webui.torrent_list.each do |t|
+          hash = t['hash']
+          if hash == torrent_hash
+            # qbt torrent data is split into the list data, and properties data.
+            props = webui.properties hash
+            # Merge the properties data in to the list data.
+            t.merge(props)
+
+            write_raw_torrent_properties t, webui.trackers(torrent_hash)
+          end
+        end
+      end
+
+      def get_trackers torrent_hash
+        webui.trackers torrent_hash
+      end
+
     private
 
       def parse_args args
@@ -235,6 +254,36 @@ module TorrentProcessor
         end
 
         converted_torrents
+      end
+
+      def write_raw_torrent_properties torrent_data, trackers
+        log "Name: #{torrent_data.fetch('name')}"
+
+        tab = "  "
+        log "Props:"
+        log tab + "hash: " + torrent_data.fetch("hash")
+        log tab + "ulrate:     " + torrent_data.fetch("upspeed").to_s
+        log tab + "dlrate:     " + torrent_data.fetch("dlspeed").to_s
+        log tab + "eta:        " + torrent_data.fetch("eta").to_s
+        log tab + "num_leechs: " + torrent_data.fetch("num_leechs").to_s
+        log tab + "num_seeds:  " + torrent_data.fetch("num_seeds").to_s
+        log tab + "priority:   " + torrent_data.fetch("priority").to_s
+        log tab + "progress:   " + torrent_data.fetch("progress").to_s
+        log tab + "seed_ratio: " + torrent_data.fetch("ratio").to_s
+        log tab + "size:       " + torrent_data.fetch("size").to_s
+        log tab + "state:      " + torrent_data.fetch("state").to_s
+        log
+        log tab + "trackers: "
+        trackers.each do |tracker|
+          log tab + tab + "msg:       " + tracker.fetch("msg")
+          log tab + tab + "num_peers: " + tracker.fetch("num_peers")
+          log tab + tab + "status:    " + tracker.fetch("status")
+          log tab + tab + "url:       " + tracker.fetch("url")
+          log tab + tab + "-"*10
+        end
+        log
+        log "------------------------------------"
+        log
       end
     end # class QBitTorrentAdapter
   end
