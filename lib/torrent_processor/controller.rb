@@ -147,7 +147,7 @@ module TorrentProcessor
         puts "*"*10
         puts "    Torrent Processor has not yet been configured."
         puts "    Use the .setup command from within the console or"
-        puts "    run TorrentProcessor with the -init option to configure it."
+        puts "    run TorrentProcessor with the --init option to configure it."
         puts "*"*10
         puts
       end
