@@ -200,27 +200,28 @@ def generate_configuration dir_name, &block
   cp 'spec/data/config-v2.yml', cfg_file
   TorrentProcessor.load_configuration cfg_file
 
+  TorrentProcessor.configure do |config|
+    config.app_path                 = dir_name
+    config.log_dir                  = dir_name
+    config.tv_processing            = File.join(dir_name, 'tv')
+    config.movie_processing         = File.join(dir_name, 'movie')
+    config.other_processing         = File.join(dir_name, 'other')
+    config.utorrent.dir_completed_download  = File.join(dir_name, 'completed')
+    config.qbtorrent.dir_completed_download = File.join(dir_name, 'completed')
+    config.tmdb.target_movies_path          = File.join(dir_name, 'final_movies')
+
+    mkpath config.tv_processing
+    mkpath config.movie_processing
+    mkpath config.other_processing
+    mkpath config.utorrent.dir_completed_download
+    mkpath config.tmdb.target_movies_path
+  end
+
   if block_given?
     TorrentProcessor.configure &block
-  else
-    TorrentProcessor.configure do |config|
-      config.app_path                 = dir_name
-      config.log_dir                  = dir_name
-      config.tv_processing            = File.join(dir_name, 'tv')
-      config.movie_processing         = File.join(dir_name, 'movie')
-      config.other_processing         = File.join(dir_name, 'other')
-      config.utorrent.dir_completed_download  = File.join(dir_name, 'completed')
-      config.qbtorrent.dir_completed_download = File.join(dir_name, 'completed')
-      config.tmdb.target_movies_path          = File.join(dir_name, 'final_movies')
-
-      mkpath config.tv_processing
-      mkpath config.movie_processing
-      mkpath config.other_processing
-      mkpath config.utorrent.dir_completed_download
-      mkpath config.tmdb.target_movies_path
-    end
-    TorrentProcessor.save_configuration
   end
+
+  TorrentProcessor.save_configuration
 end
 
 require_relative 'support/dirs'
