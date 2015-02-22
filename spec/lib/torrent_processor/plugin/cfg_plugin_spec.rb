@@ -38,43 +38,99 @@ describe CfgPlugin do
         TorrentProcessor.save_configuration
       end
 
-    context '#cfg_user' do
+    context "uTorrent backend" do
 
-      let(:cmd) { '.user foo' }
+      before(:each) do
+        TorrentProcessor.configuration.backend = :utorrent
+        TorrentProcessor.save_configuration
+      end
 
-      it "configure uTorrent user name" do
-        plugin.cfg_user args
-        expect(TorrentProcessor.configuration.utorrent.user).to eq 'foo'
+      context '#cfg_user' do
+
+        let(:cmd) { '.user foo' }
+
+        it "configure uTorrent user name" do
+          plugin.cfg_user args
+          expect(TorrentProcessor.configuration.utorrent.user).to eq 'foo'
+        end
+      end
+
+      context '#cfg_pwd' do
+
+        let(:cmd) { '.pwd bar' }
+
+        it "configure uTorrent password" do
+          plugin.cfg_pwd args
+          expect(TorrentProcessor.configuration.utorrent.pass).to eq 'bar'
+        end
+      end
+
+      context '#cfg_ip' do
+
+        let(:cmd) { '.ip 10.0.0.1' }
+
+        it "configure uTorrent IP address" do
+          plugin.cfg_ip args
+          expect(TorrentProcessor.configuration.utorrent.ip).to eq '10.0.0.1'
+        end
+      end
+
+      context '#cfg_port' do
+
+        let(:cmd) { '.port 10625' }
+
+        it "configure uTorrent port" do
+          plugin.cfg_port args
+          expect(TorrentProcessor.configuration.utorrent.port).to eq '10625'
+        end
       end
     end
 
-    context '#cfg_pwd' do
+    context "qbTorrent backend" do
 
-      let(:cmd) { '.pwd bar' }
-
-      it "configure uTorrent password" do
-        plugin.cfg_pwd args
-        expect(TorrentProcessor.configuration.utorrent.pass).to eq 'bar'
+      before(:each) do
+        TorrentProcessor.configuration.backend = :qbtorrent
+        TorrentProcessor.save_configuration
       end
-    end
 
-    context '#cfg_ip' do
+      context '#cfg_user' do
 
-      let(:cmd) { '.ip 10.0.0.1' }
+        let(:cmd) { '.user bar' }
 
-      it "configure uTorrent IP address" do
-        plugin.cfg_ip args
-        expect(TorrentProcessor.configuration.utorrent.ip).to eq '10.0.0.1'
+        it "configure qbTorrent user name" do
+          plugin.cfg_user args
+          expect(TorrentProcessor.configuration.qbtorrent.user).to eq 'bar'
+        end
       end
-    end
 
-    context '#cfg_port' do
+      context '#cfg_pwd' do
 
-      let(:cmd) { '.port 10625' }
+        let(:cmd) { '.pwd baz' }
 
-      it "configure uTorrent port" do
-        plugin.cfg_port args
-        expect(TorrentProcessor.configuration.utorrent.port).to eq '10625'
+        it "configure qbTorrent password" do
+          plugin.cfg_pwd args
+          expect(TorrentProcessor.configuration.qbtorrent.pass).to eq 'baz'
+        end
+      end
+
+      context '#cfg_ip' do
+
+        let(:cmd) { '.ip 10.0.0.2' }
+
+        it "configure qbTorrent IP address" do
+          plugin.cfg_ip args
+          expect(TorrentProcessor.configuration.qbtorrent.ip).to eq '10.0.0.2'
+        end
+      end
+
+      context '#cfg_port' do
+
+        let(:cmd) { '.port 10999' }
+
+        it "configure qbTorrent port" do
+          plugin.cfg_port args
+          expect(TorrentProcessor.configuration.qbtorrent.port).to eq '10999'
+        end
       end
     end
 

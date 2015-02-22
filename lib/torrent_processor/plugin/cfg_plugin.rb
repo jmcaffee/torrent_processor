@@ -19,10 +19,10 @@ module TorrentProcessor
     include TorrentProcessor::Utility
 
     def CfgPlugin.register_cmds
-      { ".user" =>        Command.new(CfgPlugin, :cfg_user,       "Configure uTorrent user"),
-        ".pwd" =>         Command.new(CfgPlugin, :cfg_pwd,        "Configure uTorrent password"),
-        ".ip" =>          Command.new(CfgPlugin, :cfg_ip,         "Configure uTorrent IP address"),
-        ".port" =>        Command.new(CfgPlugin, :cfg_port,       "Configure uTorrent Port"),
+      { ".user" =>        Command.new(CfgPlugin, :cfg_user,       "Configure Torrent app user"),
+        ".pwd" =>         Command.new(CfgPlugin, :cfg_pwd,        "Configure Torrent app password"),
+        ".ip" =>          Command.new(CfgPlugin, :cfg_ip,         "Configure Torrent app IP address"),
+        ".port" =>        Command.new(CfgPlugin, :cfg_port,       "Configure Torrent app Port"),
         ".addfilter" =>   Command.new(CfgPlugin, :cfg_addfilter,  "Add a tracker seed filter"),
         ".delfilter" =>   Command.new(CfgPlugin, :cfg_delfilter,  "Delete a tracker seed filter"),
         ".listfilters" => Command.new(CfgPlugin, :cfg_listfilters,"List current tracker filters"),
@@ -31,72 +31,68 @@ module TorrentProcessor
     end
 
     ###
-    # Configure uTorrent user
+    # Configure Torrent app user
     #
     def cfg_user(args)
       parse_args args
       user_name = cmd_arguments('.user', args[:cmd])
 
-      log " Current username: #{cfg.utorrent.user}"
+      log " Current username: #{get_user}"
       unless user_name.empty?
-        cfg.utorrent.user = user_name
-        save_cfg
+        set_user user_name
 
-        log " Username changed to: #{cfg.utorrent.user}"
+        log " Username changed to: #{get_user}"
       end
 
       return true
     end
 
     ###
-    # Configure uTorrent password
+    # Configure Torrent app password
     #
     def cfg_pwd(args)
       parse_args args
       user_pwd = cmd_arguments('.pwd', args[:cmd])
 
-      log " Current password: #{cfg.utorrent.pass}"
+      log " Current password: #{get_pwd}"
       unless user_pwd.empty?
-        cfg.utorrent.pass = user_pwd
-        save_cfg
+        set_pwd user_pwd
 
-        log " Password changed to: #{cfg.utorrent.pass}"
+        log " Password changed to: #{get_pwd}"
       end
 
       return true
     end
 
     ###
-    # Configure uTorrent IP address
+    # Configure Torrent app IP address
     #
     def cfg_ip(args)
       parse_args args
       ip = cmd_arguments('.ip', args[:cmd])
 
-      log " Current address: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+      log " Current address: #{get_ip}:#{get_port}"
       unless ip.empty?
-        cfg.utorrent.ip = ip
-        save_cfg
+        set_ip ip
 
-        log " Address changed to: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+        log " Address changed to: #{get_ip}:#{get_port}"
       end
 
       return true
     end
 
     ###
-    # Configure uTorrent Port
+    # Configure Torrent app Port
     #
     def cfg_port(args)
       parse_args args
       port = cmd_arguments('.port', args[:cmd])
 
-      log " Current address: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+      log " Current address: #{get_ip}:#{get_port}"
       unless port.empty?
-        cfg.utorrent.port = port
-        save_cfg
+        set_port port
 
-        log " Address changed to: #{cfg.utorrent.ip}:#{cfg.utorrent.port}"
+        log " Address changed to: #{get_ip}:#{get_port}"
       end
 
       return true
@@ -192,6 +188,50 @@ module TorrentProcessor
 
     def save_cfg
       TorrentProcessor.save_configuration
+    end
+
+    def backend_cfg
+      if cfg.backend == :utorrent
+        return cfg.utorrent
+      else
+        return cfg.qbtorrent
+      end
+    end
+
+    def get_ip
+      backend_cfg.ip
+    end
+
+    def get_port
+      backend_cfg.port
+    end
+
+    def get_user
+      backend_cfg.user
+    end
+
+    def get_pwd
+      backend_cfg.pass
+    end
+
+    def set_ip ip
+      backend_cfg.ip = ip
+      save_cfg
+    end
+
+    def set_port port
+      backend_cfg.port = port
+      save_cfg
+    end
+
+    def set_user user
+      backend_cfg.user = user
+      save_cfg
+    end
+
+    def set_pwd pwd
+      backend_cfg.pass = pwd
+      save_cfg
     end
   end # class CfgPlugin
   end # module
