@@ -18,7 +18,7 @@ end # module
 require_relative('plugin/base_plugin')
 require_relative('plugin/cfg_plugin')
 require_relative('plugin/db_plugin')
-require_relative('plugin/ut_plugin')
+require_relative('plugin/torrent_plugin')
 require_relative('plugin/cmd_plugin_manager')
 require_relative('plugin/command')
 require_relative('plugin/rss_plugin')

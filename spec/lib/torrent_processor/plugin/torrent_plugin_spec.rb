@@ -1,5 +1,5 @@
 ##############################################################################
-# File::    ut_plugin_spec.rb
+# File::    torrent_plugin_spec.rb
 # Purpose:: Torrent App Plugin specification
 #
 # Author::    Jeff McAffee 2014-01-14
@@ -11,11 +11,11 @@ require 'spec_helper'
 
 include TorrentProcessor::Plugin
 
-describe UTPlugin do
+describe TorrentPlugin do
 
   before(:each) { CaptureLogger.reset }
 
-  subject(:plugin) { UTPlugin.new }
+  subject(:plugin) { TorrentPlugin.new }
 
   let(:args) do
     {
@@ -50,7 +50,7 @@ describe UTPlugin do
     let(:cmd) { '.jobprops' }
 
     it "returns current torrent app job properties" do
-      allow_any_instance_of(TorrentProcessor::Plugin::UTPlugin).to receive(:getInput).and_return('0')
+      allow_any_instance_of(TorrentProcessor::Plugin::TorrentPlugin).to receive(:getInput).and_return('0')
       plugin.cmd_jobprops args
       expect { CaptureLogger.contains 'Horizon.S52E16' }
     end
@@ -81,7 +81,7 @@ describe UTPlugin do
     let(:cmd) { '.tdetails' }
 
     it "display torrent details" do
-      allow_any_instance_of(TorrentProcessor::Plugin::UTPlugin).to receive(:getInput).and_return('1')
+      allow_any_instance_of(TorrentProcessor::Plugin::TorrentPlugin).to receive(:getInput).and_return('1')
       plugin.cmd_torrent_details args
       expect { CaptureLogger.contains 'availability       : 65536' }
     end

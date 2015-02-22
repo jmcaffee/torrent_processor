@@ -247,7 +247,7 @@ module TorrentProcessor
     # Configure Torrent specific commands
     #
     def configure_torrent_commands
-      CmdPluginManager.register_plugin(:ut, UTPlugin)
+      CmdPluginManager.register_plugin(:ut, TorrentPlugin)
       @torrent_cmds = CmdPluginManager.command_list(:ut)
 
       # Add the commands to a cmd array.

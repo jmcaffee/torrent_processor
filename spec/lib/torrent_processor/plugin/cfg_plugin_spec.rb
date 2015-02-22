@@ -1,6 +1,6 @@
 ##############################################################################
-# File::    ut_plugin_spec.rb
-# Purpose:: uTorrent Plugin specification
+# File::    cfg_plugin_spec.rb
+# Purpose:: Configuration Plugin specification
 #
 # Author::    Jeff McAffee 2014-01-14
 # Copyright:: Copyright (c) 2014, kTech Systems LLC. All rights reserved.

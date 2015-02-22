@@ -38,7 +38,7 @@ describe Console do
     context 'cmd: .jobprops' do
 
       it 'display torrent app job properties' do
-        allow_any_instance_of(TorrentProcessor::Plugin::UTPlugin).to receive(:getInput).and_return('0')
+        allow_any_instance_of(TorrentProcessor::Plugin::TorrentPlugin).to receive(:getInput).and_return('0')
         expect(console.process_cmd('.jobprops')).to be_truthy
         expect { CaptureLogger.contains 'Horizon.S52E16' }
       end
@@ -63,7 +63,7 @@ describe Console do
     context 'cmd: .tdetails' do
 
       it 'display details of a torrent in torrent app' do
-        allow_any_instance_of(TorrentProcessor::Plugin::UTPlugin).to receive(:getInput).and_return('0')
+        allow_any_instance_of(TorrentProcessor::Plugin::TorrentPlugin).to receive(:getInput).and_return('0')
         expect(console.process_cmd('.tdetails')).to be_truthy
         expect { CaptureLogger.contains 'availability       : 65536' }
       end

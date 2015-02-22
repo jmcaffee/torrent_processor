@@ -12,20 +12,20 @@ require 'benchmark'
 module TorrentProcessor
   module Plugin
 
-  class UTPlugin < BasePlugin
+  class TorrentPlugin < BasePlugin
     include TorrentProcessor
     include KtCmdLine
     include Utility
 
-    def UTPlugin.register_cmds
-      { ".testcon" =>     Command.new(UTPlugin, :cmd_test_connection,  "Test the Torrent App WebUI connection"),
-        ".tsettings" =>   Command.new(UTPlugin, :cmd_settings,         "Grab the current Torrent App settings"),
-        ".jobprops" =>    Command.new(UTPlugin, :cmd_jobprops,         "Retrieve a torrent's job properties"),
-        ".tlist" =>       Command.new(UTPlugin, :cmd_list,             "Get a list of torrents from Torrent App"),
-        ".tnames" =>      Command.new(UTPlugin, :cmd_names,            "Display names of torrents in Torrent App"),
-        ".tdetails" =>    Command.new(UTPlugin, :cmd_torrent_details,  "Display torrent(s) details"),
-        ".listquery" =>   Command.new(UTPlugin, :cmd_list_query,       "Return response output of list query"),
-        #"." => Command.new(UTPlugin, :, ""),
+    def TorrentPlugin.register_cmds
+      { ".testcon" =>     Command.new(TorrentPlugin, :cmd_test_connection,  "Test the Torrent App WebUI connection"),
+        ".tsettings" =>   Command.new(TorrentPlugin, :cmd_settings,         "Grab the current Torrent App settings"),
+        ".jobprops" =>    Command.new(TorrentPlugin, :cmd_jobprops,         "Retrieve a torrent's job properties"),
+        ".tlist" =>       Command.new(TorrentPlugin, :cmd_list,             "Get a list of torrents from Torrent App"),
+        ".tnames" =>      Command.new(TorrentPlugin, :cmd_names,            "Display names of torrents in Torrent App"),
+        ".tdetails" =>    Command.new(TorrentPlugin, :cmd_torrent_details,  "Display torrent(s) details"),
+        ".listquery" =>   Command.new(TorrentPlugin, :cmd_list_query,       "Return response output of list query"),
+        #"." => Command.new(TorrentPlugin, :, ""),
       }
     end
 
