@@ -144,7 +144,7 @@ module TorrentProcessor::Plugin
       q = "SELECT hash, name FROM torrents WHERE (tp_state IS NULL#{and_id});" if from == "NULL" || from == "null"
 
       #log "Executing query: #{q} :"
-      rows = database.execute( q )
+      rows = database.read( q )
       log "Found #{rows.length} rows matching '#{from}'#{and_id}."
 
       return true unless rows.length > 0
@@ -169,7 +169,7 @@ module TorrentProcessor::Plugin
 
       Formatter.print_header "ID | Ratio | Name"
       q = "SELECT id,ratio,name from torrents;"
-      Formatter.print_query_results( database.execute( q ) )
+      Formatter.print_query_results( database.read( q ) )
       return true
     end
 
@@ -203,7 +203,7 @@ module TorrentProcessor::Plugin
       end
 
       Formatter.print_header "Table description(s)"
-      Formatter.print_query_results( database.execute( q ) )
+      Formatter.print_query_results( database.read( q ) )
       return true;
     end
 
@@ -217,7 +217,7 @@ module TorrentProcessor::Plugin
 
       Formatter.print_header "ID | TP State | Name"
       q = "SELECT id,tp_state,name from torrents;"
-      Formatter.print_query_results( database.execute( q ) )
+      Formatter.print_query_results( database.read( q ) )
       return true
     end
 
