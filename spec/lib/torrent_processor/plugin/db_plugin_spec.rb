@@ -18,6 +18,7 @@ describe DBPlugin do
 
   before(:each) do
     CaptureLogger.reset
+    TorrentProcessor::Utility::Formatter.set_output_mode(:pretty)
   end
 
   describe '#db_connect' do
