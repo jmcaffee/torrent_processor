@@ -274,7 +274,7 @@ describe Database do
           db.create_database
 
           Database::Schema.perform_migrations db
-          expect(db.schema_version).to eq 1
+          expect(db.schema_version).to eq 2
         end
       end
 

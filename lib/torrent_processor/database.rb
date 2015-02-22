@@ -220,6 +220,7 @@ module TorrentProcessor
       if inserts.length > 0
         query = build_batch_insert_query( inserts )
         log query if verbose
+
         adapter.execute_batch( query )
       end
     end
@@ -317,7 +318,7 @@ module TorrentProcessor
       query = <<EOQ
 UPDATE torrents SET
   name              = "#{tdata.name}",
-  status            = #{tdata.status},
+  status            = "#{tdata.status}",
   percent_progress  = #{tdata.percent_progress},
   ratio             = #{tdata.ratio},
   label             = "#{tdata.label}",
@@ -374,7 +375,7 @@ INSERT INTO torrents (
   msg,
   folder
 )
-values ("#{tdata.hash}", #{tdata.status}, "#{tdata.name}", #{tdata.percent_progress}, #{tdata.ratio}, "#{tdata.label}", "#{tdata.msg}", "#{tdata.folder}");
+values ("#{tdata.hash}", "#{tdata.status}", "#{tdata.name}", #{tdata.percent_progress}, #{tdata.ratio}, "#{tdata.label}", "#{tdata.msg}", "#{tdata.folder}");
 
 EOQ
     end
@@ -397,7 +398,7 @@ INSERT OR REPLACE INTO torrents (
   msg,
   folder
 )
-values ("#{tdata.hash}", #{tdata.status}, "#{tdata.name}", #{tdata.percent_progress}, #{tdata.ratio}, "#{tdata.label}", "#{tdata.msg}", "#{tdata.folder}");
+values ("#{tdata.hash}", "#{tdata.status}", "#{tdata.name}", #{tdata.percent_progress}, #{tdata.ratio}, "#{tdata.label}", "#{tdata.msg}", "#{tdata.folder}");
 EOQ
     end
 
@@ -421,7 +422,7 @@ EOQ
 
     class Schema
       # Update SCHEMA_VERSION when new migrations are added.
-      SCHEMA_VERSION = 1 unless defined?(SCHEMA_VERSION)
+      SCHEMA_VERSION = 2 unless defined?(SCHEMA_VERSION)
 
       def self.create_base_schema( db )
         schema = <<EOQ
@@ -431,7 +432,7 @@ CREATE TABLE IF NOT EXISTS torrents (
   hash TEXT UNIQUE,
   created TEXT,
   modified TEXT,
-  status NUMERIC,
+  status TEXT,
   name TEXT,
   percent_progress NUMERIC,
   ratio NUMERIC,
@@ -534,7 +535,7 @@ EOQ
 
       def self.perform_migrations(db)
         return unless db.schema_version < SCHEMA_VERSION
-        migrate_to_v1(db)
+        migrate_to_v2(db)
       end
 
       def self.migrate_to_v1(db)
@@ -555,6 +556,64 @@ EOQ
 
         db.execute('PRAGMA user_version = 1;')
         db.log "v1 migration complete." if db.verbose
+      end
+
+      def self.migrate_to_v2(db)
+        migrate_to_v1 db
+
+        ver = db.schema_version
+        return if ver >= 2
+        db.log "Migrating DB to v2..." if db.verbose
+
+        # Copy existing table to tmp table
+        result = db.execute("CREATE TABLE 'new_torrents' AS SELECT * FROM 'torrents';")
+        result = db.execute("DROP TABLE 'torrents';")
+
+        # Recreate the old table, updating status column type to be text (was numeric)
+        schema = <<EOQ
+-- Create the torrents table
+CREATE TABLE IF NOT EXISTS torrents (
+  id INTEGER PRIMARY KEY,
+  hash TEXT UNIQUE,
+  created TEXT,
+  modified TEXT,
+  status TEXT,
+  name TEXT,
+  percent_progress NUMERIC,
+  ratio NUMERIC,
+  label TEXT,
+  msg TEXT,
+  folder TEXT,
+  tp_state TEXT DEFAULT NULL
+);
+EOQ
+        db.execute( schema )
+
+        # Copy torrent data from tmp table to updated torrents table
+        rows = db.execute("SELECT * FROM 'new_torrents';")
+        rows.each do |row|
+          q = <<EOQ
+INSERT OR REPLACE INTO torrents (
+  hash,
+  status,
+  name,
+  percent_progress,
+  ratio,
+  label,
+  msg,
+  folder
+)
+values ("#{row[0]}", "#{row[1]}", "#{row[2]}", #{row[3]}, #{row[4]}, "#{row[5]}", "#{row[6]}", "#{row[7]}");
+EOQ
+
+          result = db.execute q
+        end
+
+        # Cleanup the tmp table
+        result = db.execute("DROP TABLE 'new_torrents';")
+
+        db.execute('PRAGMA user_version = 2;')
+        db.log "v2 migration complete." if db.verbose
       end
     end # class
   end # class Database
