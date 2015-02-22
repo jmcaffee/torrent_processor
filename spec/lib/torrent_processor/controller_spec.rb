@@ -19,9 +19,7 @@ describe Controller do
   end
 
   let(:work_dir) do
-    dir = 'tmp/spec/controller'
-    mkpath dir
-    dir
+    spec_tmp_dir('controller').to_s
   end
 
   #let(:logger) { SimpleLogger }
@@ -36,15 +34,56 @@ describe Controller do
 
   describe '#new' do
 
-    it 'initializes services used by the app' do
-      controller
-      expect(Runtime.service.logger).to_not be nil
-      expect(Runtime.service.database).to_not be nil
-      expect(Runtime.service.utorrent).to_not be nil
-      expect(Runtime.service.moviedb).to_not be nil
-      expect(Runtime.service.processor).to_not be nil
-      expect(Runtime.service.console).to_not be nil
-      expect(controller.setup).to_not be nil
+    context 'utorrent backend' do
+
+      subject(:controller) do
+        allow_any_instance_of(TorrentProcessor::TPSetup).to receive(:app_data_path).and_return(work_dir)
+
+        generate_configuration(work_dir) do |config|
+          config.backend = :utorrent
+        end
+
+        Controller.new
+      end
+
+      it 'initializes services used by the app' do
+        controller
+        expect(Runtime.service.logger).to_not be nil
+        expect(Runtime.service.database).to_not be nil
+        expect(Runtime.service.webui).to_not be nil
+        expect(Runtime.service.webui.class).to be TorrentProcessor::Service::UTorrent::UTorrentWebUI
+        expect(Runtime.service.webui_type).to eq :utorrent
+        expect(Runtime.service.moviedb).to_not be nil
+        expect(Runtime.service.processor).to_not be nil
+        expect(Runtime.service.console).to_not be nil
+        expect(controller.setup).to_not be nil
+      end
+    end
+
+    context 'qbtorrent backend' do
+
+      subject(:controller) do
+        allow_any_instance_of(TorrentProcessor::TPSetup).to receive(:app_data_path).and_return(work_dir)
+
+        generate_configuration(work_dir) do |config|
+          config.backend = :qbtorrent
+        end
+
+        Controller.new
+      end
+
+      it 'initializes services used by the app' do
+        controller
+        expect(Runtime.service.logger).to_not be nil
+        expect(Runtime.service.database).to_not be nil
+        expect(Runtime.service.webui).to_not be nil
+        expect(Runtime.service.webui.class).to be ::QbtClient::WebUI
+        expect(Runtime.service.webui_type).to eq :qbtorrent
+        expect(Runtime.service.moviedb).to_not be nil
+        expect(Runtime.service.processor).to_not be nil
+        expect(Runtime.service.console).to_not be nil
+        expect(controller.setup).to_not be nil
+      end
     end
   end
 

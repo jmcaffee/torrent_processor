@@ -93,12 +93,25 @@ module TorrentProcessor
       # Configure the database.
       Runtime.service.database = Database.new( :cfg => cfg )
 
-      # Configure the uTorrent interface.
-      Runtime.service.utorrent = Service::UTorrent::UTorrentWebUI.new(
-                                                              cfg.utorrent.ip,
-                                                              cfg.utorrent.port,
-                                                              cfg.utorrent.user,
-                                                              cfg.utorrent.pass )
+      Runtime.service.webui_type = cfg.backend
+
+      # Configure the backend interface
+      if cfg.backend == :utorrent
+        # Configure the uTorrent interface.
+        Runtime.service.webui = Service::UTorrent::UTorrentWebUI.new(
+                                                                cfg.utorrent.ip,
+                                                                cfg.utorrent.port,
+                                                                cfg.utorrent.user,
+                                                                cfg.utorrent.pass )
+
+      elsif cfg.backend == :qbtorrent
+        # Configure the qBitTorrent interface.
+        Runtime.service.webui = ::QbtClient::WebUI.new(
+                                  cfg.qbtorrent.ip,
+                                  cfg.qbtorrent.port,
+                                  cfg.qbtorrent.user,
+                                  cfg.qbtorrent.pass )
+      end
 
       # Configure the MovieDB service.
       api_key = cfg.tmdb.api_key
@@ -112,12 +125,14 @@ module TorrentProcessor
 
       # Configure the processor (main object).
       Runtime.service.processor = Processor.new( :logger => Runtime.service.logger,
-                                                 :utorrent => Runtime.service.utorrent,
+                                                 :webui => Runtime.service.webui,
+                                                 :webui_type => Runtime.service.webui_type,
                                                  :database => Runtime.service.database,
                                                  :moviedb => Runtime.service.moviedb )
 
       # Configure the console object.
-      Runtime.service.console = Console.new( :utorrent => Runtime.service.utorrent,
+      Runtime.service.console = Console.new( :webui => Runtime.service.webui,
+                                             :webui_type => Runtime.service.webui_type,
                                              :database => Runtime.service.database,
                                              :processor => Runtime.service.processor )
     end

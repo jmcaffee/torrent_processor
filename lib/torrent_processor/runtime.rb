@@ -20,7 +20,8 @@ module Runtime
   class Service
     attr_accessor :logger
     attr_accessor :database
-    attr_accessor :utorrent
+    attr_accessor :webui
+    attr_accessor :webui_type
     attr_accessor :moviedb
     attr_accessor :processor
     attr_accessor :console
