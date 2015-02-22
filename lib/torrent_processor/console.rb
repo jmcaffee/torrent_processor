@@ -89,7 +89,8 @@ module TorrentProcessor
           next
         end
 
-        if ( process_cmd(q) )
+        process_result = process_cmd(q)
+        if ( process_result == true || process_result == :abort )
           next
         end
 

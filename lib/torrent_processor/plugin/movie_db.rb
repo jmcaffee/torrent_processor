@@ -103,18 +103,10 @@ module TorrentProcessor
     def cmd_test_connection(args)
       parse_args args
 
-      log "Attempting to connect to TMDB"
+      log "Testing TMDB connection"
       log "..."
 
       result = test_connection
-
-      if result
-        log "Successful connection."
-        return true
-      end
-
-      log "Connection failed"
-      return false
     end
 
     def cmd_search_movie(args)
@@ -155,7 +147,17 @@ module TorrentProcessor
     #
     def test_connection()
       tmdb_config = Tmdb::Configuration.new
-      log "Attempting to connect to #{tmdb_config.base_url}"
+      url = tmdb_config.base_url
+
+      # If url is not populated, it's probably because no API key has
+      # been configured, or an incorrect API key has been provided.
+      if url.nil?
+        log "Missing TMDb url. Have you configured your TMDb API Key?"
+        log "If you've configured your TMDb API Key, please confirm it is correct."
+        return :abort
+      end
+
+      log "Attempting to connect to #{url}"
 
       movie = Tmdb::Movie.find('Fight Club')
       # Returns an array of suggested movies with the best suggestion first.
@@ -165,9 +167,9 @@ module TorrentProcessor
         log "Successful connection."
         return true
       end
-
+    rescue
       log "Unable to connect"
-      return false
+      return :abort
     end
 
     def search_movie(text)
