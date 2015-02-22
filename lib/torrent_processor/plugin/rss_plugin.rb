@@ -1,6 +1,6 @@
 ##############################################################################
 # File::    rssplugin.rb
-# Purpose:: RSS uTorrent Plugin class
+# Purpose:: RSS Torrent App Plugin class
 #
 # Author::    Jeff McAffee 02/25/2012
 # Copyright:: Copyright (c) 2012, kTech Systems LLC. All rights reserved.
@@ -15,7 +15,7 @@ module TorrentProcessor::Plugin
     include KtCmdLine
     include TorrentProcessor::Utility
 
-    attr_reader :database, :utorrent
+    attr_reader :database
 
 
     def RSSPlugin.register_cmds
@@ -58,9 +58,10 @@ module TorrentProcessor::Plugin
       parse_args args
 
       data = torrent_app.torrent_list
-      display_current_feed_list( torrent_app.rssfeeds )
+      feeds = torrent_app.rssfeeds
+      display_current_feed_list( feeds )
       #puts data
-      log " #{torrent_app.rssfeeds.length} Feed(s) found."
+      log " #{feeds.length} Feed(s) found."
       log
 
       return true
@@ -72,9 +73,10 @@ module TorrentProcessor::Plugin
       parse_args args
 
       data = torrent_app.torrent_list
-      display_current_feed_list( torrent_app.rssfilters )
+      filters = torrent_app.rssfilters
+      display_current_feed_list( filters )
       #puts data
-      log " #{torrent_app.rssfilters.length} Filter(s) found."
+      log " #{filters.length} Filter(s) found."
       log
 
       return true
@@ -89,13 +91,14 @@ module TorrentProcessor::Plugin
       parse_args args
 
       torrent_app.torrent_list
-      hashes = select_rss_hashes( torrent_app.rssfeeds )
+      feeds = torrent_app.rssfeeds
+      hashes = select_rss_hashes( feeds )
       return true if hashes.nil?
 
       hashes.each do |feed|
         Formatter.print_rule
         hsh = feed[0]
-        Formatter.print(torrent_app.rssfeeds[hsh].to_hsh)
+        Formatter.print(feeds[hsh].to_hsh)
       end # each torr
 
       Formatter.print_rule
@@ -114,21 +117,23 @@ module TorrentProcessor::Plugin
       cmd_parts = cmd.split
       hashes = []
       torrent_app.torrent_list
+      filters = torrent_app.rssfilters
+
       if (cmd_parts.length > 1)
         fid = Integer(cmd_parts[1])
-        hashes = display_current_feed_list( torrent_app.rssfilters )
+        hashes = display_current_feed_list( filters )
         newhashes = []
         newhashes << hashes[fid].clone
         hashes = newhashes.clone
       else
-        hashes = select_rss_hashes( torrent_app.rssfilters )
+        hashes = select_rss_hashes( filters )
       end
       return true if hashes.nil?
 
       hashes.each do |filter|
         Formatter.print_rule
         hsh = filter[0]
-        Formatter.print(torrent_app.rssfilters[hsh].to_hsh)
+        Formatter.print(filters[hsh].to_hsh)
       end # each torr
 
       Formatter.print_rule
