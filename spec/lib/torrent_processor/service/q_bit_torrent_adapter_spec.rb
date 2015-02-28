@@ -121,7 +121,7 @@ describe QBitTorrentAdapter do
 
   context "#removed_torrents" do
 
-    it "returns list of torrents removed since last check" do
+    it "returns hash of torrents removed since last check" do
       # Create a file cache file
       cache_data = ['hash1', 'hash2', 'hash3']
       yml_path = File.join(spec_tmp_dir('q_bit_torrent_adapter'), 'qbtcache.yml')
@@ -143,7 +143,7 @@ describe QBitTorrentAdapter do
         .and_return(current_torrent_data)
 
       # Verify the method returns the hash that is missing.
-      expect(adapter.removed_torrents).to include('hash3') #.include?('hash3')).to eq true
+      expect(adapter.removed_torrents.key?('hash3')).to eq true
     end
   end
 

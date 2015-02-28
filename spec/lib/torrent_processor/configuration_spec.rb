@@ -38,11 +38,19 @@ describe TorrentProcessor do
       cfg.utorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
       cfg.utorrent.seed_ratio             = 0
 
+      cfg.qbtorrent.ip                     = '127.0.0.1'
+      cfg.qbtorrent.port                   = '8083'
+      cfg.qbtorrent.user                   = 'admin'
+      cfg.qbtorrent.pass                   = 'abc'
+      cfg.qbtorrent.dir_completed_download = File.join(tmp_path, 'qbtorrents/completed')
+      cfg.qbtorrent.seed_ratio             = 0
+
       cfg.tmdb.api_key              = ENV['TMDB_API_KEY']
       cfg.tmdb.language             = 'en'
       cfg.tmdb.target_movies_path   = File.join(tmp_path, 'movies_final')
       cfg.tmdb.can_copy_start_time  = "00:00"
       cfg.tmdb.can_copy_stop_time   = "23:59"
+      cfg.backend = :utorrent
       cfg
     end
 
@@ -78,6 +86,7 @@ describe TorrentProcessor do
           cfg.utorrent.pass                   = 'testpass'
           cfg.utorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
           cfg.utorrent.seed_ratio             = 0
+          cfg.backend                         = :utorrent
         end
         TorrentProcessor.configuration.utorrent
       end
@@ -104,24 +113,25 @@ describe TorrentProcessor do
       subject do
         TorrentProcessor.configure do |cfg|
           cfg.qbtorrent.ip                     = '127.0.0.1'
-          cfg.qbtorrent.port                   = '8081'
-          cfg.qbtorrent.user                   = 'testuser'
-          cfg.qbtorrent.pass                   = 'testpass'
-          cfg.qbtorrent.dir_completed_download = File.join(tmp_path, 'torrents/completed')
+          cfg.qbtorrent.port                   = '8083'
+          cfg.qbtorrent.user                   = 'admin'
+          cfg.qbtorrent.pass                   = 'abc'
+          cfg.qbtorrent.dir_completed_download = File.join(tmp_path, 'qbtorrent/completed')
           cfg.qbtorrent.seed_ratio             = 0
+          cfg.backend                           = :qbtorrent
         end
         TorrentProcessor.configuration.qbtorrent
       end
 
       its(:ip) { should == '127.0.0.1' }
 
-      its(:port) { should == '8081' }
+      its(:port) { should == '8083' }
 
-      its(:user) { should == 'testuser' }
+      its(:user) { should == 'admin' }
 
-      its(:pass) { should == 'testpass' }
+      its(:pass) { should == 'abc' }
 
-      its(:dir_completed_download) { should == File.join(tmp_path, 'torrents/completed') }
+      its(:dir_completed_download) { should == File.join(tmp_path, 'qbtorrent/completed') }
 
       its(:seed_ratio) { should == 0 }
 
@@ -243,8 +253,17 @@ describe TorrentProcessor do
         config.utorrent.dir_completed_download = tmp_path
         config.utorrent.seed_ratio = 1500
 
+        config.qbtorrent.ip = '127.0.0.1'
+        config.qbtorrent.port = 8083
+        config.qbtorrent.user = 'admin'
+        config.qbtorrent.pass = 'abc'
+        config.qbtorrent.dir_completed_download = File.join(tmp_path,'qbtorrent/completed')
+        config.qbtorrent.seed_ratio = 1500
+
         config.tmdb.api_key = 'apikey'
         config.tmdb.language = 'es'
+
+        config.backend = :utorrent
       end
 
       blocking_file_delete cfg_file
@@ -258,8 +277,17 @@ describe TorrentProcessor do
         config.utorrent.dir_completed_download = nil
         config.utorrent.seed_ratio = nil
 
+        config.qbtorrent.ip = nil
+        config.qbtorrent.port = nil
+        config.qbtorrent.user = nil
+        config.qbtorrent.pass = nil
+        config.qbtorrent.dir_completed_download = nil
+        config.qbtorrent.seed_ratio = nil
+
         config.tmdb.api_key = nil
         config.tmdb.language = nil
+
+        config.backend = nil
       end
     end
 
@@ -276,8 +304,95 @@ describe TorrentProcessor do
       expect(cfg.utorrent.pass).to eq 'ut_pass'
       expect(cfg.utorrent.dir_completed_download).to eq tmp_path
       expect(cfg.utorrent.seed_ratio).to eq 1500
+
+      expect(cfg.qbtorrent.ip).to eq '127.0.0.1'
+      expect(cfg.qbtorrent.port).to eq 8083
+      expect(cfg.qbtorrent.user).to eq 'admin'
+      expect(cfg.qbtorrent.pass).to eq 'abc'
+      expect(cfg.qbtorrent.dir_completed_download).to eq File.join(tmp_path,'qbtorrent/completed')
+      expect(cfg.qbtorrent.seed_ratio).to eq 1500
+
       expect(cfg.tmdb.api_key).to eq 'apikey'
       expect(cfg.tmdb.language).to eq 'es'
+
+      expect(cfg.backend).to eq :utorrent
     end
   end # context .load_configuration
+
+  context '.dir_completed_download' do
+
+    let(:cfg_file) { 'tmp/spec/load-config.yml' }
+
+    let(:config_file) do
+      TorrentProcessor.configure do |config|
+        config.utorrent.ip = '127.0.0.1'
+        config.utorrent.port = 8080
+        config.utorrent.user = 'ut_user'
+        config.utorrent.pass = 'ut_pass'
+        config.utorrent.dir_completed_download = tmp_path
+        config.utorrent.seed_ratio = 1500
+
+        config.qbtorrent.ip = '127.0.0.1'
+        config.qbtorrent.port = 8083
+        config.qbtorrent.user = 'admin'
+        config.qbtorrent.pass = 'abc'
+        config.qbtorrent.dir_completed_download = File.join(tmp_path,'qbtorrent/completed')
+        config.qbtorrent.seed_ratio = 2500
+
+        config.tmdb.api_key = 'apikey'
+        config.tmdb.language = 'es'
+
+        config.backend = :utorrent
+      end
+
+      blocking_file_delete cfg_file
+      TorrentProcessor.save_configuration cfg_file
+    end
+
+    let(:cfg) { TorrentProcessor.configuration }
+
+    context "utorrent backend" do
+
+      it 'returns dir based on value of backend' do
+        config_file
+
+        TorrentProcessor.load_configuration cfg_file
+
+        expect(cfg.dir_completed_download).to eq tmp_path
+      end
+
+      it 'returns seed ratio based on value of backend' do
+        config_file
+
+        TorrentProcessor.load_configuration cfg_file
+
+        expect(cfg.seed_ratio).to eq 1500
+      end
+    end
+
+    context "qbtorrent backend" do
+
+      it 'returns dir based on value of backend' do
+        config_file
+
+        TorrentProcessor.load_configuration cfg_file
+        TorrentProcessor.configure do |config|
+          config.backend = :qbtorrent
+        end
+
+        expect(cfg.dir_completed_download).to eq File.join(tmp_path,'qbtorrent/completed')
+      end
+
+      it 'returns seed ratio based on value of backend' do
+        config_file
+
+        TorrentProcessor.load_configuration cfg_file
+        TorrentProcessor.configure do |config|
+          config.backend = :qbtorrent
+        end
+
+        expect(cfg.seed_ratio).to eq 2500
+      end
+    end
+  end # context
 end

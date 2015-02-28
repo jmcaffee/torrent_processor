@@ -14,6 +14,7 @@ module TorrentProcessor
     class QBitTorrentAdapter
       include TorrentProcessor::Utility::Loggable
       include TorrentProcessor::Utility::Verbosable
+      include TorrentProcessor::Utility::Normalizable
 
       def initialize(args)
         parse_args args
@@ -62,7 +63,7 @@ module TorrentProcessor
       end
 
       ###
-      # Return array of torrent hashes that have been removed since the last
+      # Return hash of torrents that have been removed since the last
       # #removed_torrents call.
       #
       # refresh_cache: if true (default), the cache will be updated with the
@@ -76,7 +77,8 @@ module TorrentProcessor
         cached_torrents = YAML.load_file(cache_file) if cache_file.exist?
         cached_torrents ||= []
 
-        current_torrents = webui.torrent_list
+        all_torrents = webui.torrent_list
+        current_torrents = all_torrents.clone
         current_torrents.map! { |t| t['hash'] }
 
         removed = cached_torrents.select { |h| !current_torrents.include?(h) }
@@ -86,7 +88,10 @@ module TorrentProcessor
           File.open(cache_file, 'w+') { |f| f.write(YAML.dump(current_torrents)) }
         end
 
-        removed
+        removed_torrent_data = {}
+        removed.each { |hsh| removed_torrent_data[hsh] = 'removed' }
+
+        removed_torrent_data
       end
 
       ###
@@ -101,7 +106,8 @@ module TorrentProcessor
       end
 
       def get_torrent_seed_ratio torrent_hash, default_ratio
-        webui.properties( torrent_hash ).fetch('share_ratio', default_ratio)
+        normalize_percent(
+          webui.properties( torrent_hash ).fetch('share_ratio', default_ratio) )
       end
 
       def apply_seed_limits torrent_hashes, filters
@@ -226,6 +232,7 @@ module TorrentProcessor
       def populate_app_prefs
         prefs = webui.preferences
 
+        # Seed ratio is not provided by qBitTorrent at this time.
         @seed_ratio = 0
         @completed_downloads_dir = prefs.fetch('save_path', '')
 
@@ -246,11 +253,13 @@ module TorrentProcessor
           hash = t['hash']
           # qbt torrent data is split into the list data, and properties data.
           props = webui.properties hash
-          # Merge the properties data in to the list data.
-          converted_torrents[hash] = TorrentProcessor::Service::QBitTorrent::TorrentData.new(t.merge(props))
+          unless props.nil?
+            # Merge the properties data in to the list data.
+            converted_torrents[hash] = TorrentProcessor::Service::QBitTorrent::TorrentData.new(t.merge(props))
 
-          # Convert floating point percentages to integer where 1000 = 100%
-          converted_torrents[hash].normalize_percents
+            # Convert floating point percentages to integer where 1000 = 100%
+            converted_torrents[hash].normalize_percents
+          end
         end
 
         converted_torrents
