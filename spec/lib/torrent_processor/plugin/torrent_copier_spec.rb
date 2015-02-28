@@ -31,6 +31,7 @@ describe TorrentCopier do
       #end
       blocking_file_delete(File.join(completed_downloads, 'robocopy.log'))
       blocking_file_delete(File.join(target_dir, test_torrent))
+      generate_configuration test_root_dir
     end
 
     let(:completed_downloads) { File.join(test_root_dir, 'completed_downloads') }
@@ -81,6 +82,27 @@ describe TorrentCopier do
         TorrentCopier.new.execute(args, torrent_data)
         expect(File.exists?(File.join(target_dir, test_torrent))).to be true
         expect(File.exists?(File.join(target_dir, test_torrent, 'test_250kb.part06.rar'))).to be true
+      end
+
+      # qbtorrent will return the completed_dir for the torrent's filedir.
+      # The torrent's name will be a directory.
+      context 'torrent filedir IS completed dir' do
+
+        let(:data_dir)      { 'spec/data' }
+        let(:test_torrent)  { 'multi_rar' }
+        let(:torrent_data) do
+          {
+            :filename => test_torrent,
+            :filedir  => completed_downloads,
+            :label    => 'TV'
+          }
+        end
+
+        it "copies a directory to the configured destination directory" do
+          TorrentCopier.new.execute(args, torrent_data)
+          expect(File.exists?(File.join(target_dir, test_torrent))).to be true
+          expect(File.exists?(File.join(target_dir, test_torrent, 'test_250kb.part06.rar'))).to be true
+        end
       end
     end
   end

@@ -145,7 +145,16 @@ module TorrentProcessor
           config.utorrent.seed_ratio              = seed_ratio
           config.utorrent.dir_completed_download  = dir_completed_download
         end
+
+      when 'qBitTorrent'
+        # Store utorrent data in the configuration object.
+        TorrentProcessor.configure do |config|
+          config.qbtorrent.seed_ratio              = seed_ratio
+          config.qbtorrent.dir_completed_download  = dir_completed_download
+        end
       end
+
+      TorrentProcessor.save_configuration
 
       log( "    #{app_name} seed ratio: #{seed_ratio.to_s}" )
       log( "    #{app_name} completed download dir: #{dir_completed_download}" )
@@ -237,7 +246,7 @@ module TorrentProcessor
         torrents.each do |hash, t|
           database.delete_torrent( hash )
           # Log it
-          log( "Torrent removed (NOT requested): #{t.name}" )
+          log( "Torrent removed (NOT requested): #{hash}" )
         end
 
     end
@@ -287,7 +296,12 @@ module TorrentProcessor
 
           begin
 
-            ProcessorPluginManager.execute_each( { :logger => @logger }, torrent)
+            args = {
+              :logger => @logger,
+              :cfg => cfg,
+              :database => database,
+            }
+            ProcessorPluginManager.execute_each( args, torrent)
 
             # For each torrent, if processed successfully (file copied), set state = STATE_PROCESSED
             database.update_torrent_state( r[0], STATE_PROCESSED )
@@ -349,7 +363,7 @@ module TorrentProcessor
     # Determine the target seed ratio for a torrent.
     #
     def get_target_seed_ratio(name, hash)
-      base_ratio = TorrentProcessor.configuration.utorrent.seed_ratio
+      base_ratio = TorrentProcessor.configuration.seed_ratio
 
       # This torrent may have an overridden target seed ratio.
       target_ratio = torrent_app.get_torrent_seed_ratio hash, base_ratio
@@ -361,7 +375,10 @@ module TorrentProcessor
       # Add some padding to the target ratio since the final ratio is almost
       # never exactly reached.
       # 5 = .05 percent.
-      target_ratio = target_ratio - 5
+      if target_ratio > 5
+        target_ratio = target_ratio - 5
+      end
+      target_ratio
     end
 
 

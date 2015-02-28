@@ -87,7 +87,12 @@ module TorrentProcessor::Service
       # Do a straight system copy if running on unix (robocopy doesn't exist).
       if Ktutils::OS.unix?
         src_path = Pathname(src_dir)
-        dest_path = Pathname(dest_dir)
+        # We have to split the final dir name off or we end up with
+        # some/dest/path/torrent_dir/torrent_dir after the copy.
+        # Freakin robocopy REQUIRES the torrent_dir on the dest path or
+        # it dumps the CONTENTS of the dir being copied into the dest dir
+        # (ie. it doesn't create the dest dir).
+        dest_path = Pathname(dest_dir).split[0]
         dest_path.mkpath
         begin
           FileUtils.cp_r src_path, dest_dir

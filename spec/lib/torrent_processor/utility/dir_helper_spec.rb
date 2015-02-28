@@ -26,6 +26,7 @@ describe TorrentProcessor::Utility::DirHelper do
           config.movie_processing = movie_dir
           config.other_processing = other_dir
 
+          config.backend = :utorrent
           config.utorrent.dir_completed_download = download_dir
         end
       end
@@ -82,6 +83,7 @@ describe TorrentProcessor::Utility::DirHelper do
           config.movie_processing = movie_dir
           config.other_processing = other_dir
 
+          config.backend = :utorrent
           config.utorrent.dir_completed_download = download_dir
         end
       end
@@ -108,7 +110,7 @@ describe TorrentProcessor::Utility::DirHelper do
           let(:current_dir) { File.join(download_dir, 'sub_dir') }
 
           it 'returns the destination directory' do
-            expect(subject.destination(current_dir, torrent_name, label)).to eq movie_dir #File.join(movie_dir, 'sub_dir', torrent_name)
+            expect(subject.destination(current_dir, torrent_name, label)).to eq movie_dir
           end
 
           context 'torrent name IS the subdirectory name' do
@@ -117,7 +119,7 @@ describe TorrentProcessor::Utility::DirHelper do
             let(:torrent_name) { 'sub_dir' }
 
             it 'does not append the torrent name to the subdirectory' do
-              expect(subject.destination(current_dir, torrent_name, label)).to eq movie_dir #File.join(movie_dir, 'sub_dir')
+              expect(subject.destination(current_dir, torrent_name, label)).to eq movie_dir
             end
           end # context torrent name is subdirectory name
         end # context torrent in subdirectory

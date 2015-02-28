@@ -39,11 +39,26 @@ module TorrentProcessor
           :logger           => logger
         })
 
+      # qbtorrent returns the 'completed downloads' dir in torrent[:filedir]
+      # and the torrent[:filename] will be the folder name.
+      #
+      # Check to see if the path (completed_downloads/filedir) is a directory.
+      # If it is, pass it in as the torrent_dir instead of just the 'completed
+      # downloads' dir.
+      #
+      # This should result in dir_helper returning TRUE for the subdir?
+      #
+      torrent_dir = Pathname(torrent[:filedir])
+      potential_dir = torrent_dir + torrent[:filename]
+      if potential_dir.exist? && potential_dir.directory?
+        torrent[:filedir] = potential_dir
+      end
+
       dest_path = dir_helper.destination torrent[:filedir], torrent[:filename], torrent[:label]
 
       # Copy the torrent.
 
-      copy_torrent dest_path, dir_helper.subdirectory?
+      copy_torrent dest_path, dir_helper.subdirectory
 
       # Verify copy was successful.
 
@@ -61,14 +76,19 @@ module TorrentProcessor
       @other_processing = args[:other_processing]   if args[:other_processing]
       @tv_processing    = args[:tv_processing]      if args[:tv_processing]
       @movie_processing = args[:movie_processing]   if args[:movie_processing]
+
+      @completed_dir    ||= cfg.dir_completed_download
+      @other_processing ||= cfg.other_processing
+      @tv_processing    ||= cfg.tv_processing
+      @movie_processing ||= cfg.movie_processing
     end
 
     def defaults
       { :logger           => ::NullLogger,
-        :completed_dir    => TorrentProcessor.configuration.utorrent.dir_completed_download,
-        :other_processing => TorrentProcessor.configuration.other_processing,
-        :tv_processing    => TorrentProcessor.configuration.tv_processing,
-        :movie_processing => TorrentProcessor.configuration.movie_processing,
+        #:completed_dir    => cfg.dir_completed_download,
+        #:other_processing => cfg.other_processing,
+        #:tv_processing    => cfg.tv_processing,
+        #:movie_processing => cfg.movie_processing,
       }
     end
 
@@ -82,15 +102,19 @@ module TorrentProcessor
       @torrent = default_torrent_args.merge(args)
     end
 
-    def copy_torrent dest_path, is_dir
-      if is_dir
-        TorrentProcessor::Service::Robocopy.copy_dir(torrent[:filedir], dest_path, true, @logger)
-      else
+    def copy_torrent dest_path, subdir
+      if subdir.nil?
         TorrentProcessor::Service::Robocopy.copy_file(torrent[:filedir], dest_path, torrent[:filename], @logger)
+      else
+        dest_path = File.join(dest_path, subdir)
+        TorrentProcessor::Service::Robocopy.copy_dir(torrent[:filedir], dest_path, true, @logger)
       end # if
     end
 
     def verify_torrent_in_completed_download_dir
+      log '#'*40
+      log torrent.inspect
+      log "completed_dir: #{completed_dir}"
       if (!torrent[:filedir].include?( completed_dir ))
         log("    ERROR: Downloaded Torrent is not in the expected location.")
         log("           Torrent location: #{torrent[:filedir]}")

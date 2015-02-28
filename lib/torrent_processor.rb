@@ -32,7 +32,7 @@ module TorrentProcessor
 
   def self.save_configuration cfg_file = nil
     if cfg_file.nil?
-      if configuration.app_path.nil? || configuration.app_path.empty?
+      if configuration.app_path.nil? || configuration.app_path.to_s.empty?
         raise ArgumentError, 'Filename must be provided if app_path not provided'
       end
 
@@ -69,6 +69,16 @@ module TorrentProcessor
       @qbtorrent = QBitTorrentConfiguration.new
       @tmdb = TMdbConfiguration.new
       @filters = {}
+    end
+
+    def dir_completed_download
+      return utorrent.dir_completed_download if backend == :utorrent
+      qbtorrent.dir_completed_download
+    end
+
+    def seed_ratio
+      return utorrent.seed_ratio if backend == :utorrent
+      qbtorrent.seed_ratio
     end
 
     class UTorrentConfiguration
