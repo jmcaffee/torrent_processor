@@ -84,7 +84,7 @@ $$ List out the questions and what they are for $$
 
 ## Testing
 
-To successfully run the TMDb tests, you'll need you're TMDb API key (see above).
+To successfully run the TMDb tests, you'll need your TMDb API key (see above).
 Create a file named `.envsetup` in the project root containing the following:
 
     #!/bin/bash
