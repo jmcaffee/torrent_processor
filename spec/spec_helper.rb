@@ -192,6 +192,7 @@ class CaptureLogger < NullLogger
 end
 
 def generate_configuration dir_name, &block
+  dir_name = String(dir_name)
   cfg_file = File.join(dir_name, 'config.yml')
 
   rm cfg_file if File.exists? cfg_file
