@@ -21,17 +21,22 @@ TorrentProcessor also performs other processing tasks such as:
 
 ## Requirements
 
-TorrentProcessor works with the uTorrent BitTorrent client.
+TorrentProcessor works with either uTorrent or qBitTorrent Bit Torrent
+applications.
+
+__Note: uTorrent's WebUI has gotten extremely slow over the last few
+releases. It now takes ~ 2 mins. to get a list of torrents.__
+
+__Note: qBitTorrent doesn't support setting seed ratios via WebUI.__
 
 Additional applications are needed to perform some tasks (all free):
 
-- Robocopy - for copying/moving files
+- Robocopy - for copying/moving files (on windows)
 - 7-Zip    - for extracting RAR archives
 - TMdb API - for looking up movie info
 
 
 ## Installing
-
 
 ### Robocopy
 
@@ -65,6 +70,7 @@ your API key is located.
 
 Copy the API key and save it.
 
+---
 
 ## Configuration
 
@@ -79,10 +85,23 @@ Complete the questions with your information.
 
 $$ List out the questions and what they are for $$
 
+---
 
 ## Scheduling
 
+_ToDo_
+
+---
+
 ## Testing
+
+Testing with `guard` works better when running MRI ruby compared to jruby.
+For this reason, there's a script to make it easy to switch between the two
+rubies: `switchruby`
+
+Before starting guard, switch out of jruby.
+
+    switchruby
 
 To successfully run the TMDb tests, you'll need your TMDb API key (see above).
 Create a file named `.envsetup` in the project root containing the following:
@@ -94,9 +113,9 @@ Create a file named `.envsetup` in the project root containing the following:
 
 Replace `PUT_YOUR_KEY_HERE` with your API key and save it.
 
-Before running tests, in the terminal your start the tests from, source `.envsetup`
-file, then run your tests. The tests will look for the API key in the
-environment variables.
+Before running tests, in the terminal you'll start the tests from,
+source `.envsetup` file, then run your tests.
+The tests will look for the API key in the environment variables.
 
     $ source ./.envsetup
     $ bundle exec rspec
@@ -107,35 +126,22 @@ Or, if using guard:
     $ bundle exec guard
 
 `.envsetup` is ignored in `.gitignore` so you don't have to worry about your
-API key getting uploaded to the repo.
+API key getting uploaded/committed to the repo.
 
 ---
 
-= File:   README.txt
-= Purpose:  Additions, modifications and notes for TorrentProcessor.
-=
-= Copyright:  Copyright (c) 2011-2014, kTech Systems LLC. All rights reserved.
-= Website:    http://ktechsystems.com
-========================================================================
+## Building
 
-BUILDING THE PROJECT:
+Make sure you're using jruby to build the app distro.
 
-  Rake is used to build and install the project. By default, rake
-  will run all specs.
+    switchruby
 
-  Tasks to take note of:
+It should say `jruby 1.7.18`
 
+The following rake tasks will clean the build and dist dirs, then build
+the jars and scripts, and bundle the result into a 7-zip (7z) archive.
 
-    rake spec             # Runs all specs
-    rake spec_pretty      # Output spec results in document format
-    rake dist             # Clean, uninstall all versions of torrentprocessor
-                            gem, build the gem, install the gem,
-                            create the OCRA executable and create the
-                            installer (will be found in build dir).
-    rake exe              # Builds the OCRA executable
-    rake exe_installer    # Builds the OCRA executable and installer
+    rake build:clean dist:clean dist
 
-  So, to build the project:
-    rake spec   # make sure everything is good.
-    rake dist   # build installer
-  
+The distro can be found in `dist`.
+
