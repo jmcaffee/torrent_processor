@@ -6,6 +6,7 @@ setlocal
 set apppath=%~dp0
 set appdir=%apppath:~0,-1%
 
-java -jar %appdir%/<%= app_name.downcase %>-<%= app_version %>.jar <%= app_name.downcase %> %*
+echo Starting... this might take a few seconds...
+java -jar %appdir%/<%= app_name.snakecase %>-<%= app_version %>.jar <%= app_name.snakecase %> %*
 
 endlocal

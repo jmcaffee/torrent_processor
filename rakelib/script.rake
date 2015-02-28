@@ -8,6 +8,8 @@
 ##############################################################################
 
 require_relative 'lib/start_cmd_template'
+require_relative 'lib/start_sh_template'
+require_relative 'lib/ext/string'
 
 namespace :script do
   desc "generate a windows startup script"
@@ -21,5 +23,20 @@ namespace :script do
     templater.app_version = PKG_VERSION
     templater.template = 'rakelib/lib/templates/start.cmd.erb'
     templater.create_script script
+  end
+
+  desc "generate a 'nix startup script"
+  task :generate_sh do
+
+    script = "build/#{PROJNAME.snakecase}"
+    rm_f script if File.exists? script
+
+    templater = StartShTemplate.new
+    templater.app_name = PROJNAME
+    templater.app_version = PKG_VERSION
+    templater.template = 'rakelib/lib/templates/start.sh.erb'
+    templater.create_script script
+
+    File.chmod(0744, script)
   end
 end

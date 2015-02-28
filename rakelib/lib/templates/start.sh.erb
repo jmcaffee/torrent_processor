@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# Script file to execute <%= app_name %> <%= app_version %>
+#
+
+script=$( readlink -m $( type -p $0 ))
+appdir=`dirname ${script}`
+
+echo Starting... this might take a few seconds...
+java -jar $appdir/<%= app_name.snakecase %>-<%= app_version %>.jar <%= app_name.snakecase %> "$@"
+
