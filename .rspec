@@ -2,6 +2,6 @@
 --format documentation
 --require rspec/its
 --require pry
-#--seed 30821
+#--seed 50528
 
 config.raise_errors_for_deprecations!
