@@ -7,4 +7,5 @@ require_relative 'utility/loggers'
 # Mixins
 require_relative 'utility/loggable'
 require_relative 'utility/verbosable'
+require_relative 'utility/normalizable'
 

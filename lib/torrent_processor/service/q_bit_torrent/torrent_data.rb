@@ -8,9 +8,11 @@
 # Website::   http://ktechsystems.com
 ##############################################################################
 
+
 module TorrentProcessor::Service::QBitTorrent
 
   class TorrentData
+    include TorrentProcessor::Utility::Normalizable
 
     attr_accessor :hash               # DB field
     attr_accessor :status             # DB field
@@ -50,6 +52,9 @@ module TorrentProcessor::Service::QBitTorrent
     def amount_in_bytes amount_txt
       # Handle infinity (why, oh why...)
       return amount_txt if amount_txt == '∞'
+
+      # amount_txt could be nil...
+      amount_txt ||= '0 B'
 
       # Ex: 646.8 KiB (657.8 KiB this session)
       # Remove (session info)
@@ -93,15 +98,12 @@ module TorrentProcessor::Service::QBitTorrent
 
     def normalize_percents
       self.percent_progress ||= 0.0
-      norm_progress = (percent_progress * 1000.0).floor
-      self.percent_progress = norm_progress
+      self.percent_progress = normalize_percent self.percent_progress
 
       self.ratio ||= 0.0
       norm_ratio = ratio
       norm_ratio = uploaded / downloaded if norm_ratio == "∞"
-      norm_ratio = Float(norm_ratio)
-      norm_ratio = (norm_ratio * 1000.0).floor
-      self.ratio = norm_ratio
+      self.ratio = normalize_percent norm_ratio
     end
 
     ###
