@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+rbv=.ruby-version
+rbvbk=bk.ruby-version
+
+mv $rbv /tmp
+mv $rbvbk $rbv
+mv /tmp/$rbv $rbvbk
+
+echo Ruby version switched
+cat $rbv
+
