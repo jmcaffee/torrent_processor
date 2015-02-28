@@ -155,7 +155,7 @@ module TorrentProcessor::Service::UTorrent
     # returns:: none
     #
     def torrents_removed?()
-      return false if (@removed_torrents.nil? || @removed_torrents.length == 0)
+      return false if (@torrents_removed.nil? || @torrents_removed.length == 0)
       return true
     end
 
