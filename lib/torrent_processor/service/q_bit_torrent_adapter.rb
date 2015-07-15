@@ -106,8 +106,10 @@ module TorrentProcessor
       end
 
       def get_torrent_seed_ratio torrent_hash, default_ratio
+        data = webui.properties torrent_hash
+        data ||= {}
         normalize_percent(
-          webui.properties( torrent_hash ).fetch('share_ratio', default_ratio) )
+          data.fetch('share_ratio', default_ratio) )
       end
 
       def apply_seed_limits torrent_hashes, filters
