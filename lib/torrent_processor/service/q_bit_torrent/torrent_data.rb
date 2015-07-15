@@ -50,6 +50,10 @@ module TorrentProcessor::Service::QBitTorrent
     #
 
     def amount_in_bytes amount_txt
+      if amount_txt.is_a? Integer or amount_txt.is_a? Float or amount_txt.is_a? Fixnum
+        return amount_txt
+      end
+
       # Handle infinity (why, oh why...)
       return amount_txt if amount_txt == '∞'
 
