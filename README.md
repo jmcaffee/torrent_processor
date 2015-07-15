@@ -145,3 +145,15 @@ the jars and scripts, and bundle the result into a 7-zip (7z) archive.
 
 The distro can be found in `dist`.
 
+---
+
+## Contributing
+
+1. Fork it ( https://github.com/jmcaffee/torrent_processor/fork )
+1. Clone it (`git clone git@github.com:[my-github-username]/ktutils.git`)
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Create tests for your feature branch
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create a new Pull Request
+
