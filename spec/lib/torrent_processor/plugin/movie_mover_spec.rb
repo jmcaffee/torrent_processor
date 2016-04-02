@@ -28,9 +28,9 @@ describe MovieMover do
         generate_movie_set(root_src_dir, 'movie_1', '.avi')
       end
 
-      let(:total_recall_file) {'Total Recall-Dvdrip-H264-MRFIXIT'}
-      let(:total_recall_dir)  do
-        generate_movie_set(root_src_dir, total_recall_file, '.mp4')
+      let(:big_hero_file) {'Big Hero 6-Dvdrip-H264-MRFIXIT'}
+      let(:big_hero_dir)  do
+        generate_movie_set(root_src_dir, big_hero_file, '.mp4')
       end
 
       let(:bridesmaids_file)  {'Brides Maids 2011 DVDRiP XciD AC3 - BHRG'}
@@ -48,17 +48,17 @@ describe MovieMover do
         generate_movie_set(root_src_dir, ateam_file, '.mkv')
       end
 
-      let(:total_recall_title)        { 'Total.Recall.(2012)'       }
+      let(:big_hero_title)            { 'Big.Hero.6.(2014)'       }
       let(:bridesmaids_title)         { 'Bridesmaids.(2011)'        }
       let(:cowboys_title)             { 'Cowboys.and.Aliens.(2011)' }
       let(:ateam_title)               { 'The.A-Team.(2010)'         }
 
-      let(:total_recall_final_file)   { total_recall_title + '.mp4' }
+      let(:big_hero_final_file)       { big_hero_title + '.mp4' }
       let(:bridesmaids_final_file)    { bridesmaids_title  + '.avi' }
       let(:cowboys_final_file)        { cowboys_title      + '.mkv' }
       let(:ateam_final_file)          { ateam_title        + '.mkv' }
 
-      let(:total_recall_final_file_path)  { File.join(root_dest_dir, total_recall_title, total_recall_final_file) }
+      let(:big_hero_final_file_path)      { File.join(root_dest_dir, big_hero_title,     big_hero_final_file) }
       let(:bridesmaids_final_file_path)   { File.join(root_dest_dir, bridesmaids_title,  bridesmaids_final_file ) }
       let(:cowboys_final_file_path)       { File.join(root_dest_dir, cowboys_title,      cowboys_final_file )     }
       let(:ateam_final_file_path)         { File.join(root_dest_dir, ateam_title,        ateam_final_file )       }
@@ -69,7 +69,7 @@ describe MovieMover do
         blocking_dir_delete root_src_dir
 
         # Create the test files.
-        total_recall_dir
+        big_hero_dir
         bridesmaids_dir
         cowboys_dir
         ateam_dir
@@ -80,7 +80,7 @@ describe MovieMover do
 
 
     it "#get_video_file returns largest file in directory" do
-      expect(mover.get_video_file(total_recall_dir).end_with?(total_recall_file + '.mp4')).to eq true
+      expect(mover.get_video_file(big_hero_dir).    end_with?(big_hero_file     + '.mp4')).to eq true
       expect(mover.get_video_file(bridesmaids_dir). end_with?(bridesmaids_file  + '.avi')).to eq true
       expect(mover.get_video_file(cowboys_dir).     end_with?(cowboys_file      + '.mkv')).to eq true
       expect(mover.get_video_file(ateam_dir).       end_with?(ateam_file        + '.mkv')).to eq true
@@ -89,8 +89,8 @@ describe MovieMover do
     it "#process processes all directories in the root movie directory" do
       mover.process(root_src_dir, root_dest_dir, -1, -1)
 
-      expect(File.exist?(total_recall_final_file_path)).to eq true
-      expect(File.exist?(total_recall_dir)).to eq false
+      expect(File.exist?(big_hero_final_file_path)).to eq true
+      expect(File.exist?(big_hero_dir)).to eq false
 
       expect(File.exist?(bridesmaids_final_file_path)).to eq true
       expect(File.exist?(bridesmaids_dir)).to eq false
