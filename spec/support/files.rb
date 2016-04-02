@@ -15,6 +15,16 @@ def spec_dbg msg
   puts '+ ' + msg.to_s
 end
 
+def wait_for_file filename
+  tries = 0
+  max_tries = 5
+
+  while !filename.size? && tries < max_tries
+    sleep 1
+    tries += 1
+  end
+end
+
 def create_rar_file dest_dir
   dest_dir = Pathname(dest_dir)
   src = spec_data_dir + 'multi_rar/*.rar'
@@ -24,6 +34,9 @@ def create_rar_file dest_dir
   files.each do |f|
     cp f, dest_dir
   end
+
+  last_file = Pathname(dest_dir) + Pathname(files.last).basename
+  wait_for_file last_file
 
   spec_dbg "Created multi_rar archive in #{dest_dir}"
   dest_dir
