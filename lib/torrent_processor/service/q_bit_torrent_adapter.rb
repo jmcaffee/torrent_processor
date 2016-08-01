@@ -287,7 +287,7 @@ module TorrentProcessor
         log tab + "trackers: "
         trackers.each do |tracker|
           log tab + tab + "msg:       " + tracker.fetch("msg")
-          log tab + tab + "num_peers: " + tracker.fetch("num_peers")
+          log tab + tab + "num_peers: " + tracker.fetch("num_peers").to_s
           log tab + tab + "status:    " + tracker.fetch("status")
           log tab + tab + "url:       " + tracker.fetch("url")
           log tab + tab + "-"*10
