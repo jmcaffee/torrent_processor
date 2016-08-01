@@ -36,6 +36,14 @@ module TorrentProcessor
 
       @cfg = TorrentProcessor.configuration
 
+      unless File.exist?(@cfg.app_path)
+        puts ""
+        puts "missing configuration file at #{@cfg.app_path}"
+        puts "use '--init' command to create config file."
+        puts ""
+        return
+      end
+
       init_services
 
       @setup = TPSetup.new(
