@@ -18,7 +18,6 @@ module TorrentProcessor
   class Controller
 
   attr_reader     :cfg
-  attr_reader     :setup
 
     ###
     # Constructor
@@ -39,19 +38,22 @@ module TorrentProcessor
       unless File.exist?(@cfg.app_path)
         puts ""
         puts "missing configuration file at #{@cfg.app_path}"
-        puts "use '--init' command to create config file."
         puts ""
         return
       end
 
       init_services
+    end
 
-      @setup = TPSetup.new(
+    def setup
+      @setup ||= TPSetup.new(
         {
           :logger   => Runtime.service.logger,
           :database => Runtime.service.database
         }
       )
+
+      @setup
     end
 
     ###
@@ -78,17 +80,23 @@ module TorrentProcessor
     end
 
 
+    def validate_setup_complete!()
+      if !setup.check_setup_completed()
+        # Force the user to configure the application if it has not yet been configured.
+        puts "Torrent Processor has not yet been configured."
+        puts "Run Torrent Processor with the --init option to configure it."
+
+        log "Torrent Processor has not yet been configured."
+        log "Run Torrent Processor with the --init option to configure it."
+        exit
+      end
+    end
+
+
     ###
     # Tell user if setup needs to be completed, then process torrents.
     #
     def process()
-      if !@setup.check_setup_completed()
-        # Force the user to configure the application if it has not yet been configured.
-        log "Torrent Processor has not yet been configured."
-        log "Run Torrent Processor with the -init option to configure it."
-        exit
-      end
-
       Runtime.service.processor.process()
     end
 
@@ -149,7 +157,7 @@ module TorrentProcessor
     # Run Torrent Processor in interactive mode
     #
     def interactive_mode()
-      if !@setup.check_setup_completed()
+      if !setup.check_setup_completed()
         # Tell the user to configure the application if it has not yet been configured.
         puts
         puts "*"*10
@@ -167,7 +175,7 @@ module TorrentProcessor
     # Setup the application
     #
     def setup_app()
-      @setup.setup_app()
+      setup.setup_app()
 
     end
 
@@ -176,10 +184,10 @@ module TorrentProcessor
     end
 
     def upgrade_app
-      if ! @setup.config_needs_upgrade?
+      if ! setup.config_needs_upgrade?
         puts 'Configuration file is up to date. Skipping config upgrade.'
       else
-        @setup.upgrade_config cfg.app_data
+        setup.upgrade_config cfg.app_data
       end
 
       puts 'Attempting database upgrade'
@@ -193,7 +201,9 @@ module TorrentProcessor
     # Write message to torrentprocessor log
     #
     def log(msg)
-      Runtime.service.logger.log msg
+      unless Runtime.service.logger.nil?
+        Runtime.service.logger.log msg
+      end
     end
   end # class Controller
 

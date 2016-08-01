@@ -122,6 +122,8 @@ class TorrentProcessorApp < UserChoices::Command
       return
     end
 
+    @controller.validate_setup_complete!
+
     if(@user_choices[:upgrade])
       puts TorrentProcessor::logo()
       puts

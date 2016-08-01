@@ -246,7 +246,7 @@ module TorrentProcessor
     # returns:: false if DB doesn't exist
     #
     def db_exists?()
-      return File.exists?(database.filepath)
+      return (!database.nil? && File.exists?(database.filepath))
     end
 
     ###
@@ -455,6 +455,9 @@ module TorrentProcessor
         FileUtils.rm(database.filepath)
       end
 
+      if @db.nil?
+        @db = Database.new( :cfg => TorrentProcessor.configuration )
+      end
       puts "Creating database..."
       database.create_database
     end
