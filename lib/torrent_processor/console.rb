@@ -405,10 +405,10 @@ module TorrentProcessor
     #
 
     def update_plugins_verbose_mode flag
-      @torrent_app.verbose  = flag
-      @database.verbose     = flag
-      @database.logger      = logger
-      @processor.verbose    = flag
+      torrent_app.verbose  = flag
+      database.verbose     = flag
+      database.logger      = logger
+      processor.verbose    = flag
     end
   end # class Console
 end # module TorrentProcessor
