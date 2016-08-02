@@ -18,8 +18,8 @@ gem "xml-simple"
 gem "themoviedb"
 
 group :development do
-  gem 'puck',       ">=1.0.0.pre",  :require => false
-  gem 'jruby-jars', "= 1.7.18",     :require => false
+  gem 'puck',       "~> 1.2.4"#,  :require => false
+  gem 'jruby-jars', "= 1.7.22"#,     :require => false
 
   gem 'rdoc',               :require => false
   gem 'guard',              :require => false
