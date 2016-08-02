@@ -13,17 +13,19 @@ module Mocks
       cfg.other_processing  = File.join(tmp_dir, 'media/other')
       cfg.filters           = {}
 
-      cfg.utorrent.ip                     = '192.168.1.103'
+      #cfg.utorrent.ip                     = '192.168.1.103'
+      cfg.utorrent.ip                     = '127.0.0.1'
       cfg.utorrent.port                   = '8082'
       cfg.utorrent.user                   = 'admin'
       cfg.utorrent.pass                   = 'abc'
       cfg.utorrent.dir_completed_download = File.join(tmp_dir, 'torrents/completed')
       cfg.utorrent.seed_ratio             = 0
 
-      cfg.qbtorrent.ip                     = '192.168.1.103'
+      #cfg.qbtorrent.ip                     = '192.168.1.103'
+      cfg.qbtorrent.ip                     = '127.0.0.1'
       cfg.qbtorrent.port                   = '8083'
       cfg.qbtorrent.user                   = 'admin'
-      cfg.qbtorrent.pass                   = 'abc'
+      cfg.qbtorrent.pass                   = 'abcabc'
       cfg.qbtorrent.dir_completed_download = File.join(tmp_dir, 'torrents/completed')
       cfg.qbtorrent.seed_ratio             = 0
 

@@ -83,13 +83,13 @@ Start TorrentProcessor with the --init command line option.
 
 Complete the questions with your information.
 
-$$ List out the questions and what they are for $$
+_$$ List out the questions and what they are for $$_
 
 ---
 
 ## Scheduling
 
-_ToDo_
+_$$ ToDo $$_
 
 ---
 
@@ -145,12 +145,19 @@ the jars and scripts, and bundle the result into a 7-zip (7z) archive.
 
 The distro can be found in `dist`.
 
+### Cannot run program "ant"
+
+If you see the this error while building or running `rake`, you'll need to
+install `ant` (the `puck` gem uses ant to build the final jars).
+
+    sudo apt-get install -y ant
+
 ---
 
 ## Contributing
 
 1. Fork it ( https://github.com/jmcaffee/torrent_processor/fork )
-1. Clone it (`git clone git@github.com:[my-github-username]/ktutils.git`)
+1. Clone it (`git clone git@github.com:[my-github-username]/torrent_processor.git`)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Create tests for your feature branch
 4. Commit your changes (`git commit -am 'Add some feature'`)

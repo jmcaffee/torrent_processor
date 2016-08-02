@@ -1,6 +1,6 @@
 --- !ruby/object:TorrentProcessor::Configuration
 utorrent: !ruby/object:TorrentProcessor::Configuration::UTorrentConfiguration
-  ip: 192.168.1.103
+  ip: 127.0.0.1
   port: '8082'
   user: admin
   pass: abc

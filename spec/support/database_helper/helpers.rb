@@ -44,7 +44,8 @@ module DatabaseHelper
     cfg.other_processing  = File.join(tmp_path, 'media/other')
     cfg.filters           = {}
 
-    cfg.utorrent.ip                     = '192.168.1.103'
+    #cfg.utorrent.ip                     = '192.168.1.103'
+    cfg.utorrent.ip                     = '127.0.0.1'
     cfg.utorrent.port                   = '8082'
     cfg.utorrent.user                   = 'admin'
     cfg.utorrent.pass                   = 'abc'

@@ -1,4 +1,5 @@
 require 'rspec/mocks/standalone'
+require 'qbt_client'
 
 module Mocks
 
