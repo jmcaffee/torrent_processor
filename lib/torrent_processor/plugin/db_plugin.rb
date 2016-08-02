@@ -149,8 +149,16 @@ module TorrentProcessor::Plugin
 
       return true unless rows.length > 0
 
-      q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE (tp_state = \"#{from}\"#{and_id});"
-      q = "UPDATE torrents SET tp_state = \"#{to}\" WHERE (tp_state IS NULL#{and_id});" if from == "NULL" || from == "null"
+      if to != "NULL"
+        to = "\"#{to}\""
+      end
+
+      if from != "NULL" && from != "null"
+        from = "\"#{from}\""
+      end
+
+      q = "UPDATE torrents SET tp_state = #{to} WHERE (tp_state = #{from}#{and_id});"
+      q = "UPDATE torrents SET tp_state = #{to} WHERE (tp_state IS NULL#{and_id});" if from == "NULL" || from == "null"
 
       #log "Executing query: #{q} :"
       rows = database.execute( q )
@@ -167,8 +175,8 @@ module TorrentProcessor::Plugin
       cmd = args.fetch(:cmd)
       parse_args args
 
-      Formatter.print_header "ID | Ratio | Name"
-      q = "SELECT id,ratio,name from torrents;"
+      Formatter.print_header "ID | Ratio | Target Ratio | Name"
+      q = "SELECT id,ratio,target_ratio,name from torrents;"
       Formatter.print_query_results( database.read( q ) )
       return true
     end
