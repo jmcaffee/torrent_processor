@@ -17,9 +17,9 @@
 
 module TorrentProcessor
 
-  VERSION = "1.0.0.beta" unless constants.include?("VERSION")
+  VERSION = "1.1.0.beta" unless constants.include?("VERSION")
   APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
-  COPYRIGHT = "Copyright (C) 2015 Jeff McAffee" unless constants.include?("COPYRIGHT")
+  COPYRIGHT = "Copyright (C) 2016 Jeff McAffee" unless constants.include?("COPYRIGHT")
 
 
 
