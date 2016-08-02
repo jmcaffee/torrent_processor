@@ -5,14 +5,6 @@ GIT
     ktcommon (0.0.7)
       git_store
 
-GIT
-  remote: git@github.com:jmcaffee/qbt_client.git
-  revision: f86824d71718e8f8cb1a0b44ce95763663b7327d
-  branch: v1.0.0
-  specs:
-    qbt_client (1.0.0)
-      httparty (~> 0.7)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -52,7 +44,7 @@ GEM
     hitimes (1.2.2-java)
     hoe (3.7.3)
       rake (>= 0.8, < 11.0)
-    httparty (0.13.5)
+    httparty (0.13.7)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
     interception (0.5)
@@ -96,6 +88,8 @@ GEM
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
     puck (1.0.0.pre4)
+    qbt_client (1.0.0)
+      httparty (~> 0.7)
     rake (10.1.0)
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
@@ -165,7 +159,7 @@ DEPENDENCIES
   pry-rescue
   pry-stack_explorer
   puck (>= 1.0.0.pre)
-  qbt_client!
+  qbt_client (~> 1.0.0)
   rb-readline
   rdoc
   rspec
@@ -177,3 +171,6 @@ DEPENDENCIES
   themoviedb
   user-choices
   xml-simple
+
+BUNDLED WITH
+   1.11.2

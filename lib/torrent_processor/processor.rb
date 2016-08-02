@@ -173,7 +173,10 @@ module TorrentProcessor
         torrents_to_update = rows.map { |r| { hash: r[0], name: r[2] } }
 
         # Apply seed limits to given torrents.
-        torrent_app.apply_seed_limits torrents_to_update, cfg.filters
+        # FIXME: Implement app stored target ratios once qBitTorrent allows
+        # sending/receiving target ratios.
+        #torrent_app.apply_seed_limits torrents_to_update, cfg.filters
+        apply_seed_limits torrents_to_update, cfg.filters
     end
 
 
@@ -345,6 +348,11 @@ module TorrentProcessor
         # For each torrent, if ratio >= target ratio
         rows.each do |r|
           target_ratio = get_target_seed_ratio( r[2], r[0] )
+          log "Torrent [#{r[2]}] current ratio: #{r[1]}"
+
+          # Infinite seeding if target ratio is -1
+          next if target_ratio < 0
+
           if ( Integer(r[1]) >= target_ratio )
             # Set state = STATE_REMOVING
             database.update_torrent_state( r[0], STATE_REMOVING )
@@ -362,14 +370,22 @@ module TorrentProcessor
     ###
     # Determine the target seed ratio for a torrent.
     #
+    # Because qBitTorrent does not yet support sending/receiving target ratios
+    # on a per-torrent basis, we'll handle our own targets through the DB.
+    #
     def get_target_seed_ratio(name, hash)
       base_ratio = TorrentProcessor.configuration.seed_ratio
 
       # This torrent may have an overridden target seed ratio.
-      target_ratio = torrent_app.get_torrent_seed_ratio hash, base_ratio
+      # FIXME: Implement app stored target ratios once qBitTorrent allows
+      # sending/receiving target ratios.
+      #target_ratio = torrent_app.get_torrent_seed_ratio hash, base_ratio
+      target_ratio = database.read_torrent_target_ratio hash
       if target_ratio != base_ratio
         log( "Torrent [#{name}] has overridden target seed ratio" )
         log( "  target ratio = #{target_ratio}" )
+      else
+        log( "Torrent [#{name}] target seed ratio: #{target_ratio}" )
       end
 
       # Add some padding to the target ratio since the final ratio is almost
@@ -394,5 +410,17 @@ module TorrentProcessor
                       cfg.tmdb.can_copy_stop_time)
       end
     end
+
+    private
+
+      def apply_seed_limits torrents_to_update, filters
+        changes = torrent_app.apply_seed_limits torrents_to_update, filters
+
+        if changes.is_a? Hash
+          changes.each do |hash, limit|
+            database.update_torrent_target_ratio hash, limit
+          end
+        end
+      end
   end # class Processor
 end # module TorrentProcessor

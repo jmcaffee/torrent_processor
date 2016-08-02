@@ -264,6 +264,32 @@ module TorrentProcessor
 
 
     ###
+    # Read a torrent's target ratio
+    #
+    # returns:: target ratio
+    #
+    def read_torrent_target_ratio(hash)
+      log "DB: Read torrent target ratio: #{hash}" if verbose
+      result = adapter.read( "SELECT target_ratio FROM torrents WHERE hash = \"#{hash}\";" )
+      result[0][0]
+    end
+
+
+    ###
+    # Update a torrents target ratio
+    #
+    # hash:: Hash of Torrent
+    # ratio:: target ratio
+    #
+    def update_torrent_target_ratio(hash, ratio)
+      ratio = Integer(ratio)
+      query = "UPDATE torrents SET target_ratio = #{ratio} WHERE hash = \"#{hash}\";"
+      log "DB: Update torrent target ratio: #{query}" if verbose
+      return adapter.update( query )
+    end
+
+
+    ###
     # Create the cache id
     #
     # cache_id
@@ -417,12 +443,13 @@ EOQ
         :msg              => row[9],
         :folder           => row[10],
         :tp_state         => row[11],
+        :target_ratio     => row[12],
       }
     end
 
     class Schema
       # Update SCHEMA_VERSION when new migrations are added.
-      SCHEMA_VERSION = 2 unless defined?(SCHEMA_VERSION)
+      SCHEMA_VERSION = 3 unless defined?(SCHEMA_VERSION)
 
       def self.create_base_schema( db )
         schema = <<EOQ
@@ -439,7 +466,8 @@ CREATE TABLE IF NOT EXISTS torrents (
   label TEXT,
   msg TEXT,
   folder TEXT,
-  tp_state TEXT DEFAULT NULL
+  tp_state TEXT DEFAULT NULL,
+  target_ratio NUMERIC DEFAULT 0
 );
 EOQ
         db.execute( schema )
@@ -535,7 +563,7 @@ EOQ
 
       def self.perform_migrations(db)
         return unless db.schema_version < SCHEMA_VERSION
-        migrate_to_v2(db)
+        migrate_to_v3(db)
       end
 
       def self.migrate_to_v1(db)
@@ -614,6 +642,66 @@ EOQ
 
         db.execute('PRAGMA user_version = 2;')
         db.log "v2 migration complete." if db.verbose
+      end
+
+      def self.migrate_to_v3(db)
+        migrate_to_v2 db
+
+        ver = db.schema_version
+        return if ver >= 3
+        db.log "Migrating DB to v3..." if db.verbose
+
+        # Copy existing table to tmp table
+        result = db.execute("CREATE TABLE 'new_torrents' AS SELECT * FROM 'torrents';")
+        result = db.execute("DROP TABLE 'torrents';")
+
+        # Recreate the old table, adding new target_ratio column
+        schema = <<EOQ
+-- Create the torrents table
+CREATE TABLE IF NOT EXISTS torrents (
+  id INTEGER PRIMARY KEY,
+  hash TEXT UNIQUE,
+  created TEXT,
+  modified TEXT,
+  status TEXT,
+  name TEXT,
+  percent_progress NUMERIC,
+  ratio NUMERIC,
+  label TEXT,
+  msg TEXT,
+  folder TEXT,
+  tp_state TEXT DEFAULT NULL,
+  target_ratio NUMERIC DEFAULT 0
+);
+EOQ
+        db.execute( schema )
+
+        # Copy torrent data from tmp table to updated torrents table
+        rows = db.execute("SELECT * FROM 'new_torrents';")
+        rows.each do |row|
+          q = <<EOQ
+INSERT OR REPLACE INTO torrents (
+  hash,
+  status,
+  name,
+  percent_progress,
+  ratio,
+  label,
+  msg,
+  folder,
+  tp_state
+)
+values ("#{row[0]}", "#{row[1]}", "#{row[2]}", #{row[3]}, #{row[4]}, "#{row[5]}", "#{row[6]}", "#{row[7]}", "#{row[8]}");
+EOQ
+
+          result = db.execute q
+        end
+
+        # Cleanup the tmp table
+        result = db.execute("DROP TABLE 'new_torrents';")
+
+        db.execute('PRAGMA user_version = 3;')
+        db.log "v3 migration complete." if db.verbose
       end
     end # class
   end # class Database
