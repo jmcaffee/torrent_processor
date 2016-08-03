@@ -10,7 +10,7 @@
 require 'find'
 require 'logger'
 require 'ktutils/os'
-require 'torrent_processor/version'
+require_relative 'torrent_processor/version'
 
 module TorrentProcessor
   class << self
@@ -124,16 +124,16 @@ end
 ##############################################################################
 # Require each lib file
 #
-require 'torrent_processor/utility'
-require 'torrent_processor/service'
-require 'torrent_processor/controller'
-require 'torrent_processor/processor'
-require 'torrent_processor/runtime'
-require 'torrent_processor/tp_setup'
-require 'torrent_processor/database'
-require 'torrent_processor/console'
-require 'torrent_processor/plugin'
-require 'torrent_processor/torrent_app'
+require_relative 'torrent_processor/utility'
+require_relative 'torrent_processor/service'
+require_relative 'torrent_processor/controller'
+require_relative 'torrent_processor/processor'
+require_relative 'torrent_processor/runtime'
+require_relative 'torrent_processor/tp_setup'
+require_relative 'torrent_processor/database'
+require_relative 'torrent_processor/console'
+require_relative 'torrent_processor/plugin'
+require_relative 'torrent_processor/torrent_app'
 
 # If compiling with OCRA we want these gems available to us so we need
 # to require them.
