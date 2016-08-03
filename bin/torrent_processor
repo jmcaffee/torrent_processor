@@ -18,9 +18,9 @@
 #rescue LoadError
   # See https://github.com/iconara/puck/issues/12 re: LOAD_PATH
   #puts "raw path: #{File.expand_path("../../lib", __FILE__)}"
-  #path = File.expand_path("../../lib", __FILE__).sub(/^classpath:(C:\/)/, 'classpath:')
   #puts "path: #{path}"
   $LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
+  #path = File.expand_path("../../lib", __FILE__).sub(/^classpath:(C:\/)/, 'classpath:')
   #$LOAD_PATH.unshift(path)
   #puts 'LOAD_PATH:'
   #$LOAD_PATH.each do |p|

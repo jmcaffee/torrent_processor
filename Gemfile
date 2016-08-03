@@ -19,11 +19,13 @@ gem "themoviedb"
 
 group :development do
   gem 'puck',       "~> 1.2.4"#,  :require => false
-  gem 'jruby-jars', "= 1.7.22"#,     :require => false
+  #gem 'jruby-jars', "= 1.7.24"#,     :require => false
+  gem 'jruby-jars', "= 9.1.2.0"#,     :require => false
 
   gem 'rdoc',               :require => false
-  gem 'guard',              :require => false
-  gem 'guard-rspec',        :require => false
+end
+
+group :debug do
   gem 'pry',                :require => false
   gem 'pry-nav',            :require => false
   gem 'pry-rescue',         :require => false
@@ -32,6 +34,8 @@ group :development do
 end
 
 group :test do
+  gem 'guard',              :require => false
+  gem 'guard-rspec',        :require => false
   gem 'rspec'
   gem 'rspec-its'
   gem 'simplecov',          :require => false
