@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Script file to uninstall <%= app_name %> <%= app_version %>
+#
+
+script=$( readlink -m $( type -p $0 ))
+scriptdir=`dirname ${script}`
+
+appdir=/usr/local/src/<%= app_name.snakecase %>-<%= app_version %>
+exename=$appdir/<%= app_name.snakecase %>
+
+
+echo Uninstalling <%= app_name %> v<%= app_version %>...
+
+# Delete the link
+#
+if [[ -f /usr/local/bin/<%= app_name.snakecase %> ]]; then
+  rm /usr/local/bin/<%= app_name.snakecase %>
+fi
+
+# Delete the exe dir
+#
+if [[ -d $appdir ]]; then
+  rm -rf $appdir
+fi
+
+
+echo <%= app_name %> has been uninstalled from $appdir
+echo
+echo Please submit any bugs to https://github.com/jmcaffee/torrent_processor/issues
+echo
+

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#
+# Script file to install <%= app_name %> <%= app_version %>
+#
+
+script=$( readlink -m $( type -p $0 ))
+scriptdir=`dirname ${script}`
+
+appdir=/usr/local/src/<%= app_name.snakecase %>-<%= app_version %>
+exename=$appdir/<%= app_name.snakecase %>
+
+
+echo Installing <%= app_name %> v<%= app_version %>...
+
+if [[ -f /usr/local/bin/<%= app_name.snakecase %> ]]; then
+  echo An older version of <%= app_name %> appears to be installed.
+  echo Please uninstall the older version before installing <%= app_version %>.
+  exit 1
+fi
+
+# Create a version specific dir in /usr/local/src
+#
+mkdir -p $appdir
+
+# Copy contents of this script's directory to the new appdir
+#
+cp $scriptdir/* $appdir/
+
+# Make soft link from /usr/local/bin/<%= app_name.snakecase %> to appdir
+#
+ln -s $exename /usr/local/bin/<%= app_name.snakecase %>
+
+echo <%= app_name %> installed to $appdir
+echo You can uninstall <%= app_name %> by running $appdir/uninstall.sh.
+echo
+echo Please submit any bugs to https://github.com/jmcaffee/torrent_processor/issues
+echo
+

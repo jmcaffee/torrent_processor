@@ -9,6 +9,8 @@
 
 require_relative 'lib/start_cmd_template'
 require_relative 'lib/start_sh_template'
+require_relative 'lib/install_sh_template'
+require_relative 'lib/uninstall_sh_template'
 require_relative 'lib/ext/string'
 
 namespace :script do
@@ -35,6 +37,36 @@ namespace :script do
     templater.app_name = PROJNAME
     templater.app_version = PKG_VERSION
     templater.template = 'rakelib/lib/templates/start.sh.erb'
+    templater.create_script script
+
+    File.chmod(0755, script)
+  end
+
+  desc "generate a 'nix install script"
+  task :generate_install_sh do
+
+    script = "build/install.sh"
+    rm_f script if File.exists? script
+
+    templater = InstallShTemplate.new
+    templater.app_name = PROJNAME
+    templater.app_version = PKG_VERSION
+    templater.template = 'rakelib/lib/templates/install.sh.erb'
+    templater.create_script script
+
+    File.chmod(0744, script)
+  end
+
+  desc "generate a 'nix uninstall script"
+  task :generate_uninstall_sh do
+
+    script = "build/uninstall.sh"
+    rm_f script if File.exists? script
+
+    templater = UninstallShTemplate.new
+    templater.app_name = PROJNAME
+    templater.app_version = PKG_VERSION
+    templater.template = 'rakelib/lib/templates/uninstall.sh.erb'
     templater.create_script script
 
     File.chmod(0744, script)
