@@ -36,7 +36,7 @@ module TorrentProcessor::Service::QBitTorrent
       @name                 = torrent['name']
       @percent_progress     = torrent['progress']
       @ratio                = amount_in_bytes(torrent['share_ratio'])
-      @label                = '' # torrent['']  # Not supported in QBitTorrent
+      @label                = torrent['category']
       @msg                  = torrent['comment']
       @folder               = torrent['save_path']
       @uploaded             = amount_in_bytes(torrent['total_uploaded'])
