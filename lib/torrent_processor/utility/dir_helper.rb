@@ -63,8 +63,8 @@ module TorrentProcessor::Utility
 
     def final_directory label
       dest_path = @other_processing
-      dest_path = @tv_processing     if (label.include?("TV"))
-      dest_path = @movie_processing  if (label.include?("Movie"))
+      dest_path = @tv_processing     if (label.downcase.include?("tv"))
+      dest_path = @movie_processing  if (label.downcase.include?("movie"))
       dest_path
     end
 
