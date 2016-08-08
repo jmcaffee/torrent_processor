@@ -112,21 +112,25 @@ module TorrentProcessor
     end
 
     def verify_torrent_in_completed_download_dir
+      tmp_completed_dir = completed_dir
+      tmp_file_dir = torrent[:filedir]
+
       log '#'*40
       log torrent.inspect
-      log "completed_dir: #{completed_dir}"
-      if (!torrent[:filedir].include?( completed_dir ))
+      log "completed_dir: #{tmp_completed_dir}"
+      if (!tmp_file_dir.include?( tmp_completed_dir ))
         log("    ERROR: Downloaded Torrent is not in the expected location.")
-        log("           Torrent location: #{torrent[:filedir]}")
-        log("           Expected location: #{completed_dir} -- or a subdirectory of this location.")
+        log("           Torrent location: #{tmp_file_dir}")
+        log("           Expected location: #{tmp_completed_dir} -- or a subdirectory of this location.")
         log("    Copy operation will be attempted later.")
         raise PluginError, 'Torrent download not yet completed'
       end
     end
 
     def verify_successful_copy target_path
-      if( !File.exists?(target_path) )
-        log ("    ERROR: Unable to verify that target exists. Target path: #{target_path}")
+      tmp_target_path = target_path
+      if( !File.exists?(tmp_target_path) )
+        log ("    ERROR: Unable to verify that target exists. Target path: #{tmp_target_path}")
         raise PluginError, 'Torrent copy failed'
       end
     end
