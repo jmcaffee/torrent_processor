@@ -59,13 +59,28 @@ end
 task :default => [:spec]
 
 desc "Build jar and scripts"
-task :build => [BUILDDIR, :jar, 'script:generate_cmd', 'script:generate_sh'] do
+task :build => [BUILDDIR, :jar, 'script:generate_cmd', 'script:generate_sh', 'script:generate_install_sh', 'script:generate_uninstall_sh'] do
 end
 
 namespace :build do
   desc "Clean build dir"
   task :clean do
     rm_rf 'build'
+  end
+
+  task :drop do
+    # If we don't expand the path, the `exist?` method doesn't find the path
+    # even if it exists.
+    dropdir = Pathname(Pathname("~/Dropbox/torrents").expand_path)
+    if dropdir.exist?
+      jarfile = "#{PROJNAME.snakecase}-#{PKG_VERSION}.jar"
+      rm_f "#{dropdir}/#{jarfile}"
+      cd './build' do
+        sh "cp #{jarfile} #{dropdir}/"
+      end
+    else
+      puts "[build:drop] dropdir doesn't exist: #{dropdir}"
+    end
   end
 end
 
