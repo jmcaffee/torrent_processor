@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (C) 2015  Jeff McAffee
+#    Copyright (C) 2017  Jeff McAffee
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 
 module TorrentProcessor
 
-  VERSION = "1.1.1.beta" unless constants.include?("VERSION")
+  VERSION = "2.0.0.beta" unless constants.include?("VERSION")
   APPNAME = "TorrentProcessor" unless constants.include?("APPNAME")
-  COPYRIGHT = "Copyright (C) 2016 Jeff McAffee" unless constants.include?("COPYRIGHT")
+  COPYRIGHT = "Copyright (C) 2017 Jeff McAffee" unless constants.include?("COPYRIGHT")
 
 
 

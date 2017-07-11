@@ -140,6 +140,10 @@ Complete the questions with your information.
 
 _$$ List out the questions and what they are for $$_
 
++ When entering the Torrent client's IP address, make sure it includes the protocol:
+
+    http://127.0.0.1
+
 - - -
 
 Scheduling

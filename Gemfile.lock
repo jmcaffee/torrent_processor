@@ -65,8 +65,9 @@ GEM
       interception (>= 0.5)
       pry
     puck (1.2.4-java)
-    qbt_client (1.0.0)
+    qbt_client (2.0.0)
       httparty (~> 0.7)
+      json
     rake (11.2.2)
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
@@ -132,7 +133,7 @@ DEPENDENCIES
   pry-rescue
   pry-stack_explorer
   puck (~> 1.2.4)
-  qbt_client (~> 1.0.0)
+  qbt_client (~> 2.0.0)
   rb-readline
   rdoc
   rspec
