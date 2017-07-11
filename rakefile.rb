@@ -68,7 +68,7 @@ namespace :build do
     rm_rf 'build'
   end
 
-  task :drop do
+  task :drop_jar do
     # If we don't expand the path, the `exist?` method doesn't find the path
     # even if it exists.
     dropdir = Pathname(Pathname("~/Dropbox/torrents").expand_path)
@@ -79,7 +79,22 @@ namespace :build do
         sh "cp #{jarfile} #{dropdir}/"
       end
     else
-      puts "[build:drop] dropdir doesn't exist: #{dropdir}"
+      puts "[build:drop_jar] dropdir doesn't exist: #{dropdir}"
+    end
+  end
+
+  task :drop_dist do
+    # If we don't expand the path, the `exist?` method doesn't find the path
+    # even if it exists.
+    dropdir = Pathname(Pathname("~/Dropbox/torrents").expand_path)
+    if dropdir.exist?
+      distfile = "#{PROJNAME.snakecase}-#{PKG_VERSION}.7z"
+      rm_f "#{dropdir}/#{distfile}"
+      cd './dist' do
+        sh "cp #{distfile} #{dropdir}/"
+      end
+    else
+      puts "[build:drop_dist] dropdir doesn't exist: #{dropdir}"
     end
   end
 end
